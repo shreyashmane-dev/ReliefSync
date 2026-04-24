@@ -49,6 +49,8 @@ export const ReportsHome = () => {
   const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [imageUploadWarning, setImageUploadWarning] = useState<string | null>(null);
   const [confirmingReportId, setConfirmingReportId] = useState<string | null>(null);
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
 
@@ -91,16 +93,28 @@ export const ReportsHome = () => {
     setSelectedImages((current) => current.filter((file) => file.name !== name));
   };
 
-  const uploadReportImages = async () => {
-    if (!user?.id || selectedImages.length === 0) return [];
+  // Uploads images one-by-one, never throws — returns URLs of whichever uploads succeed.
+  const uploadReportImagesSafe = async (): Promise<{ urls: string[]; failed: number }> => {
+    if (!user?.id || selectedImages.length === 0) return { urls: [], failed: 0 };
 
-    return Promise.all(
+    let failed = 0;
+    const urls: string[] = [];
+
+    await Promise.all(
       selectedImages.map(async (file, index) => {
-        const fileRef = ref(storage, `report_media/${user.id}/${Date.now()}-${index}-${file.name}`);
-        await uploadBytes(fileRef, file);
-        return getDownloadURL(fileRef);
+        try {
+          const fileRef = ref(storage, `report_media/${user.id}/${Date.now()}-${index}-${file.name}`);
+          await uploadBytes(fileRef, file);
+          const url = await getDownloadURL(fileRef);
+          urls.push(url);
+        } catch (err: any) {
+          console.warn('Image upload skipped:', file.name, err?.message);
+          failed += 1;
+        }
       }),
     );
+
+    return { urls, failed };
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -108,8 +122,11 @@ export const ReportsHome = () => {
     if (!user) return;
 
     setSubmitting(true);
+    setSubmitError(null);
+    setImageUploadWarning(null);
     try {
-      const imageUrls = await uploadReportImages();
+      // Upload images safely — submission never blocked by photo errors
+      const { urls: imageUrls, failed: failedUploads } = await uploadReportImagesSafe();
 
       await addDoc(collection(db, 'reports'), {
         ...form,
@@ -133,8 +150,21 @@ export const ReportsHome = () => {
       setShowModal(false);
       setSelectedImages([]);
       setForm({ title: '', category: 'Medical', severity: 'Medium', location: '', description: '' });
-    } catch (error) {
+
+      // Show a warning AFTER modal closes if some photos were skipped
+      if (failedUploads > 0) {
+        setImageUploadWarning(
+          `Report submitted! However, ${failedUploads} photo${failedUploads > 1 ? 's' : ''} could not be uploaded — update Firebase Storage rules to allow report_media uploads.`
+        );
+        setTimeout(() => setImageUploadWarning(null), 8000);
+      }
+    } catch (error: any) {
       console.error('Error submitting report:', error);
+      if (error?.code === 'permission-denied' || error?.message?.includes('permission')) {
+        setSubmitError('Permission denied. Make sure you are logged in and Firestore rules allow report creation.');
+      } else {
+        setSubmitError(error.message || 'Failed to submit report. Please check your connection.');
+      }
     } finally {
       setSubmitting(false);
     }
@@ -192,6 +222,21 @@ export const ReportsHome = () => {
           Live Firebase reports, community confirmations, and media-backed field updates.
         </p>
       </div>
+
+      {/* Warning banner: shows after modal closes if some images were skipped */}
+      {imageUploadWarning && (
+        <div style={{ background: '#fffbeb', border: '1px solid #fde68a', color: '#92400e', padding: '12px 16px', borderRadius: 12, fontSize: 14, fontWeight: 600, display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+          <span className="material-symbols-outlined" style={{ fontSize: 20, color: '#d97706', flexShrink: 0, marginTop: 1 }}>warning</span>
+          <div>
+            <div>{imageUploadWarning}</div>
+            <div style={{ marginTop: 6, fontWeight: 500, fontSize: 13 }}>
+              Fix in Firebase Console → Storage → Rules: add{' '}
+              <code style={{ background: '#fef3c7', padding: '1px 6px', borderRadius: 4 }}>report_media/{'{userId}'}/**</code>{' '}
+              with write permission for authenticated users.
+            </div>
+          </div>
+        </div>
+      )}
 
       <div style={{ display: 'flex', gap: 12, marginBottom: 20, flexWrap: 'wrap' }}>
         <div style={{ position: 'relative', flex: 1, minWidth: 200 }}>
@@ -560,6 +605,13 @@ export const ReportsHome = () => {
             </div>
 
             <form onSubmit={handleSubmit} style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 18 }}>
+              {submitError && (
+                <div style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#b91c1c', padding: '12px 16px', borderRadius: 12, fontSize: 14, fontWeight: 600, display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: 18, marginTop: 2 }}>error</span>
+                  <div style={{ flex: 1 }}>{submitError}</div>
+                </div>
+              )}
+              
               <div>
                 <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#434654', marginBottom: 6 }}>Incident Title *</label>
                 <input
