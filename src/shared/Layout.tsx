@@ -17,10 +17,10 @@ export const Layout = () => {
     <div className="bg-background text-on-background font-body-md min-h-screen flex flex-col antialiased">
       {/* TopAppBar */}
       <header className="bg-white dark:bg-slate-900 w-full sticky top-0 z-50 border-b border-slate-100 dark:border-slate-800 shadow-sm dark:shadow-none font-sans text-base font-semibold">
-        <div className="flex justify-between items-center px-6 py-3 w-full max-w-[1200px] mx-auto">
+        <div className="flex justify-between items-center px-4 md:px-6 py-3 w-full max-w-[1200px] mx-auto gap-3">
           <div className="flex items-center gap-md">
             <span className="material-symbols-outlined text-blue-700 dark:text-blue-400 fill text-[24px]">emergency</span>
-            <span className="text-xl font-extrabold tracking-tight text-blue-700 dark:text-blue-500">ReliefSync</span>
+            <span className="text-lg md:text-xl font-extrabold tracking-tight text-blue-700 dark:text-blue-500">ReliefSync</span>
           </div>
 
           {/* Desktop Nav */}
@@ -44,8 +44,8 @@ export const Layout = () => {
             })}
           </nav>
 
-          <div className="flex items-center gap-sm">
-            <button className="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center hover:bg-surface-container-highest transition-colors">
+          <div className="flex items-center gap-sm shrink-0">
+            <button className="hidden sm:flex w-10 h-10 rounded-full bg-surface-container-high items-center justify-center hover:bg-surface-container-highest transition-colors">
               <span className="material-symbols-outlined text-on-surface-variant">notifications</span>
             </button>
             <Link to="/profile">
@@ -71,21 +71,21 @@ export const Layout = () => {
       </main>
 
       {/* BottomNavBar (Mobile Only) */}
-      <nav className="md:hidden bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 shadow-[0_-2px_10px_rgba(0,0,0,0.02)] fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pt-2 pb-6 z-50 font-sans text-[11px] font-bold uppercase tracking-wider">
+      <nav className="md:hidden bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 shadow-[0_-2px_10px_rgba(0,0,0,0.02)] fixed bottom-0 left-0 w-full flex justify-around items-center px-2 pt-2 pb-5 z-50 font-sans text-[10px] font-bold uppercase tracking-[0.08em]">
         {navItems.map((item) => {
           const isActive = pathname === item.path || (item.path !== '/' && pathname.startsWith(item.path));
           return (
             <Link
               key={item.path}
               to={item.path}
-              className={`flex flex-col items-center justify-center transition-all active:scale-90 duration-200 w-1/4 ${
+              className={`flex flex-col items-center justify-center transition-all active:scale-90 duration-200 w-1/4 min-w-0 ${
                 isActive
-                  ? 'text-blue-700 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/20 rounded-xl px-4 py-1'
+                  ? 'text-blue-700 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/20 rounded-xl px-2 py-1'
                   : 'text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-300'
               }`}
             >
-              <span className={`material-symbols-outlined mb-1 ${isActive ? 'fill' : ''}`}>{item.icon}</span>
-              {item.label}
+              <span className={`material-symbols-outlined mb-1 text-[20px] ${isActive ? 'fill' : ''}`}>{item.icon}</span>
+              <span className="truncate max-w-full">{item.label}</span>
             </Link>
           );
         })}

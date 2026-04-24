@@ -2,8 +2,32 @@
 @config "../tailwind.config.js";
 
 @layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
   body {
     @apply bg-background text-on-background font-body-md min-h-screen antialiased;
+    overflow-x: hidden;
+  }
+
+  #root {
+    min-height: 100vh;
+  }
+
+  img {
+    max-width: 100%;
+  }
+
+  input,
+  textarea,
+  select,
+  button {
+    font: inherit;
   }
 }
 
