@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ReliefSync - AI Assistant</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary-fixed": "#001848",
+                    "on-secondary-fixed-variant": "#920024",
+                    "error-container": "#ffdad6",
+                    "secondary-container": "#ff5263",
+                    "primary-fixed": "#dae2ff",
+                    "outline": "#737685",
+                    "on-surface": "#191c1e",
+                    "inverse-primary": "#b2c5ff",
+                    "on-primary": "#ffffff",
+                    "tertiary-fixed": "#82f9be",
+                    "surface": "#f8f9fb",
+                    "tertiary": "#004e32",
+                    "secondary-fixed-dim": "#ffb3b4",
+                    "on-primary-container": "#c4d2ff",
+                    "outline-variant": "#c3c6d6",
+                    "tertiary-fixed-dim": "#65dca4",
+                    "primary": "#003d9b",
+                    "surface-container-highest": "#e1e2e4",
+                    "secondary": "#b81a36",
+                    "on-tertiary-fixed": "#002113",
+                    "surface-variant": "#e1e2e4",
+                    "surface-container-low": "#f3f4f6",
+                    "primary-fixed-dim": "#b2c5ff",
+                    "inverse-on-surface": "#f0f1f3",
+                    "on-error": "#ffffff",
+                    "surface-bright": "#f8f9fb",
+                    "on-tertiary": "#ffffff",
+                    "surface-dim": "#d9dadc",
+                    "surface-tint": "#0c56d0",
+                    "background": "#f8f9fb",
+                    "on-tertiary-fixed-variant": "#005235",
+                    "tertiary-container": "#006844",
+                    "on-error-container": "#93000a",
+                    "primary-container": "#0052cc",
+                    "on-secondary-fixed": "#40000a",
+                    "error": "#ba1a1a",
+                    "on-surface-variant": "#434654",
+                    "on-secondary": "#ffffff",
+                    "surface-container-high": "#e7e8ea",
+                    "secondary-fixed": "#ffdad9",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary-fixed-variant": "#0040a2",
+                    "on-background": "#191c1e",
+                    "inverse-surface": "#2e3132",
+                    "surface-container": "#edeef0",
+                    "on-tertiary-container": "#72e9af",
+                    "on-secondary-container": "#5b0013"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "sm": "12px",
+                    "lg": "24px",
+                    "md": "16px",
+                    "gutter": "24px",
+                    "xxl": "48px",
+                    "xl": "32px",
+                    "base": "8px",
+                    "container-max": "1200px",
+                    "xs": "4px"
+            },
+            "fontFamily": {
+                    "body-md": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "label-bold": ["Inter"],
+                    "h3": ["Inter"],
+                    "h2": ["Inter"],
+                    "h1": ["Inter"],
+                    "caption": ["Inter"],
+                    "body-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "body-sm": ["14px", {"lineHeight": "1.45", "fontWeight": "400"}],
+                    "label-bold": ["14px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                    "h3": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                    "h2": ["32px", {"lineHeight": "1.25", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "h1": ["40px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "caption": ["12px", {"lineHeight": "1.2", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                    "body-lg": ["18px", {"lineHeight": "1.55", "fontWeight": "400"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        /* Hide scrollbar for clean UI in chips/cards */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body-md flex flex-col min-h-screen relative antialiased">
+<!-- TopAppBar (from JSON) -->
+<header class="w-full sticky top-0 z-50 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 shadow-sm dark:shadow-none flex justify-between items-center px-6 py-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-blue-700 dark:text-blue-400 font-sans text-base font-semibold" style="font-variation-settings: 'FILL' 1;">emergency</span>
+<h1 class="text-xl font-extrabold tracking-tight text-blue-700 dark:text-blue-500">ReliefSync</h1>
+</div>
+<div>
+<img alt="User profile photo" class="w-8 h-8 rounded-full object-cover" data-alt="Close up portrait of a smiling young woman with dark hair in professional attire against a neutral background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5uAP2Q7iRUvERiUyuIILJJEnT7JYEIfvJohthCwg8f4S3QTYHpbsZoptdJ6qb58LQPY-w70_w3rDLkwL8tQ9_97Vi0yDpAHRXNh87VjKV_7oMc1NnMgeJwuvA2QBxpWCR92IKPgE_jdJDLFKBjA5pQ6rUMr72A88eg1Ku_8rvJGCSNYIAlgJr1ZHq1egwnairVn_SVjDzAc_AY9JYkh3-J_fYNw1aP8mtmz2Qxnl9Y7wvsyxlbbm41J_KcrYGUxG3RQMpTEI1M_lJ"/>
+</div>
+</header>
+<!-- Main Chat Canvas -->
+<main class="flex-1 overflow-y-auto px-4 pt-6 pb-[200px] flex flex-col gap-6 max-w-container-max mx-auto w-full">
+<!-- Time Marker -->
+<div class="flex justify-center">
+<span class="font-caption text-caption text-on-surface-variant bg-surface-container-high px-3 py-1 rounded-full">Today, 10:42 AM</span>
+</div>
+<!-- Bot Welcome Message -->
+<div class="flex gap-3 max-w-[90%] md:max-w-[70%]">
+<div class="w-10 h-10 rounded-full bg-primary-container text-on-primary flex items-center justify-center shrink-0 shadow-[0px_4px_8px_rgba(0,82,204,0.15)]">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+</div>
+<div class="bg-surface-container-lowest shadow-[0px_2px_4px_rgba(0,0,0,0.05)] rounded-2xl rounded-tl-sm p-4 text-body-md text-on-surface">
+                Hello! I'm your ReliefSync Assistant. I'm here to help coordinate relief efforts, provide safety updates, and connect you with nearby resources. How can I assist you right now?
+            </div>
+</div>
+<!-- User Message -->
+<div class="flex gap-3 max-w-[90%] md:max-w-[70%] self-end">
+<div class="bg-primary-container text-on-primary shadow-[0px_2px_4px_rgba(0,0,0,0.1)] rounded-2xl rounded-tr-sm p-4 text-body-md">
+                Can you show me active relief efforts and supply drops near the Downtown sector?
+            </div>
+</div>
+<!-- Bot Response with Resource Cards -->
+<div class="flex gap-3 max-w-[100%] md:max-w-[85%]">
+<div class="w-10 h-10 rounded-full bg-primary-container text-on-primary flex items-center justify-center shrink-0 shadow-[0px_4px_8px_rgba(0,82,204,0.15)] mt-1">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+</div>
+<div class="flex flex-col gap-3 min-w-0 w-full">
+<div class="bg-surface-container-lowest shadow-[0px_2px_4px_rgba(0,0,0,0.05)] rounded-2xl rounded-tl-sm p-4 text-body-md text-on-surface self-start">
+                    I found 2 active supply drops and medical tents within a 1-mile radius of Downtown. Here are the details:
+                </div>
+<!-- Horizontal scrollable resource cards -->
+<div class="flex gap-4 overflow-x-auto pb-4 pt-1 snap-x no-scrollbar w-full">
+<!-- Resource Card 1 -->
+<div class="min-w-[260px] md:min-w-[300px] bg-surface-container-lowest rounded-[16px] p-[24px] snap-start shadow-[0px_2px_4px_rgba(0,0,0,0.05)] border border-surface-container-high flex flex-col gap-3 shrink-0">
+<div class="flex items-start justify-between">
+<div class="w-10 h-10 rounded-full bg-secondary-container/20 text-secondary flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">local_hospital</span>
+</div>
+<span class="px-2.5 py-1 bg-tertiary-fixed/20 text-tertiary-container font-caption text-caption rounded-full border border-tertiary-fixed">Active Now</span>
+</div>
+<div>
+<h3 class="font-label-bold text-label-bold text-on-surface mb-1">Central Medical Tent</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2">Providing essential first aid, trauma care, and basic medical supplies. Staffed by volunteer nurses.</p>
+</div>
+<div class="mt-auto pt-2 flex items-center gap-1.5 text-on-surface-variant font-caption text-caption">
+<span class="material-symbols-outlined text-[16px]">location_on</span>
+<span>0.4 miles • City Hall Plaza</span>
+</div>
+</div>
+<!-- Resource Card 2 -->
+<div class="min-w-[260px] md:min-w-[300px] bg-surface-container-lowest rounded-[16px] p-[24px] snap-start shadow-[0px_2px_4px_rgba(0,0,0,0.05)] border border-surface-container-high flex flex-col gap-3 shrink-0">
+<div class="flex items-start justify-between">
+<div class="w-10 h-10 rounded-full bg-primary-container/10 text-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">water_drop</span>
+</div>
+<span class="px-2.5 py-1 bg-tertiary-fixed/20 text-tertiary-container font-caption text-caption rounded-full border border-tertiary-fixed">Active Now</span>
+</div>
+<div>
+<h3 class="font-label-bold text-label-bold text-on-surface mb-1">Clean Water Distribution</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2">Pallets of bottled water and purification tablets available for families in the affected zone.</p>
+</div>
+<div class="mt-auto pt-2 flex items-center gap-1.5 text-on-surface-variant font-caption text-caption">
+<span class="material-symbols-outlined text-[16px]">location_on</span>
+<span>0.7 miles • Community Center</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Input Area & Suggestions -->
+<div class="fixed bottom-[68px] left-0 w-full bg-gradient-to-t from-surface via-surface to-transparent pt-8 pb-4 px-4 flex flex-col gap-3 z-40">
+<div class="max-w-container-max mx-auto w-full flex flex-col gap-3">
+<!-- Suggestion Chips -->
+<div class="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+<button class="whitespace-nowrap px-4 py-2 bg-surface-container-lowest border border-outline-variant rounded-full font-label-bold text-label-bold text-on-surface-variant shadow-[0px_2px_4px_rgba(0,0,0,0.05)] hover:bg-surface-container-low transition-colors flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">shield</span> Safety Guidelines
+                </button>
+<button class="whitespace-nowrap px-4 py-2 bg-surface-container-lowest border border-outline-variant rounded-full font-label-bold text-label-bold text-on-surface-variant shadow-[0px_2px_4px_rgba(0,0,0,0.05)] hover:bg-surface-container-low transition-colors flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">near_me</span> Nearby Help
+                </button>
+<button class="whitespace-nowrap px-4 py-2 bg-error-container/30 border border-secondary-fixed-dim rounded-full font-label-bold text-label-bold text-secondary shadow-[0px_2px_4px_rgba(0,0,0,0.05)] hover:bg-error-container/50 transition-colors flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">warning</span> Report Incident
+                </button>
+</div>
+<!-- Chat Input -->
+<div class="flex items-center gap-2 bg-surface-container-lowest rounded-full p-1.5 shadow-[0px_8px_16px_rgba(0,82,204,0.08)] border border-outline-variant focus-within:border-primary-container transition-colors">
+<button class="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-primary-container transition-colors rounded-full shrink-0">
+<span class="material-symbols-outlined">add_circle</span>
+</button>
+<input class="flex-1 bg-transparent border-none focus:ring-0 font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant outline-none px-2 py-2" placeholder="Type a message or use voice..." type="text"/>
+<button class="w-11 h-11 flex items-center justify-center bg-primary-container text-on-primary rounded-full hover:bg-on-primary-fixed-variant transition-colors shadow-[0px_4px_8px_rgba(0,82,204,0.2)] shrink-0">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">mic</span>
+</button>
+</div>
+</div>
+</div>
+<!-- BottomNavBar (from JSON) -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pt-2 pb-6 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 shadow-[0_-2px_10px_rgba(0,0,0,0.02)] z-50">
+<!-- Tab 1: Reports (Inactive) -->
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-300 transition-all font-sans text-[11px] font-bold uppercase tracking-wider gap-1 active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined">assignment</span>
+<span>Reports</span>
+</a>
+<!-- Tab 2: My Reports (Inactive) -->
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-300 transition-all font-sans text-[11px] font-bold uppercase tracking-wider gap-1 active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined">folder_shared</span>
+<span>My Reports</span>
+</a>
+<!-- Tab 3: Impact (Inactive) -->
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-300 transition-all font-sans text-[11px] font-bold uppercase tracking-wider gap-1 active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span>Impact</span>
+</a>
+<!-- Tab 4: AI Assistant (Active) -->
+<a class="flex flex-col items-center justify-center text-blue-700 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/20 rounded-xl px-4 py-1 font-sans text-[11px] font-bold uppercase tracking-wider gap-1 active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+<span>AI Assistant</span>
+</a>
+</nav>
+</body></html>

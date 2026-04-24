@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ReliefSync - My Reports</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary-fixed": "#002113",
+                    "surface-dim": "#d9dadc",
+                    "primary-fixed-dim": "#b2c5ff",
+                    "on-error-container": "#93000a",
+                    "primary-container": "#0052cc",
+                    "surface-container-high": "#e7e8ea",
+                    "on-primary-fixed": "#001848",
+                    "surface-container": "#edeef0",
+                    "inverse-on-surface": "#f0f1f3",
+                    "on-tertiary-container": "#72e9af",
+                    "secondary-fixed-dim": "#ffb3b4",
+                    "on-primary-fixed-variant": "#0040a2",
+                    "tertiary-container": "#006844",
+                    "on-primary-container": "#c4d2ff",
+                    "on-secondary-container": "#5b0013",
+                    "tertiary": "#004e32",
+                    "background": "#f8f9fb",
+                    "on-secondary-fixed": "#40000a",
+                    "error": "#ba1a1a",
+                    "on-background": "#191c1e",
+                    "primary-fixed": "#dae2ff",
+                    "surface-variant": "#e1e2e4",
+                    "surface-tint": "#0c56d0",
+                    "surface-container-low": "#f3f4f6",
+                    "outline": "#737685",
+                    "on-surface": "#191c1e",
+                    "error-container": "#ffdad6",
+                    "secondary": "#b81a36",
+                    "surface-container-highest": "#e1e2e4",
+                    "inverse-surface": "#2e3132",
+                    "secondary-fixed": "#ffdad9",
+                    "tertiary-fixed-dim": "#65dca4",
+                    "on-surface-variant": "#434654",
+                    "tertiary-fixed": "#82f9be",
+                    "on-error": "#ffffff",
+                    "inverse-primary": "#b2c5ff",
+                    "on-primary": "#ffffff",
+                    "surface-bright": "#f8f9fb",
+                    "on-secondary-fixed-variant": "#920024",
+                    "surface-container-lowest": "#ffffff",
+                    "outline-variant": "#c3c6d6",
+                    "primary": "#003d9b",
+                    "on-secondary": "#ffffff",
+                    "on-tertiary-fixed-variant": "#005235",
+                    "secondary-container": "#ff5263",
+                    "surface": "#f8f9fb",
+                    "on-tertiary": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "sm": "12px",
+                    "base": "8px",
+                    "lg": "24px",
+                    "gutter": "24px",
+                    "xs": "4px",
+                    "xxl": "48px",
+                    "xl": "32px",
+                    "container-max": "1200px",
+                    "md": "16px"
+            },
+            "fontFamily": {
+                    "body-sm": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "caption": ["Inter"],
+                    "h2": ["Inter"],
+                    "h1": ["Inter"],
+                    "h3": ["Inter"],
+                    "body-md": ["Inter"],
+                    "label-bold": ["Inter"]
+            },
+            "fontSize": {
+                    "body-sm": ["14px", {"lineHeight": "1.45", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "1.55", "fontWeight": "400"}],
+                    "caption": ["12px", {"lineHeight": "1.2", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                    "h2": ["32px", {"lineHeight": "1.25", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "h1": ["40px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "h3": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "label-bold": ["14px", {"lineHeight": "1.2", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #E5E7EB;
+            border-radius: 10px;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background font-body-md text-on-surface min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 shadow-[0px_2px_4px_rgba(0,0,0,0.05)] sticky top-0 full-width z-50 flex justify-between items-center w-full px-4 h-16">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[#0052CC]" data-icon="location_on">location_on</span>
+<h1 class="font-['Inter'] font-extrabold tracking-tight text-xl text-[#0052CC]">ReliefSync</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined text-gray-500" data-icon="notifications">notifications</span>
+</button>
+</div>
+</header>
+<main class="max-w-container-max mx-auto px-4 pt-8">
+<!-- Status Dashboard Overview -->
+<div class="mb-xxl">
+<h2 class="font-h2 text-h2 mb-lg text-on-surface">Overview</h2>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-lg">
+<!-- Active -->
+<div class="bg-white rounded-xl p-lg shadow-[0px_2px_4px_rgba(0,0,0,0.05)] border-l-4 border-[#0052CC]">
+<div class="flex justify-between items-start mb-sm">
+<span class="font-label-bold text-label-bold text-[#0052CC]">Active</span>
+<span class="material-symbols-outlined text-[#0052CC]" data-icon="rocket_launch">rocket_launch</span>
+</div>
+<p class="font-h1 text-h1">02</p>
+<p class="font-caption text-caption text-outline">Ongoing relief operations</p>
+</div>
+<!-- Pending -->
+<div class="bg-white rounded-xl p-lg shadow-[0px_2px_4px_rgba(0,0,0,0.05)] border-l-4 border-secondary-container">
+<div class="flex justify-between items-start mb-sm">
+<span class="font-label-bold text-label-bold text-secondary-container">Pending</span>
+<span class="material-symbols-outlined text-secondary-container" data-icon="pending_actions">pending_actions</span>
+</div>
+<p class="font-h1 text-h1">05</p>
+<p class="font-caption text-caption text-outline">Awaiting coordinator review</p>
+</div>
+<!-- Resolved -->
+<div class="bg-white rounded-xl p-lg shadow-[0px_2px_4px_rgba(0,0,0,0.05)] border-l-4 border-tertiary-container">
+<div class="flex justify-between items-start mb-sm">
+<span class="font-label-bold text-label-bold text-tertiary-container">Resolved</span>
+<span class="material-symbols-outlined text-tertiary-container" data-icon="check_circle">check_circle</span>
+</div>
+<p class="font-h1 text-h1">14</p>
+<p class="font-caption text-caption text-outline">Cases closed successfully</p>
+</div>
+</div>
+</div>
+<!-- Tracking Section -->
+<div class="mb-xxl">
+<div class="flex items-center justify-between mb-lg">
+<h2 class="font-h2 text-h2 text-on-surface">Report Tracking</h2>
+<button class="font-label-bold text-label-bold text-[#0052CC] flex items-center gap-1 hover:underline">
+                    View Archive <span class="material-symbols-outlined text-[18px]" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+<!-- Report Card 1 -->
+<div class="bg-white rounded-xl p-lg shadow-[0px_2px_4px_rgba(0,0,0,0.05)] mb-lg border border-gray-100">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-md mb-lg">
+<div>
+<div class="flex items-center gap-2 mb-1">
+<span class="font-label-bold text-label-bold text-on-surface">Emergency Water Supply</span>
+<span class="bg-[#0052CC]/10 text-[#0052CC] text-caption px-2 py-0.5 rounded-full">In Progress</span>
+</div>
+<p class="font-body-sm text-body-sm text-outline flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="schedule">schedule</span> Submitted 2h ago • Case #RS-8821
+                        </p>
+</div>
+<div class="flex -space-x-2">
+<img class="w-8 h-8 rounded-full border-2 border-white object-cover" data-alt="professional portrait of a male emergency responder in a blue uniform" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAnqs0gUk-CtCIu5PNl_yBhfmAhn-yWImyKzP6tBQyJik2Exb873fRwK9xNuxk7GQDU--9XYhxVQCTbR8adqOkAbLZSKw5ckzHJWxAzVuBsj2coKW-xmcN-6awa2YFPlWB6_n33uK1xDrqSnLzSV-s9oIMExrjvnENdjAaw2A7--5kDGm7wRqRmAJdFJqcqH_DfyEASJMM_csIh8hi4VV9s62dHRFS3Wz2Rr9HO5wHlKkQ5cQLeKbN0EYyqZPqlhOEobxFnZMK6XQcm"/>
+<img class="w-8 h-8 rounded-full border-2 border-white object-cover" data-alt="professional portrait of a female volunteer coordinator with a warm smile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7oALIpEXo12JR7JVLqkanqUK8QI6tM9IEwJ526Wftlso39b4kpX1QC657aTopSD2y0nT9oShUosNgYbZsj-b4YtJ17-nmTXk2I3je-JHNHk-SSZ7WOHisB6V4wGf2qLmH-SsBU31GFd9rCpbfp361TOi33XzNSt59mXlmQOLlCmgWXLV8IZqwVfp9EANb3kS3ivbujB-fgxuSYSEa38Lkj8nblQ4dCcikYHptKigkkAgmAoMpHp9eXPOGMPMlDoBgUkh7sFP8jL4g"/>
+<div class="w-8 h-8 rounded-full border-2 border-white bg-surface-container-high flex items-center justify-center text-[10px] font-bold">+1</div>
+</div>
+</div>
+<!-- Journey Timeline -->
+<div class="relative py-lg px-4 bg-surface-container-lowest rounded-lg border border-gray-50">
+<div class="absolute top-1/2 left-8 right-8 h-0.5 bg-gray-100 -translate-y-1/2"></div>
+<div class="absolute top-1/2 left-8 w-1/2 h-0.5 bg-[#0052CC] -translate-y-1/2"></div>
+<div class="relative flex justify-between">
+<div class="flex flex-col items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-[#0052CC] flex items-center justify-center text-white z-10">
+<span class="material-symbols-outlined text-[16px]" data-icon="done" data-weight="fill">done</span>
+</div>
+<span class="font-label-bold text-caption text-[#0052CC]">Submitted</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-[#0052CC] flex items-center justify-center text-white z-10">
+<span class="material-symbols-outlined text-[16px]" data-icon="person_pin" data-weight="fill">person_pin</span>
+</div>
+<span class="font-label-bold text-caption text-[#0052CC]">Assigned</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-white border-2 border-gray-200 flex items-center justify-center text-gray-300 z-10">
+<span class="material-symbols-outlined text-[16px]" data-icon="task_alt">task_alt</span>
+</div>
+<span class="font-label-bold text-caption text-outline">Resolved</span>
+</div>
+</div>
+</div>
+<div class="mt-lg grid grid-cols-2 gap-lg">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-[#0052CC]">
+<span class="material-symbols-outlined" data-icon="timer">timer</span>
+</div>
+<div>
+<p class="font-caption text-caption text-outline">ETA Arrival</p>
+<p class="font-label-bold text-label-bold">14 mins</p>
+</div>
+</div>
+<div class="space-y-1">
+<div class="flex justify-between items-center">
+<p class="font-caption text-caption text-outline">Aid Progress</p>
+<p class="font-label-bold text-label-bold text-tertiary-container">65%</p>
+</div>
+<div class="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden">
+<div class="bg-tertiary-container h-full rounded-full" style="width: 65%;"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Report Card 2 (Active/Dispatched) -->
+<div class="bg-white rounded-xl p-lg shadow-[0px_2px_4px_rgba(0,0,0,0.05)] border border-gray-100">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-md mb-lg">
+<div>
+<div class="flex items-center gap-2 mb-1">
+<span class="font-label-bold text-label-bold text-on-surface">Structural Integrity Check</span>
+<span class="bg-secondary-container/10 text-secondary-container text-caption px-2 py-0.5 rounded-full">Pending</span>
+</div>
+<p class="font-body-sm text-body-sm text-outline flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="location_on">location_on</span> Main St. Block C • Case #RS-9012
+                        </p>
+</div>
+</div>
+<div class="relative py-lg px-4 bg-surface-container-lowest rounded-lg border border-gray-50">
+<div class="absolute top-1/2 left-8 right-8 h-0.5 bg-gray-100 -translate-y-1/2"></div>
+<div class="relative flex justify-between">
+<div class="flex flex-col items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-[#0052CC] flex items-center justify-center text-white z-10">
+<span class="material-symbols-outlined text-[16px]" data-icon="done" data-weight="fill">done</span>
+</div>
+<span class="font-label-bold text-caption text-[#0052CC]">Submitted</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-white border-2 border-[#0052CC] flex items-center justify-center text-[#0052CC] z-10">
+<span class="material-symbols-outlined text-[16px]" data-icon="hourglass_empty">hourglass_empty</span>
+</div>
+<span class="font-label-bold text-caption text-[#0052CC]">In Review</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-white border-2 border-gray-200 flex items-center justify-center text-gray-300 z-10">
+<span class="material-symbols-outlined text-[16px]" data-icon="person_pin">person_pin</span>
+</div>
+<span class="font-label-bold text-caption text-outline">Assigned</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Feedback Needed Section -->
+<div class="mb-lg">
+<h3 class="font-h3 text-h3 mb-lg text-on-surface">Feedback Needed</h3>
+<div class="bg-surface-container-lowest rounded-2xl border-2 border-dashed border-outline-variant p-xl text-center">
+<div class="max-w-md mx-auto">
+<div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-lg text-[#0052CC]">
+<span class="material-symbols-outlined text-4xl" data-icon="rate_review">rate_review</span>
+</div>
+<h4 class="font-label-bold text-body-lg mb-xs">How was the Medical Aid?</h4>
+<p class="font-body-sm text-body-sm text-outline mb-lg">Your report Case #RS-7720 was resolved yesterday. Please rate the responders to help us improve service.</p>
+<div class="flex justify-center gap-2 mb-lg">
+<span class="material-symbols-outlined text-3xl text-secondary-container cursor-pointer" data-icon="star" data-weight="fill">star</span>
+<span class="material-symbols-outlined text-3xl text-secondary-container cursor-pointer" data-icon="star" data-weight="fill">star</span>
+<span class="material-symbols-outlined text-3xl text-secondary-container cursor-pointer" data-icon="star" data-weight="fill">star</span>
+<span class="material-symbols-outlined text-3xl text-secondary-container cursor-pointer" data-icon="star" data-weight="fill">star</span>
+<span class="material-symbols-outlined text-3xl text-gray-200 cursor-pointer" data-icon="star">star</span>
+</div>
+<div class="flex gap-sm">
+<button class="flex-1 px-lg py-sm border-2 border-[#0052CC] text-[#0052CC] font-label-bold rounded-lg transition-colors hover:bg-blue-50">Skip</button>
+<button class="flex-1 px-lg py-sm bg-[#0052CC] text-white font-label-bold rounded-lg transition-all active:scale-95">Submit Feedback</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 shadow-[0px_-4px_12px_rgba(0,0,0,0.03)] fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-3 pb-safe rounded-t-2xl">
+<div class="flex flex-col items-center justify-center bg-blue-50 dark:bg-blue-900/20 text-[#0052CC] dark:text-blue-300 rounded-xl px-2 py-1">
+<span class="material-symbols-outlined" data-icon="feed">feed</span>
+<span class="font-['Inter'] text-[11px] font-bold">Reports</span>
+</div>
+<div class="flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 hover:text-[#0052CC] dark:hover:text-blue-300 transition-transform active:scale-90 duration-150">
+<span class="material-symbols-outlined" data-icon="assignment_turned_in">assignment_turned_in</span>
+<span class="font-['Inter'] text-[11px] font-medium">Tracking</span>
+</div>
+<div class="flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 hover:text-[#0052CC] dark:hover:text-blue-300 transition-transform active:scale-90 duration-150">
+<span class="material-symbols-outlined" data-icon="military_tech">military_tech</span>
+<span class="font-['Inter'] text-[11px] font-medium">Impact</span>
+</div>
+<div class="flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 hover:text-[#0052CC] dark:hover:text-blue-300 transition-transform active:scale-90 duration-150">
+<span class="material-symbols-outlined" data-icon="smart_toy">smart_toy</span>
+<span class="font-['Inter'] text-[11px] font-medium">Assistant</span>
+</div>
+<div class="flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 hover:text-[#0052CC] dark:hover:text-blue-300 transition-transform active:scale-90 duration-150">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-['Inter'] text-[11px] font-medium">Profile</span>
+</div>
+</nav>
+</body></html>

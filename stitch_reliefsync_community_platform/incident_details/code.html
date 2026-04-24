@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ReliefSync - Incident Details</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-fixed": "#001848",
+                        "on-secondary-fixed-variant": "#920024",
+                        "error-container": "#ffdad6",
+                        "secondary-container": "#ff5263",
+                        "primary-fixed": "#dae2ff",
+                        "outline": "#737685",
+                        "on-surface": "#191c1e",
+                        "inverse-primary": "#b2c5ff",
+                        "on-primary": "#ffffff",
+                        "tertiary-fixed": "#82f9be",
+                        "surface": "#f8f9fb",
+                        "tertiary": "#004e32",
+                        "secondary-fixed-dim": "#ffb3b4",
+                        "on-primary-container": "#c4d2ff",
+                        "outline-variant": "#c3c6d6",
+                        "tertiary-fixed-dim": "#65dca4",
+                        "primary": "#003d9b",
+                        "surface-container-highest": "#e1e2e4",
+                        "secondary": "#b81a36",
+                        "on-tertiary-fixed": "#002113",
+                        "surface-variant": "#e1e2e4",
+                        "surface-container-low": "#f3f4f6",
+                        "primary-fixed-dim": "#b2c5ff",
+                        "inverse-on-surface": "#f0f1f3",
+                        "on-error": "#ffffff",
+                        "surface-bright": "#f8f9fb",
+                        "on-tertiary": "#ffffff",
+                        "surface-dim": "#d9dadc",
+                        "surface-tint": "#0c56d0",
+                        "background": "#f8f9fb",
+                        "on-tertiary-fixed-variant": "#005235",
+                        "tertiary-container": "#006844",
+                        "on-error-container": "#93000a",
+                        "primary-container": "#0052cc",
+                        "on-secondary-fixed": "#40000a",
+                        "error": "#ba1a1a",
+                        "on-surface-variant": "#434654",
+                        "on-secondary": "#ffffff",
+                        "surface-container-high": "#e7e8ea",
+                        "secondary-fixed": "#ffdad9",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed-variant": "#0040a2",
+                        "on-background": "#191c1e",
+                        "inverse-surface": "#2e3132",
+                        "surface-container": "#edeef0",
+                        "on-tertiary-container": "#72e9af",
+                        "on-secondary-container": "#5b0013"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "12px",
+                        "lg": "24px",
+                        "md": "16px",
+                        "gutter": "24px",
+                        "xxl": "48px",
+                        "xl": "32px",
+                        "base": "8px",
+                        "container-max": "1200px",
+                        "xs": "4px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "label-bold": ["Inter"],
+                        "h3": ["Inter"],
+                        "h2": ["Inter"],
+                        "h1": ["Inter"],
+                        "caption": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "body-sm": ["14px", {"lineHeight": "1.45", "fontWeight": "400"}],
+                        "label-bold": ["14px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                        "h3": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                        "h2": ["32px", {"lineHeight": "1.25", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "h1": ["40px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "caption": ["12px", {"lineHeight": "1.2", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                        "body-lg": ["18px", {"lineHeight": "1.55", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background font-body-md text-on-background antialiased pb-28">
+<!-- Task-Focused Screen: Suppressing global navigation components as per guidelines. Custom back-navigation header implemented. -->
+<!-- Hero Header -->
+<div class="relative w-full h-[340px]">
+<img class="w-full h-full object-cover" data-alt="flooded residential street after severe storm with high murky water levels and abandoned vehicles, overcast gray lighting, urgent mood" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDGEJ8sniKxhgkg_y2tU3jEENmZ0XXSvb2EPOuboyEr2rohd-r6DwGLiaI3qTyP2Kr6VFJwc8bvzag1mO3-DscSY-BlTIQACSyeRjlkO2yHUoYkAiX1UBbyZeKYVbEz8Xd9c84FzC6YqoXFrM-Zg92DagkMMtQgLIPJgRsP4ClH7DpmlHUyITlsQ0XAbwTgT7SLOXWRU6SnpT5dghwySAE8WzzfySbV1BlrIuC4n1ypEMbpqoUOxYLVGo3iFgDtEoZJOyr23jIw3dbb"/>
+<!-- Gradient Overlay for readability -->
+<div class="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-black/90"></div>
+<!-- Top Actions -->
+<div class="absolute top-0 left-0 w-full p-6 flex justify-between items-center z-10">
+<button class="w-10 h-10 bg-surface-container-lowest/20 backdrop-blur-md rounded-full flex items-center justify-center text-on-primary hover:bg-surface-container-lowest/30 transition-colors shadow-[0_2px_4px_rgba(0,0,0,0.1)]">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">arrow_back</span>
+</button>
+<button class="w-10 h-10 bg-surface-container-lowest/20 backdrop-blur-md rounded-full flex items-center justify-center text-on-primary hover:bg-surface-container-lowest/30 transition-colors shadow-[0_2px_4px_rgba(0,0,0,0.1)]">
+<span class="material-symbols-outlined">share</span>
+</button>
+</div>
+<!-- Incident Title & Meta -->
+<div class="absolute bottom-12 left-6 right-6 z-10 text-on-primary">
+<div class="flex items-center gap-2 mb-3">
+<span class="bg-secondary text-on-secondary font-label-bold text-caption px-3 py-1 rounded-full uppercase tracking-wider">Critical SOS</span>
+<span class="font-caption text-caption text-on-primary/80 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">schedule</span> 15 mins ago
+                </span>
+</div>
+<h1 class="font-h2 text-h2 text-on-primary mb-2">Flash Flooding Trap in Riverdale Block</h1>
+<div class="flex items-center gap-1 text-on-primary/90 font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[18px]">location_on</span>
+<span>400 Block, Riverside Ave, District 4</span>
+</div>
+</div>
+</div>
+<!-- Main Content Canvas -->
+<main class="relative z-20 -mt-8 bg-surface-container-lowest rounded-t-[24px] px-6 py-8 shadow-[0_-4px_24px_rgba(0,0,0,0.08)] min-h-screen">
+<!-- Pull Indicator (Mobile aesthetic) -->
+<div class="w-12 h-1.5 bg-surface-variant rounded-full mx-auto mb-8"></div>
+<!-- Section: Description -->
+<section class="mb-10">
+<p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed">
+                Sudden flash flooding has breached the containment wall, trapping approximately 15 residents on the ground floors of the Riverdale apartment complex. Water currents are unusually strong and debris is hazardous. Immediate extraction via specialized motorized rescue boats is mandated. Standard emergency vehicles cannot access the perimeter.
+            </p>
+</section>
+<!-- Section: Community Verification (Bento Style) -->
+<section class="mb-10">
+<h3 class="font-label-bold text-label-bold text-on-surface mb-4 uppercase tracking-widest text-outline">Community Verification</h3>
+<div class="grid grid-cols-2 gap-4">
+<button class="bg-error/10 border-2 border-error/20 rounded-xl p-4 flex flex-col items-center justify-center gap-2 hover:bg-error/20 transition-colors shadow-[0_2px_4px_rgba(0,0,0,0.02)] relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-t from-error/5 to-transparent"></div>
+<span class="material-symbols-outlined text-[28px] text-error relative z-10" style="font-variation-settings: 'FILL' 1;">warning</span>
+<span class="font-label-bold text-label-bold text-error relative z-10">Still Active</span>
+<span class="font-caption text-caption text-on-surface-variant relative z-10">42 Confirmations</span>
+</button>
+<button class="bg-surface-container border border-outline-variant/50 rounded-xl p-4 flex flex-col items-center justify-center gap-2 hover:bg-surface-variant transition-colors shadow-[0_2px_4px_rgba(0,0,0,0.02)]">
+<span class="material-symbols-outlined text-[28px] text-outline">check_circle</span>
+<span class="font-label-bold text-label-bold text-on-surface-variant">Resolved</span>
+<span class="font-caption text-caption text-outline">0 Confirmations</span>
+</button>
+</div>
+</section>
+<!-- Section: Interactive Map Preview -->
+<section class="mb-10">
+<div class="flex justify-between items-end mb-4">
+<h3 class="font-label-bold text-label-bold text-on-surface uppercase tracking-widest text-outline">Zone Map Preview</h3>
+<span class="font-caption text-caption text-primary flex items-center gap-1 cursor-pointer hover:underline">
+                    Expand Map <span class="material-symbols-outlined text-[14px]">open_in_full</span>
+</span>
+</div>
+<div class="relative w-full h-[180px] rounded-xl overflow-hidden bg-surface-container shadow-sm border border-outline-variant/50">
+<img class="w-full h-full object-cover opacity-90 saturate-50" data-alt="top down satellite map view of city grid with a faint red overlay indicating flooded danger zone" data-location="Riverdale, District 4" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAcpS7WS3Wi8mGaVEFbBQ5w_o5p2bmRg0GrG0v5HPOkCIXniwEQU5KeBQEGrbyiOJWxTDxcTDRxR4g7PWemnGDGjU3n9dgCZLVVbR8cJ93aN8BoO3KcwQd2kw9vykOBMNfQhIkXlUvNtIf04bAjs1nwKW1zJGxbX6K_8F1d4mDidyHszQAmx-FtMS1lVJoQsxoCga6yATVp9bGCPv98VrROO1ylc1TqWpT7WtbbvngsbWot76C1RA2bxxdq4ILld3FZ9q5qGMSTWqiT"/>
+<!-- Map UI Overlay -->
+<div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+<div class="absolute bottom-3 left-3 bg-surface-container-lowest/90 backdrop-blur px-3 py-1.5 rounded-lg shadow-sm border border-outline-variant/30 flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-error">my_location</span>
+<span class="font-caption text-caption text-on-surface">1.2 miles away</span>
+</div>
+<!-- Pulsing Map Pin -->
+<div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+<div class="w-16 h-16 bg-error/20 rounded-full flex items-center justify-center animate-pulse">
+<div class="w-5 h-5 bg-error rounded-full border-2 border-surface-container-lowest shadow-[0_0_10px_rgba(186,26,26,0.5)]"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section: Resources Deployed (Glassmorphism Pills) -->
+<section class="mb-10">
+<h3 class="font-label-bold text-label-bold text-on-surface mb-4 uppercase tracking-widest text-outline">Resources Deployed</h3>
+<div class="flex flex-wrap gap-3">
+<div class="bg-primary/5 border border-primary/20 px-4 py-3 rounded-full flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">sailing</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-bold text-label-bold text-primary">3 Boats</span>
+<span class="font-caption text-caption text-on-surface-variant">En Route</span>
+</div>
+</div>
+<div class="bg-tertiary-container/10 border border-tertiary-container/20 px-4 py-3 rounded-full flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-tertiary-container text-on-tertiary-container flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">medical_services</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-bold text-label-bold text-tertiary-container">2 Medics</span>
+<span class="font-caption text-caption text-on-surface-variant">On Scene</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Section: Live Updates Timeline -->
+<section class="mb-8">
+<div class="flex justify-between items-center mb-6">
+<h3 class="font-label-bold text-label-bold text-on-surface uppercase tracking-widest text-outline">Live Updates</h3>
+<span class="bg-error/10 text-error font-caption text-caption px-2 py-1 rounded-md flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-error animate-pulse"></span> Live
+                </span>
+</div>
+<div class="relative pl-[22px] border-l-2 border-surface-container-highest space-y-8 pb-4">
+<!-- Timeline Item 1 (Newest) -->
+<div class="relative">
+<div class="absolute -left-[29px] top-1 w-[14px] h-[14px] rounded-full bg-primary border-[3px] border-surface-container-lowest shadow-sm z-10"></div>
+<div class="font-label-bold text-label-bold text-primary mb-1">Update from HQ</div>
+<div class="font-caption text-caption text-outline mb-2">Just now</div>
+<div class="font-body-sm text-body-sm text-on-surface bg-surface-container-low p-4 rounded-xl rounded-tl-none border border-outline-variant/30 shadow-[0_2px_4px_rgba(0,0,0,0.02)]">
+                        Rescue Boat Unit Alpha has arrived at the perimeter. Assessing current strength before proceeding to ground floor windows.
+                    </div>
+</div>
+<!-- Timeline Item 2 -->
+<div class="relative">
+<div class="absolute -left-[29px] top-1 w-[14px] h-[14px] rounded-full bg-outline-variant border-[3px] border-surface-container-lowest z-10"></div>
+<div class="font-label-bold text-label-bold text-on-surface-variant mb-1">Local Volunteer</div>
+<div class="font-caption text-caption text-outline mb-2">15 mins ago</div>
+<div class="font-body-sm text-body-sm text-on-surface bg-surface-container-low p-4 rounded-xl rounded-tl-none border border-outline-variant/30">
+                        Water level has risen another 6 inches in the last hour. Seeking higher ground on 2nd floor balconies. 
+                    </div>
+</div>
+<!-- Timeline Item 3 -->
+<div class="relative">
+<div class="absolute -left-[29px] top-1 w-[14px] h-[14px] rounded-full bg-outline-variant border-[3px] border-surface-container-lowest z-10"></div>
+<div class="font-label-bold text-label-bold text-on-surface-variant mb-1">Initial SOS Signal</div>
+<div class="font-caption text-caption text-outline mb-2">45 mins ago</div>
+<div class="font-body-sm text-body-sm text-on-surface bg-surface-container-low p-4 rounded-xl rounded-tl-none border border-outline-variant/30">
+                        Distress beacon activated by complex management. Immediate assistance requested for multiple trapped individuals.
+                    </div>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Sticky Action (Suppresses BottomNav) -->
+<div class="fixed bottom-0 left-0 w-full px-6 py-5 bg-surface-container-lowest/90 backdrop-blur-lg border-t border-surface-container z-50 shadow-[0_-8px_24px_rgba(0,0,0,0.04)]">
+<div class="max-w-container-max mx-auto">
+<button class="w-full bg-primary hover:bg-primary/90 text-on-primary font-label-bold text-body-md py-4 rounded-xl shadow-[0_4px_12px_rgba(0,61,155,0.2)] transition-all active:scale-[0.98] flex items-center justify-center gap-2">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">volunteer_activism</span>
+                I'M HERE TO HELP
+            </button>
+</div>
+</div>
+</body></html>

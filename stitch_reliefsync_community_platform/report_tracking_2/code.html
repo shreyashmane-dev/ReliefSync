@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ReliefSync - Report Details</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-primary-fixed": "#001848",
+                      "on-secondary-fixed-variant": "#920024",
+                      "error-container": "#ffdad6",
+                      "secondary-container": "#ff5263",
+                      "primary-fixed": "#dae2ff",
+                      "outline": "#737685",
+                      "on-surface": "#191c1e",
+                      "inverse-primary": "#b2c5ff",
+                      "on-primary": "#ffffff",
+                      "tertiary-fixed": "#82f9be",
+                      "surface": "#f8f9fb",
+                      "tertiary": "#004e32",
+                      "secondary-fixed-dim": "#ffb3b4",
+                      "on-primary-container": "#c4d2ff",
+                      "outline-variant": "#c3c6d6",
+                      "tertiary-fixed-dim": "#65dca4",
+                      "primary": "#003d9b",
+                      "surface-container-highest": "#e1e2e4",
+                      "secondary": "#b81a36",
+                      "on-tertiary-fixed": "#002113",
+                      "surface-variant": "#e1e2e4",
+                      "surface-container-low": "#f3f4f6",
+                      "primary-fixed-dim": "#b2c5ff",
+                      "inverse-on-surface": "#f0f1f3",
+                      "on-error": "#ffffff",
+                      "surface-bright": "#f8f9fb",
+                      "on-tertiary": "#ffffff",
+                      "surface-dim": "#d9dadc",
+                      "surface-tint": "#0c56d0",
+                      "background": "#f8f9fb",
+                      "on-tertiary-fixed-variant": "#005235",
+                      "tertiary-container": "#006844",
+                      "on-error-container": "#93000a",
+                      "primary-container": "#0052cc",
+                      "on-secondary-fixed": "#40000a",
+                      "error": "#ba1a1a",
+                      "on-surface-variant": "#434654",
+                      "on-secondary": "#ffffff",
+                      "surface-container-high": "#e7e8ea",
+                      "secondary-fixed": "#ffdad9",
+                      "surface-container-lowest": "#ffffff",
+                      "on-primary-fixed-variant": "#0040a2",
+                      "on-background": "#191c1e",
+                      "inverse-surface": "#2e3132",
+                      "surface-container": "#edeef0",
+                      "on-tertiary-container": "#72e9af",
+                      "on-secondary-container": "#5b0013"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "sm": "12px",
+                      "lg": "24px",
+                      "md": "16px",
+                      "gutter": "24px",
+                      "xxl": "48px",
+                      "xl": "32px",
+                      "base": "8px",
+                      "container-max": "1200px",
+                      "xs": "4px"
+              },
+              "fontFamily": {
+                      "body-md": ["Inter"],
+                      "body-sm": ["Inter"],
+                      "label-bold": ["Inter"],
+                      "h3": ["Inter"],
+                      "h2": ["Inter"],
+                      "h1": ["Inter"],
+                      "caption": ["Inter"],
+                      "body-lg": ["Inter"]
+              },
+              "fontSize": {
+                      "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                      "body-sm": ["14px", {"lineHeight": "1.45", "fontWeight": "400"}],
+                      "label-bold": ["14px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                      "h3": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                      "h2": ["32px", {"lineHeight": "1.25", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "h1": ["40px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "caption": ["12px", {"lineHeight": "1.2", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                      "body-lg": ["18px", {"lineHeight": "1.55", "fontWeight": "400"}]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-family: 'Material Symbols Outlined';
+            font-weight: normal;
+            font-style: normal;
+            font-size: 24px;
+            line-height: 1;
+            letter-spacing: normal;
+            text-transform: none;
+            display: inline-block;
+            white-space: nowrap;
+            word-wrap: normal;
+            direction: ltr;
+            -webkit-font-feature-settings: 'liga';
+            -webkit-font-smoothing: antialiased;
+        }
+        .shadow-level-1 {
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md min-h-screen">
+<!-- TopAppBar Component (from JSON) -->
+<header class="bg-white dark:bg-slate-900 w-full sticky top-0 z-50 border-b border-slate-100 dark:border-slate-800 shadow-sm dark:shadow-none flex justify-between items-center px-6 py-3 w-full">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-blue-700 dark:text-blue-400" data-icon="emergency">emergency</span>
+<span class="font-sans text-base font-semibold text-xl font-extrabold tracking-tight text-blue-700 dark:text-blue-500">ReliefSync</span>
+</div>
+<div>
+<img alt="User profile photo" class="w-8 h-8 rounded-full" data-alt="Close-up portrait of a professional individual with a neutral expression, well-lit against a soft background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1glwf3zbQz3JNT5EMsNXq7wA4UD-nAeTYNZiVZXwp3OtUE74JFB8g1yobJ-oEoH_uezwzR4g6yLJJ-mtBCKGcahqDtP2JYDmo7TEFGgq5NmE4g-rz0XKl7L6pzrvdxqFsv242N_7MAIr-UPhzLD95fuMOVFmWmr-gv9fawuRVSC04FZddD_1TxrGEq6ffluoQdjG5eoiIGNkMq778pL42POI5o4mBFeZPc64Ci_Oq0KFP_x8jDjyeupHARPSNaX40yYNGBnmUd1mh"/>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="max-w-[1200px] mx-auto px-gutter py-xl">
+<!-- Back Navigation Context -->
+<a class="inline-flex items-center gap-xs text-primary font-label-bold text-label-bold mb-lg hover:underline" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="arrow_back">arrow_back</span>
+            Back to My Reports
+        </a>
+<!-- Header Area -->
+<div class="flex flex-col md:flex-row md:items-start justify-between gap-md mb-xxl">
+<div>
+<h1 class="font-h1 text-h1 text-on-surface mb-xs">Medical Supply Shortage</h1>
+<p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px]" data-icon="tag">tag</span>
+                    RS-8492 • Reported Today, 08:14 AM
+                </p>
+</div>
+<div class="inline-flex items-center gap-xs bg-secondary-container/10 px-md py-base rounded-full border border-secondary-container/20">
+<span class="material-symbols-outlined text-secondary text-[16px]" data-icon="medical_services">medical_services</span>
+<span class="font-label-bold text-label-bold text-secondary">Critical Priority</span>
+</div>
+</div>
+<!-- Master-Detail Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-lg">
+<!-- Left Column: Details & Timeline -->
+<div class="lg:col-span-8 flex flex-col gap-lg">
+<!-- Status Timeline Card -->
+<div class="bg-surface-container-lowest rounded-[16px] shadow-level-1 p-lg">
+<h2 class="font-h3 text-h3 text-on-surface mb-lg">Status Tracking</h2>
+<div class="relative flex justify-between items-center w-full mt-xl mb-md">
+<!-- Progress Line Background -->
+<div class="absolute top-1/2 left-0 w-full h-[2px] bg-surface-variant -z-10 -translate-y-1/2"></div>
+<!-- Active Progress Line -->
+<div class="absolute top-1/2 left-0 w-[66%] h-[2px] bg-primary-container -z-10 -translate-y-1/2"></div>
+<!-- Step 1: Reported -->
+<div class="flex flex-col items-center gap-sm">
+<div class="w-[32px] h-[32px] rounded-full bg-primary-container text-on-primary flex items-center justify-center border-4 border-surface-container-lowest">
+<span class="material-symbols-outlined text-[16px]" data-icon="check">check</span>
+</div>
+<span class="font-label-bold text-label-bold text-on-surface">Reported</span>
+</div>
+<!-- Step 2: Assigned -->
+<div class="flex flex-col items-center gap-sm">
+<div class="w-[32px] h-[32px] rounded-full bg-primary-container text-on-primary flex items-center justify-center border-4 border-surface-container-lowest">
+<span class="material-symbols-outlined text-[16px]" data-icon="check">check</span>
+</div>
+<span class="font-label-bold text-label-bold text-on-surface">Assigned</span>
+</div>
+<!-- Step 3: In Route (Current) -->
+<div class="flex flex-col items-center gap-sm">
+<div class="w-[32px] h-[32px] rounded-full bg-primary-container text-on-primary flex items-center justify-center border-4 border-surface-container-lowest ring-4 ring-primary-container/20">
+<span class="material-symbols-outlined text-[16px]" data-icon="local_shipping">local_shipping</span>
+</div>
+<span class="font-label-bold text-label-bold text-primary-container">In Route</span>
+</div>
+<!-- Step 4: Resolved (Pending) -->
+<div class="flex flex-col items-center gap-sm">
+<div class="w-[32px] h-[32px] rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center border-4 border-surface-container-lowest">
+<span class="material-symbols-outlined text-[16px]" data-icon="task_alt">task_alt</span>
+</div>
+<span class="font-label-bold text-label-bold text-on-surface-variant">Resolved</span>
+</div>
+</div>
+</div>
+<!-- Report Details Card -->
+<div class="bg-surface-container-lowest rounded-[16px] shadow-level-1 p-lg">
+<h2 class="font-h3 text-h3 text-on-surface mb-md">Report Description</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mb-lg">
+                        Community center at Elm St is critically low on basic first aid supplies, particularly sterile gauze, antiseptics, and thermal blankets following the recent flooding event. We currently have 15 individuals requiring minor medical attention and supplies are expected to run out within 4 hours.
+                    </p>
+<!-- Location Section -->
+<div class="mt-lg">
+<h3 class="font-label-bold text-label-bold text-on-surface mb-sm">Incident Location</h3>
+<div class="flex items-start gap-md mb-md">
+<span class="material-symbols-outlined text-primary-container" data-icon="location_on">location_on</span>
+<span class="font-body-md text-body-md text-on-surface-variant">442 Elm Street, Community Hall Wing B<br/>Sector 4, North District</span>
+</div>
+<div class="w-full h-[200px] rounded-lg overflow-hidden bg-surface-variant border border-outline-variant relative">
+<img alt="Map Location" class="w-full h-full object-cover" data-alt="Top-down view of a digital city map interface with a clear street grid and subtle terrain details" data-location="City map overhead view" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCy_X4YEt13NgAXTzb3dheBzjBdXn-swCSwqDbh8PJUvh2P5KIq0GkVF8ocnspX-T13ykEyDDPndhyt5rMtqwPlU9glwlTdHvP-aKxth6UjBPjD3nrZTB6t0J0kkF27I6P4lVBB5u6Sc30wva6_UZZg9QBuUCLm7qWI6cd4l9IJ9FUAVIoEGouhWChRs-k_XzRuzO8AoPerSEnBdqBGJdQfmezFoeMIoMrWjYxFwjjrYiPvX2jaQMv2CM75fr7bnxUCQCeR7B7ztz0D"/>
+<!-- Custom Map Pin -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full border-2 border-secondary bg-white flex items-center justify-center shadow-md">
+<div class="w-4 h-4 rounded-full bg-secondary"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Attachments Gallery -->
+<div class="bg-surface-container-lowest rounded-[16px] shadow-level-1 p-lg">
+<h2 class="font-h3 text-h3 text-on-surface mb-md flex items-center gap-xs">
+<span class="material-symbols-outlined" data-icon="photo_library">photo_library</span>
+                        Photo Attachments
+                    </h2>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-md mt-md">
+<div class="aspect-square rounded-lg overflow-hidden border border-outline-variant">
+<img alt="Empty supply shelf" class="w-full h-full object-cover" data-alt="Empty metal shelving units in a storage room with stark overhead lighting indicating a lack of supplies" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC66ynJaaa8rRIhG68ZZ2-J9k1kKuVqmirb7H9t0HQV_DLKX0FiysgR_HnqKMcCyQbB2Wzg1f1gs3Dm3cwd8nV9HeDPjDar4UzFzetgFmzq90QoIgI6ue0PbCP2ylmBYP6Ep1ub68B_0bkUINq1MArk9fthaHVUJP8mx6WpvHjw5Ajw-6LVsT_Hnn_7mNgPd3DEZBH73z0NU4kbjoCyZ7v1BBeHSuy7vweTjGVghQ2zvvWgtaXlnXUTXhvQCnA2D8TEOZVQDz4zMqb3"/>
+</div>
+<div class="aspect-square rounded-lg overflow-hidden border border-outline-variant">
+<img alt="Makeshift triage area" class="w-full h-full object-cover" data-alt="A makeshift medical triage area setup with cots and basic equipment in a community hall setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-LE0Y9xEQIdS68skuAh99-a6Xmw1NmbOgp0oUQrxKMcgRc4MEsH8FPcAEwUixLL1m_v3aJ3vxHAe1R-370D29mrE5qI9aZUoJvNL0yIExCDgICioRyZapeW7fbTwAAWLst0QVPuq8H_xt3ZRCbBprUqRtmiS4gAYZf8N7nKQuIEdvU-LvZdIwLWuUXVKo4PLlpLKjhm_CLBAxQncfarfHie68rt5k7T9HuuCMi1v8t4zbM68eVpwnFiXtzWQhDIZfoUjkHwXh0Emr"/>
+</div>
+</div>
+</div>
+<!-- Feedback Section (Post-Resolution Preview) -->
+<div class="bg-surface-container-lowest rounded-[16px] shadow-level-1 p-lg border border-outline-variant opacity-75 grayscale-[20%]">
+<div class="flex justify-between items-center mb-md">
+<h2 class="font-h3 text-h3 text-on-surface">Provide Feedback</h2>
+<span class="font-caption text-caption text-on-surface-variant bg-surface-container px-sm py-xs rounded-full">Unlocks upon resolution</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-lg">How would you rate the speed and quality of the assistance provided?</p>
+<div class="flex gap-sm mb-lg text-outline-variant">
+<span class="material-symbols-outlined text-[32px]" data-icon="star_rate">star_rate</span>
+<span class="material-symbols-outlined text-[32px]" data-icon="star_rate">star_rate</span>
+<span class="material-symbols-outlined text-[32px]" data-icon="star_rate">star_rate</span>
+<span class="material-symbols-outlined text-[32px]" data-icon="star_rate">star_rate</span>
+<span class="material-symbols-outlined text-[32px]" data-icon="star_rate">star_rate</span>
+</div>
+<div class="flex flex-col gap-sm">
+<label class="font-label-bold text-label-bold text-on-surface">Additional Comments (Optional)</label>
+<textarea class="w-full bg-surface border border-outline-variant rounded-lg p-md font-body-md text-body-md text-on-surface focus:border-primary-container focus:ring-1 focus:ring-primary-container resize-none" disabled="" placeholder="Tell us about your experience..." rows="3"></textarea>
+</div>
+<button class="mt-lg w-full md:w-auto px-lg py-sm bg-surface-container-highest text-on-surface-variant font-label-bold text-label-bold rounded-lg cursor-not-allowed" disabled="">Submit Feedback</button>
+</div>
+</div>
+<!-- Right Column: ETA & Volunteer Context -->
+<div class="lg:col-span-4 flex flex-col gap-lg">
+<!-- ETA Card -->
+<div class="bg-primary-container rounded-[16px] shadow-level-1 p-lg text-on-primary">
+<div class="flex items-center justify-between mb-sm">
+<h3 class="font-label-bold text-label-bold text-primary-fixed-dim">Estimated Arrival</h3>
+<span class="material-symbols-outlined" data-icon="schedule">schedule</span>
+</div>
+<div class="font-h1 text-h1 tracking-tighter mb-xs">
+                        14 <span class="font-h3 text-h3 font-normal opacity-80">mins</span>
+</div>
+<p class="font-body-sm text-body-sm text-primary-fixed">Vehicle tracking active. Route updated 2 mins ago.</p>
+</div>
+<!-- Assigned Volunteer Card -->
+<div class="bg-surface-container-lowest rounded-[16px] shadow-level-1 p-lg border-t-4 border-primary-container">
+<h3 class="font-label-bold text-label-bold text-on-surface-variant mb-lg uppercase tracking-wider">Assigned Responder</h3>
+<div class="flex items-center gap-md mb-lg">
+<div class="w-16 h-16 rounded-full overflow-hidden border-2 border-surface-container-high">
+<img alt="Volunteer Photo" class="w-full h-full object-cover" data-alt="Portrait of a female medical volunteer wearing a high-visibility vest, looking capable and reassuring" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbzdvXGhBwt2r15l8PAZm3sZI1AERjQbTcVnyx7lU3MRDXgj4K9XHhryrbfC5c4ksMCQyU3mE-ssx_KcBTAjyStoMsZCqAKbDvK_HKDtAOIrC-yYAyr8nV7nue955m1mW-WdHmvybFTfiC4r59C2B7LpITSTEgJb_GGveOODXVWITH8Uo_nGvOFCpdqsiGRhUUnmfc6uuuBT4Vs6GWXwIwji5_mng8xfT64mB-BPSDEUMRy-yT0F5JYXwFVBKk7Hh3prpKJd2r5nya"/>
+</div>
+<div>
+<h4 class="font-h3 text-h3 text-on-surface">Sarah Jenkins</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px] text-tertiary-container" data-icon="verified">verified</span>
+                                Certified Paramedic
+                            </p>
+</div>
+</div>
+<div class="space-y-sm mb-lg">
+<div class="flex items-center gap-sm font-body-sm text-body-sm text-on-surface">
+<span class="material-symbols-outlined text-outline" data-icon="directions_car">directions_car</span>
+                            White Ford Transit (RS-204)
+                        </div>
+<div class="flex items-center gap-sm font-body-sm text-body-sm text-on-surface">
+<span class="material-symbols-outlined text-outline" data-icon="inventory_2">inventory_2</span>
+                            Carrying Medical Kit B
+                        </div>
+</div>
+<button class="w-full flex items-center justify-center gap-sm bg-surface-container border border-outline-variant text-primary-container font-label-bold text-label-bold rounded-lg py-md hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined" data-icon="call">call</span>
+                        Contact Responder
+                    </button>
+</div>
+<!-- Quick Actions / Support -->
+<div class="bg-surface-container-lowest rounded-[16px] shadow-level-1 p-lg border border-outline-variant">
+<h3 class="font-label-bold text-label-bold text-on-surface mb-md">Need immediate changes?</h3>
+<button class="w-full flex items-center justify-between text-error font-body-sm text-body-sm py-sm hover:underline">
+                        Cancel Request
+                        <span class="material-symbols-outlined text-[18px]" data-icon="cancel">cancel</span>
+</button>
+<hr class="border-surface-variant my-sm"/>
+<button class="w-full flex items-center justify-between text-on-surface-variant font-body-sm text-body-sm py-sm hover:underline">
+                        Update Details
+                        <span class="material-symbols-outlined text-[18px]" data-icon="edit">edit</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+</body></html>

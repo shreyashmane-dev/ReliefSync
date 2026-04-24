@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ReliefSync - Reports</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed": "#002113",
+                        "surface-dim": "#d9dadc",
+                        "primary-fixed-dim": "#b2c5ff",
+                        "on-error-container": "#93000a",
+                        "primary-container": "#0052cc",
+                        "surface-container-high": "#e7e8ea",
+                        "on-primary-fixed": "#001848",
+                        "surface-container": "#edeef0",
+                        "inverse-on-surface": "#f0f1f3",
+                        "on-tertiary-container": "#72e9af",
+                        "secondary-fixed-dim": "#ffb3b4",
+                        "on-primary-fixed-variant": "#0040a2",
+                        "tertiary-container": "#006844",
+                        "on-primary-container": "#c4d2ff",
+                        "on-secondary-container": "#5b0013",
+                        "tertiary": "#004e32",
+                        "background": "#f8f9fb",
+                        "on-secondary-fixed": "#40000a",
+                        "error": "#ba1a1a",
+                        "on-background": "#191c1e",
+                        "primary-fixed": "#dae2ff",
+                        "surface-variant": "#e1e2e4",
+                        "surface-tint": "#0c56d0",
+                        "surface-container-low": "#f3f4f6",
+                        "outline": "#737685",
+                        "on-surface": "#191c1e",
+                        "error-container": "#ffdad6",
+                        "secondary": "#b81a36",
+                        "surface-container-highest": "#e1e2e4",
+                        "inverse-surface": "#2e3132",
+                        "secondary-fixed": "#ffdad9",
+                        "tertiary-fixed-dim": "#65dca4",
+                        "on-surface-variant": "#434654",
+                        "tertiary-fixed": "#82f9be",
+                        "on-error": "#ffffff",
+                        "inverse-primary": "#b2c5ff",
+                        "on-primary": "#ffffff",
+                        "surface-bright": "#f8f9fb",
+                        "on-secondary-fixed-variant": "#920024",
+                        "surface-container-lowest": "#ffffff",
+                        "outline-variant": "#c3c6d6",
+                        "primary": "#003d9b",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#005235",
+                        "secondary-container": "#ff5263",
+                        "surface": "#f8f9fb",
+                        "on-tertiary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "12px",
+                        "base": "8px",
+                        "lg": "24px",
+                        "gutter": "24px",
+                        "xs": "4px",
+                        "xxl": "48px",
+                        "xl": "32px",
+                        "container-max": "1200px",
+                        "md": "16px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "caption": ["Inter"],
+                        "h2": ["Inter"],
+                        "h1": ["Inter"],
+                        "h3": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-bold": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background font-body-md text-on-background min-h-screen">
+<!-- TopAppBar -->
+<header class="bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 shadow-[0px_2px_4px_rgba(0,0,0,0.05)] docked full-width top-0 sticky flex justify-between items-center w-full px-4 h-16 z-50">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[#0052CC] dark:text-blue-400" data-icon="location_on">location_on</span>
+<h1 class="text-xl font-extrabold tracking-tight text-[#0052CC] dark:text-blue-400">ReliefSync</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined text-gray-500 dark:text-gray-400" data-icon="notifications">notifications</span>
+</button>
+</div>
+</header>
+<main class="pb-24">
+<!-- Map Preview Section -->
+<section class="w-full h-[320px] relative overflow-hidden">
+<div class="absolute inset-0 bg-surface-container">
+<img alt="City map with incident pins" class="w-full h-full object-cover grayscale opacity-60" data-alt="Modern minimalist digital map interface showing a city grid with several blue and red glowing incident pins scattered across the layout" data-location="San Francisco" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAz5VRjqeEAsu-HDd-W0aVTFIlI6FC9vz0zY4cYKUlkITTQZ75obZBEOyJ4LCEeTBR9MlZYZQjlIMJuD8yh-Sii7QxnF78UOslD10by47jBvPDVXxTe6MIFgdhkq4qRx04umJ5zCdny_tXK7VQEa9CHxajEi7vcR-go9VRRjcxxoQCvFRVmtzr-NwPxerpdD5VQzPC_3BEYCevJ-Cp4HtsK8yvbpqoCGjhbY7NAvZYJsmtPtDs641d_LOfvkQSAa0CP1ToUkgZ6SuCQ"/>
+</div>
+<!-- Custom Map Overlay Elements -->
+<div class="absolute inset-0 pointer-events-none flex items-center justify-center">
+<div class="relative">
+<div class="absolute -top-12 -left-20 bg-white shadow-xl rounded-xl p-3 flex items-center gap-3 border border-outline-variant pointer-events-auto">
+<div class="w-10 h-10 rounded-lg bg-secondary-container/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary" data-icon="local_fire_department" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+</div>
+<div>
+<p class="font-label-bold text-body-sm">Residential Fire</p>
+<p class="text-caption text-outline">0.2 mi away</p>
+</div>
+</div>
+<div class="w-6 h-6 bg-primary rounded-full border-4 border-white shadow-lg animate-pulse"></div>
+</div>
+</div>
+<!-- Search/Filter Bar over Map -->
+<div class="absolute bottom-6 left-4 right-4 flex gap-2">
+<div class="flex-1 bg-white/95 backdrop-blur shadow-lg rounded-xl flex items-center px-4 h-12 border border-white">
+<span class="material-symbols-outlined text-outline mr-2" data-icon="search">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-sm w-full" placeholder="Search area for reports..." type="text"/>
+</div>
+<button class="bg-white/95 backdrop-blur shadow-lg rounded-xl aspect-square h-12 flex items-center justify-center border border-white">
+<span class="material-symbols-outlined text-primary" data-icon="tune">tune</span>
+</button>
+</div>
+</section>
+<!-- Nearby Reports Horizontal Section -->
+<section class="mt-xl px-4">
+<div class="flex justify-between items-center mb-md">
+<h2 class="font-h3 text-h3 text-on-surface">Nearby Reports</h2>
+<button class="text-primary font-label-bold text-body-sm">View All</button>
+</div>
+<div class="flex gap-4 overflow-x-auto hide-scrollbar pb-4 -mx-4 px-4">
+<!-- Card 1 -->
+<div class="flex-none w-[280px] bg-white rounded-xl shadow-[0px_2px_4px_rgba(0,0,0,0.05)] p-4 border border-surface-container hover:shadow-lg transition-shadow">
+<div class="flex justify-between items-start mb-3">
+<span class="bg-error/10 text-error text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Critical</span>
+<span class="text-caption text-outline">0.3 mi</span>
+</div>
+<div class="flex gap-3 mb-3">
+<img class="w-16 h-16 rounded-lg object-cover bg-surface-container" data-alt="Close up of a cracked urban asphalt road surface needing repair" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCarRNNxPzj7mn-ihYQbIRsw7mBTTQIGFRy3VvEjVED6o3e0ie45x6Tm5Aw2o8qo_RPRNHrhJY_k9HNx42CnPP-MDXeurrBmvFCGFYqJ9EI2SBCIEudwS3j9eKcmXXwA-LxZWNHFKa67NoYAeWH9IunC3C10mhB2D9_o7RaKo8IR60BbxQV9acetBGN5rZJpRhwUq6m7f6sQWPOAKJE7tPXK3hqybIKSrDYijK8dRDlNgjuUrnhuA-MUJBFlRoq2SQ6fXgeQLEzj081"/>
+<div>
+<h3 class="font-label-bold text-body-md line-clamp-1">Infrastructure Failure</h3>
+<p class="text-caption text-outline mt-1">Pending Review</p>
+</div>
+</div>
+<div class="flex items-center justify-between mt-4 pt-3 border-t border-surface-container">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-tertiary text-sm" data-icon="verified" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span class="text-caption font-bold">98% Confidence</span>
+</div>
+<span class="text-caption text-outline">12 verifications</span>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="flex-none w-[280px] bg-white rounded-xl shadow-[0px_2px_4px_rgba(0,0,0,0.05)] p-4 border border-surface-container">
+<div class="flex justify-between items-start mb-3">
+<span class="bg-primary/10 text-primary text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Warning</span>
+<span class="text-caption text-outline">0.8 mi</span>
+</div>
+<div class="flex gap-3 mb-3">
+<img class="w-16 h-16 rounded-lg object-cover bg-surface-container" data-alt="Damaged power lines hanging low over a residential street after a storm" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDz6f8xziRlR0KZmoGgO7c11P6H_-lkfeiHfcdqdkGWHbqpifmh9YSszmkLb5_G77YYTKxykLLWz8Qms_1D8bo7OqWDAHa4Eqxknjebeey40S3Ql09tu8lXMwz2xYDO4YYNQBE8hhNBqG8yr5V7orvVVJVQpZwdFTM1n0JQCPWTxKPTOBTuKlqQtbHhYiZ0g3ET_tIpom3IPi6ikpOTx-jVqBbzd7jpC0RrivLqp5dkikn4iRZ-Ab_AL_Btl2Ueb197fkFSDJvXmEOB"/>
+<div>
+<h3 class="font-label-bold text-body-md line-clamp-1">Downed Power Lines</h3>
+<p class="text-caption text-outline mt-1">Under Investigation</p>
+</div>
+</div>
+<div class="flex items-center justify-between mt-4 pt-3 border-t border-surface-container">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-primary text-sm" data-icon="new_releases">new_releases</span>
+<span class="text-caption font-bold">85% Confidence</span>
+</div>
+<span class="text-caption text-outline">5 verifications</span>
+</div>
+</div>
+</div>
+</section>
+<!-- All Reports Feed -->
+<section class="mt-xl px-4">
+<h2 class="font-h3 text-h3 text-on-surface mb-md">All Reports</h2>
+<!-- Filter Chips -->
+<div class="flex gap-2 overflow-x-auto hide-scrollbar mb-lg">
+<button class="bg-primary text-white px-4 py-2 rounded-full text-body-sm font-label-bold flex-none">All Types</button>
+<button class="bg-white border border-outline-variant text-on-surface-variant px-4 py-2 rounded-full text-body-sm font-label-bold flex-none">Medical</button>
+<button class="bg-white border border-outline-variant text-on-surface-variant px-4 py-2 rounded-full text-body-sm font-label-bold flex-none">Fire</button>
+<button class="bg-white border border-outline-variant text-on-surface-variant px-4 py-2 rounded-full text-body-sm font-label-bold flex-none">Infrastructure</button>
+<button class="bg-white border border-outline-variant text-on-surface-variant px-4 py-2 rounded-full text-body-sm font-label-bold flex-none">Water</button>
+</div>
+<!-- Feed List -->
+<div class="space-y-4">
+<!-- Feed Item 1 -->
+<div class="bg-white rounded-xl shadow-[0px_2px_4px_rgba(0,0,0,0.05)] overflow-hidden border-l-4 border-l-error">
+<div class="p-4 flex gap-4">
+<div class="flex-1">
+<div class="flex items-center gap-2 mb-1">
+<span class="bg-error/10 text-error text-[10px] px-2 py-0.5 rounded-full font-bold">CRITICAL</span>
+<span class="text-caption text-outline">Medical Emergency</span>
+</div>
+<h3 class="font-h3 text-body-lg text-on-surface">Respiratory distress report</h3>
+<p class="text-body-sm text-on-surface-variant line-clamp-2 mt-1">Multiple individuals reported difficulty breathing near industrial zone. Oxygen support requested.</p>
+<div class="mt-4 flex flex-wrap gap-y-2 gap-x-4">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-outline text-lg" data-icon="location_on">location_on</span>
+<span class="text-caption text-outline">0.5 miles</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-tertiary text-lg" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="text-caption text-on-tertiary-fixed-variant font-bold">92% Match</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-outline text-lg" data-icon="history">history</span>
+<span class="text-caption text-outline">4 mins ago</span>
+</div>
+</div>
+</div>
+<div class="w-24 h-24 flex-none">
+<img class="w-full h-full object-cover rounded-lg" data-alt="Interior of an ambulance showing medical equipment and oxygen tanks in clean sterile environment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDRg7_WwIKrEIyJMS3PyUtu_A7y1z25lscybmSTPVTcKwhzXkWrqRE3u47Fw8j8XExfGKu6eOhbdAQLbLHbjF_IzpUlzKCFcCRaSHUofKYKVhL_qixfCEKXg0Ejf9AQEFwGs7UHevdGp9Qdwu7LaV72aU3KBkkYlAgHcDRuDhtG4MW8QBGrJq77eajvFf5rGiRm5pTInylOc7dT8zyWjlaNsil-_H_43nXsn65d_zMMm5j0ONfif0ZmbOmBhNYLeLXw1tRO1ddyKu3R"/>
+</div>
+</div>
+<div class="bg-surface-container-low px-4 py-3 flex justify-between items-center">
+<span class="text-caption font-label-bold text-outline uppercase tracking-wider">Status: Pending Review</span>
+<div class="flex -space-x-2">
+<div class="w-6 h-6 rounded-full border-2 border-white bg-blue-100 flex items-center justify-center text-[8px] font-bold">JD</div>
+<div class="w-6 h-6 rounded-full border-2 border-white bg-green-100 flex items-center justify-center text-[8px] font-bold">AS</div>
+<div class="w-6 h-6 rounded-full border-2 border-white bg-gray-200 flex items-center justify-center text-[8px] font-bold">+8</div>
+</div>
+</div>
+</div>
+<!-- Feed Item 2 -->
+<div class="bg-white rounded-xl shadow-[0px_2px_4px_rgba(0,0,0,0.05)] overflow-hidden border-l-4 border-l-primary">
+<div class="p-4 flex gap-4">
+<div class="flex-1">
+<div class="flex items-center gap-2 mb-1">
+<span class="bg-primary/10 text-primary text-[10px] px-2 py-0.5 rounded-full font-bold">INFO</span>
+<span class="text-caption text-outline">Infrastructure</span>
+</div>
+<h3 class="font-h3 text-body-lg text-on-surface">Main road obstruction</h3>
+<p class="text-body-sm text-on-surface-variant line-clamp-2 mt-1">Large debris blocking traffic on Elm St. Intersection restricted. No injuries reported.</p>
+<div class="mt-4 flex flex-wrap gap-y-2 gap-x-4">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-outline text-lg" data-icon="location_on">location_on</span>
+<span class="text-caption text-outline">1.2 miles</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-tertiary text-lg" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="text-caption text-on-tertiary-fixed-variant font-bold">78% Match</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-outline text-lg" data-icon="history">history</span>
+<span class="text-caption text-outline">12 mins ago</span>
+</div>
+</div>
+</div>
+<div class="w-24 h-24 flex-none">
+<img class="w-full h-full object-cover rounded-lg" data-alt="Urban street blocked with yellow caution tape and construction cones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB9TOynQ_NKPiZbFEKAyzDISV_Y8hSAA9SYg_HElX2hSrIlxnU_ZTKlvn9UiZMbfvVZRpcizQHkRlCuwVZjXUx2CCa7RSAihmPxQ4hOTGEYJxVNtX7l71p2InW2ga3E6o-e7QaDtr9dKtwumBeGYp-buD9oilfT1zybvTCT4AkyjqDTcjMj__WgExC4BMCkfu-D-dNRsD85cdh1rKjlAhpU4TsCsT7Sma7S1WH4LwWee8gFOtumnwIIBmYlPXdLedsT9EzYnPDDyJA4"/>
+</div>
+</div>
+<div class="bg-surface-container-low px-4 py-3 flex justify-between items-center">
+<span class="text-caption font-label-bold text-outline uppercase tracking-wider">Status: Assigned</span>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-outline text-sm" data-icon="group">group</span>
+<span class="text-caption text-outline">3 verified</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Floating Action Button -->
+<button class="fixed right-6 bottom-24 w-14 h-14 bg-[#0052CC] text-white rounded-full shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-transform z-40">
+<span class="material-symbols-outlined text-2xl" data-icon="add">add</span>
+</button>
+<!-- BottomNavBar -->
+<nav class="bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 shadow-[0px_-4px_12px_rgba(0,0,0,0.03)] fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-3 pb-safe rounded-t-2xl">
+<a class="flex flex-col items-center justify-center bg-blue-50 dark:bg-blue-900/20 text-[#0052CC] dark:text-blue-300 rounded-xl px-2 py-1 transition-transform active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="feed" style="font-variation-settings: 'FILL' 1;">feed</span>
+<span class="font-['Inter'] text-[11px] font-medium">Reports</span>
+</a>
+<a class="flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 hover:text-[#0052CC] transition-transform active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="assignment_turned_in">assignment_turned_in</span>
+<span class="font-['Inter'] text-[11px] font-medium">My Reports</span>
+</a>
+<a class="flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 hover:text-[#0052CC] transition-transform active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="military_tech">military_tech</span>
+<span class="font-['Inter'] text-[11px] font-medium">Community Impact</span>
+</a>
+<a class="flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 hover:text-[#0052CC] transition-transform active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="smart_toy">smart_toy</span>
+<span class="font-['Inter'] text-[11px] font-medium">AI Assistant</span>
+</a>
+<a class="flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 hover:text-[#0052CC] transition-transform active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-['Inter'] text-[11px] font-medium">Profile</span>
+</a>
+</nav>
+</body></html>

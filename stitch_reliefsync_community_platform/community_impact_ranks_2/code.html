@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ReliefSync - Community Impact</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed": "#002113",
+                        "surface-dim": "#d9dadc",
+                        "primary-fixed-dim": "#b2c5ff",
+                        "on-error-container": "#93000a",
+                        "primary-container": "#0052cc",
+                        "surface-container-high": "#e7e8ea",
+                        "on-primary-fixed": "#001848",
+                        "surface-container": "#edeef0",
+                        "inverse-on-surface": "#f0f1f3",
+                        "on-tertiary-container": "#72e9af",
+                        "secondary-fixed-dim": "#ffb3b4",
+                        "on-primary-fixed-variant": "#0040a2",
+                        "tertiary-container": "#006844",
+                        "on-primary-container": "#c4d2ff",
+                        "on-secondary-container": "#5b0013",
+                        "tertiary": "#004e32",
+                        "background": "#f8f9fb",
+                        "on-background": "#191c1e",
+                        "primary-fixed": "#dae2ff",
+                        "surface-variant": "#e1e2e4",
+                        "surface-tint": "#0c56d0",
+                        "surface-container-low": "#f3f4f6",
+                        "outline": "#737685",
+                        "on-surface": "#191c1e",
+                        "error-container": "#ffdad6",
+                        "secondary": "#b81a36",
+                        "surface-container-highest": "#e1e2e4",
+                        "inverse-surface": "#2e3132",
+                        "secondary-fixed": "#ffdad9",
+                        "tertiary-fixed-dim": "#65dca4",
+                        "on-surface-variant": "#434654",
+                        "tertiary-fixed": "#82f9be",
+                        "on-error": "#ffffff",
+                        "inverse-primary": "#b2c5ff",
+                        "on-primary": "#ffffff",
+                        "surface-bright": "#f8f9fb",
+                        "on-secondary-fixed-variant": "#920024",
+                        "surface-container-lowest": "#ffffff",
+                        "outline-variant": "#c3c6d6",
+                        "primary": "#003d9b",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#005235",
+                        "secondary-container": "#ff5263",
+                        "surface": "#f8f9fb",
+                        "on-tertiary": "#ffffff",
+                        "gold": "#D4AF37",
+                        "silver": "#C0C0C0"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "12px",
+                        "base": "8px",
+                        "lg": "24px",
+                        "gutter": "24px",
+                        "xs": "4px",
+                        "xxl": "48px",
+                        "xl": "32px",
+                        "container-max": "1200px",
+                        "md": "16px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "caption": ["Inter"],
+                        "h2": ["Inter"],
+                        "h1": ["Inter"],
+                        "h3": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-bold": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["14px", {"lineHeight": "1.45", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "1.55", "fontWeight": "400"}],
+                        "caption": ["12px", {"lineHeight": "1.2", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                        "h2": ["32px", {"lineHeight": "1.25", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "h1": ["40px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "h3": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "label-bold": ["14px", {"lineHeight": "1.2", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bg-glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen pb-24">
+<!-- TopAppBar -->
+<header class="bg-white/90 dark:bg-gray-900/90 backdrop-blur-md shadow-[0px_2px_4px_rgba(0,0,0,0.05)] border-b border-gray-100 dark:border-gray-800 docked full-width top-0 sticky flex justify-between items-center w-full px-4 h-16 z-50">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[#0052CC]" data-icon="location_on">location_on</span>
+<h1 class="text-xl font-extrabold tracking-tight text-[#0052CC] dark:text-blue-400">ReliefSync</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined text-gray-500" data-icon="notifications">notifications</span>
+</button>
+</div>
+</header>
+<main class="max-w-container-max mx-auto px-gutter py-xl">
+<!-- Hero Section: Civic Dashboard -->
+<section class="grid grid-cols-1 lg:grid-cols-3 gap-lg mb-xxl">
+<div class="lg:col-span-2 relative overflow-hidden rounded-xl bg-primary-container text-white p-lg shadow-lg flex flex-col justify-between min-h-[320px]">
+<div class="absolute inset-0 opacity-10 pointer-events-none" data-alt="abstract architectural grid pattern representing civic infrastructure and urban planning with clean geometric lines" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBI1X0F1Os-V7O3FzCqEATy2bdvk00HXQWBMjQMdo6g10dGdbw0mAbdV3GxfavFbRkacUub7NZOsKqI7FaQrkDwA6fVk9sij1Ef1xQonImE19gSBlu3VcpZrZhtFIE9_Tw26uuJPSI0WWfRcvXK28ppD4VO71hq_sna3g7DLfjbPEsj27jtYcU7rbKpsiZDM8F438gHzPSQyvvfeAiKXWY_4OBcVNKKMPWzEcsqI2hYZnUwzmijN4iM9XPMPefkSHEDQLrt-hdmRYOE'); background-size: cover; background-position: center;"></div>
+<div class="relative z-10">
+<h2 class="font-h1 text-h1 mb-base">Community Impact</h2>
+<p class="font-body-lg text-body-lg opacity-90 max-w-xl">Your contributions are building a more resilient city. Track your progress and celebrate local relief milestones.</p>
+</div>
+<div class="relative z-10 flex gap-4 mt-xl">
+<div class="bg-white/10 backdrop-blur-md rounded-lg p-md border border-white/20">
+<span class="font-caption text-caption uppercase tracking-wider block mb-1">Actions Verified</span>
+<span class="font-h3 text-h3">1,284</span>
+</div>
+<div class="bg-white/10 backdrop-blur-md rounded-lg p-md border border-white/20">
+<span class="font-caption text-caption uppercase tracking-wider block mb-1">Lives Impacted</span>
+<span class="font-h3 text-h3">452</span>
+</div>
+</div>
+</div>
+<!-- Trust Score Gauge -->
+<div class="bg-white rounded-xl shadow-[0px_2px_4px_rgba(0,0,0,0.05)] p-lg flex flex-col items-center justify-center text-center border border-gray-100">
+<h3 class="font-label-bold text-label-bold text-outline uppercase mb-lg tracking-widest">Community Trust Score</h3>
+<div class="relative w-48 h-48 flex items-center justify-center">
+<svg class="w-full h-full transform -rotate-90">
+<circle class="text-surface-container" cx="96" cy="96" fill="transparent" r="88" stroke="currentColor" stroke-width="12"></circle>
+<circle class="text-primary-container" cx="96" cy="96" fill="transparent" r="88" stroke="currentColor" stroke-dasharray="552.92" stroke-dashoffset="82.93" stroke-linecap="round" stroke-width="12"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="font-h1 text-h1 text-primary">850</span>
+<span class="font-caption text-caption text-outline">Out of 1000</span>
+</div>
+</div>
+<p class="mt-lg font-body-sm text-body-sm text-on-surface-variant">Your reputation is <strong>Top 5%</strong> in the local sector.</p>
+</div>
+</section>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-xl">
+<!-- Left Column: Progression & Badges -->
+<div class="lg:col-span-8 space-y-xl">
+<!-- League Progression -->
+<section class="bg-white rounded-xl shadow-[0px_2px_4px_rgba(0,0,0,0.05)] p-lg border border-gray-100 overflow-hidden">
+<div class="flex justify-between items-center mb-xl">
+<h3 class="font-h3 text-h3 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="military_tech">military_tech</span>
+                            League Progression
+                        </h3>
+<span class="font-label-bold text-label-bold bg-primary-container/10 text-primary-container px-3 py-1 rounded-full">Silver Tier</span>
+</div>
+<!-- Progression Meter -->
+<div class="relative pt-8 pb-4">
+<div class="flex justify-between items-center mb-4 relative z-10 px-2">
+<div class="flex flex-col items-center opacity-40">
+<span class="material-symbols-outlined text-2xl" data-icon="stat_0">stat_0</span>
+<span class="font-caption text-caption mt-1">Wood</span>
+</div>
+<div class="flex flex-col items-center opacity-40">
+<span class="material-symbols-outlined text-2xl" data-icon="stat_1">stat_1</span>
+<span class="font-caption text-caption mt-1">Iron</span>
+</div>
+<div class="flex flex-col items-center opacity-40">
+<span class="material-symbols-outlined text-2xl" data-icon="stat_2">stat_2</span>
+<span class="font-caption text-caption mt-1">Bronze</span>
+</div>
+<div class="flex flex-col items-center scale-125">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="award_star" style="font-variation-settings: 'FILL' 1;">award_star</span>
+<span class="font-label-bold text-label-bold text-primary mt-1">Silver</span>
+</div>
+<div class="flex flex-col items-center opacity-50">
+<span class="material-symbols-outlined text-gold text-2xl" data-icon="diamond">diamond</span>
+<span class="font-caption text-caption mt-1">Gold</span>
+</div>
+<div class="flex flex-col items-center opacity-40">
+<span class="material-symbols-outlined text-2xl" data-icon="verified">verified</span>
+<span class="font-caption text-caption mt-1">Platinum</span>
+</div>
+<div class="flex flex-col items-center opacity-40">
+<span class="material-symbols-outlined text-2xl" data-icon="shield">shield</span>
+<span class="font-caption text-caption mt-1">Guardian</span>
+</div>
+</div>
+<div class="h-2 w-full bg-surface-container rounded-full relative overflow-hidden">
+<div class="absolute h-full bg-primary-container w-[58%] rounded-full shadow-[0_0_8px_rgba(0,82,204,0.4)]"></div>
+</div>
+<div class="mt-4 flex justify-between font-caption text-caption text-outline">
+<span>2,400 XP</span>
+<span class="text-primary-container font-semibold">600 XP to Gold</span>
+<span>3,000 XP</span>
+</div>
+</div>
+</section>
+<!-- Achievement Badges Grid -->
+<section class="bg-white rounded-xl shadow-[0px_2px_4px_rgba(0,0,0,0.05)] p-lg border border-gray-100">
+<h3 class="font-h3 text-h3 mb-xl">Unlocked Achievements</h3>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-md">
+<div class="p-md bg-background rounded-xl border border-gray-100 flex flex-col items-center text-center group hover:shadow-lg transition-all duration-300">
+<div class="w-16 h-16 rounded-full bg-primary-container/10 flex items-center justify-center mb-base text-primary-container">
+<span class="material-symbols-outlined text-3xl" data-icon="emergency" style="font-variation-settings: 'FILL' 1;">emergency</span>
+</div>
+<span class="font-label-bold text-label-bold">First Responder</span>
+<span class="text-[10px] text-outline mt-1 uppercase tracking-tighter">Level 3</span>
+</div>
+<div class="p-md bg-background rounded-xl border border-gray-100 flex flex-col items-center text-center group hover:shadow-lg transition-all duration-300">
+<div class="w-16 h-16 rounded-full bg-tertiary-container/10 flex items-center justify-center mb-base text-tertiary-container">
+<span class="material-symbols-outlined text-3xl" data-icon="fact_check" style="font-variation-settings: 'FILL' 1;">fact_check</span>
+</div>
+<span class="font-label-bold text-label-bold">Top Verifier</span>
+<span class="text-[10px] text-outline mt-1 uppercase tracking-tighter">Diamond Tag</span>
+</div>
+<div class="p-md bg-background rounded-xl border border-gray-100 flex flex-col items-center text-center group hover:shadow-lg transition-all duration-300">
+<div class="w-16 h-16 rounded-full bg-secondary-container/10 flex items-center justify-center mb-base text-secondary-container">
+<span class="material-symbols-outlined text-3xl" data-icon="volunteer_activism" style="font-variation-settings: 'FILL' 1;">volunteer_activism</span>
+</div>
+<span class="font-label-bold text-label-bold">Kind Soul</span>
+<span class="text-[10px] text-outline mt-1 uppercase tracking-tighter">50+ Helps</span>
+</div>
+<div class="p-md bg-background rounded-xl border border-gray-100 flex flex-col items-center text-center group hover:shadow-lg transition-all duration-300">
+<div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center mb-base text-outline opacity-40">
+<span class="material-symbols-outlined text-3xl" data-icon="lock" style="font-variation-settings: 'FILL' 1;">lock</span>
+</div>
+<span class="font-label-bold text-label-bold opacity-40">City Guardian</span>
+<span class="text-[10px] text-outline mt-1 uppercase tracking-tighter italic">Locked</span>
+</div>
+</div>
+<button class="w-full mt-xl py-3 border border-primary-container text-primary-container rounded-lg font-label-bold hover:bg-primary-container/5 transition-colors">
+                        View All Badges
+                    </button>
+</section>
+</div>
+<!-- Right Column: Leaderboard -->
+<div class="lg:col-span-4">
+<section class="bg-white rounded-xl shadow-[0px_2px_4px_rgba(0,0,0,0.05)] p-lg border border-gray-100 sticky top-24">
+<div class="flex justify-between items-center mb-xl">
+<h3 class="font-h3 text-h3">Leaderboard</h3>
+<span class="text-caption font-medium text-outline">This Week</span>
+</div>
+<div class="space-y-md">
+<!-- Top 3 with premium styling -->
+<div class="flex items-center gap-4 p-md bg-gradient-to-r from-gold/10 to-transparent border border-gold/20 rounded-xl">
+<span class="text-xl font-extrabold text-gold w-6 text-center">1</span>
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container border-2 border-gold shadow-sm">
+<img alt="avatar" class="w-full h-full object-cover" data-alt="professional portrait of a male urban relief coordinator with warm friendly smile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBMsYlUG-Y7I6RHNkLQBvIzS5r4t5l9mMvQ3ChVu3ghXp0M9FBt8r6AJZUhJir95GKXoguZGiqDc7NnTjcU5RUffvoofzMCXvoXeP6ufqHi4nk_g10f84mCZ-qgrPNHd15o6uvnYEY-gfSxf_9Wwpn9uTr6M4MBm6MEPV2nuqBVYAzjbLezUSVpT8si2aWvfivZ1hmfy_Li8rTF-LrwDnGbnapZdkXse92Owj6FVBNq5IJaCTc_kH2zhs5r8EBktPrTgYSAkMoc1y0Z"/>
+</div>
+<div class="flex-1">
+<div class="font-label-bold text-label-bold">Alex Rivera</div>
+<div class="text-[11px] text-outline flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]" data-icon="shield" style="font-variation-settings: 'FILL' 1;">shield</span>
+                                    Guardian
+                                </div>
+</div>
+<div class="font-label-bold text-primary">4,820</div>
+</div>
+<div class="flex items-center gap-4 p-md bg-gradient-to-r from-silver/10 to-transparent border border-silver/20 rounded-xl">
+<span class="text-xl font-extrabold text-outline w-6 text-center">2</span>
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container border-2 border-silver shadow-sm">
+<img alt="avatar" class="w-full h-full object-cover" data-alt="close up of a confident woman smiling in soft daylight with clean background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCMnE-dYxFNEQDwZ04kLnOaWXSD_Xd5Bvj7gUNKXl_20QtiycoTLGwW8YeNXgEoJcO_I-3eTWUb9WmyjgFD-4REFA3naI0ycqeV6AREn8CHZQofcGo8XnB8UiTDaYS6jC3Dx-46FaPfV3WWX6jMPKVMCYvodKbtcsnwDci9IM98KNbY3GfwUJv_42wEh90OEi9Cny-XIOPcWghMBzo1Ew5dUn3f2yPYOVJpDc_QNYHQWsGyZpmzfPJ70WwJb5fUiGA_N-h9ApELO786"/>
+</div>
+<div class="flex-1">
+<div class="font-label-bold text-label-bold">Sarah Jenkins</div>
+<div class="text-[11px] text-outline flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]" data-icon="verified" style="font-variation-settings: 'FILL' 1;">verified</span>
+                                    Platinum
+                                </div>
+</div>
+<div class="font-label-bold text-primary">4,150</div>
+</div>
+<div class="flex items-center gap-4 p-md bg-gradient-to-r from-orange-200/10 to-transparent border border-orange-200/20 rounded-xl">
+<span class="text-xl font-extrabold text-orange-400 w-6 text-center">3</span>
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container border-2 border-orange-200 shadow-sm">
+<img alt="avatar" class="w-full h-full object-cover" data-alt="headshot of a middle-aged man with kind expression wearing business casual attire" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBAPqGOGkbgoAAFs6EdLdDL9VejFctrMgZA6wQB4Z-b1l_ZAorlVmz38ccNYpU2wvs9GAjrmnYIpn6Ly-apC7YOw5InoObHFJCtS8nYRwV9t-yHkCFMo0dDSNwCbA83gW9wiXPRya3ILhVrOWjI7_fenyGEcAHLJoIMHKBvFT33gWCzfn0TGEfCep81mju3y5NXA1Fz6YdL1xFlcQilHJlhd7ggSJiL1jeQaAYtYT51SLoy20yFNLg-o_grxjSiGP-5J_xUPl5bluxT"/>
+</div>
+<div class="flex-1">
+<div class="font-label-bold text-label-bold">David Chen</div>
+<div class="text-[11px] text-outline flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]" data-icon="verified" style="font-variation-settings: 'FILL' 1;">verified</span>
+                                    Platinum
+                                </div>
+</div>
+<div class="font-label-bold text-primary">3,980</div>
+</div>
+<div class="border-t border-gray-100 my-md"></div>
+<!-- Regular Rank -->
+<div class="flex items-center gap-4 p-md bg-primary-container/5 border border-primary-container/10 rounded-xl">
+<span class="text-md font-bold text-primary-container w-6 text-center">12</span>
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container ring-2 ring-primary-container/20">
+<img alt="avatar" class="w-full h-full object-cover" data-alt="natural portrait of a young person with soft sunlight filtering through hair" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDnEyQdgdU_4NGOKSpvtJDIMINmXeDeVArvIybadEGISq7Qvmf2rGW_ik1C45FNVWRQjm5gQivvwhqI7rHq1cx4J7UdtFt1K1G3VKpfPuLcZZewS-UhJ5YUieiIdofoJ-7fUNIpP4HFzoewP06DKUMy0Vh0Ml-ekVLNwioJ6hCt8sp7yF8MEc--9zQGBDd6p_qpjBmTlCUewxtR4P2SG4wNi_DWDVRRjPu0DHTHEJjDRK0Hn8WrETM57339A6CzXmt7ounob9JEXMCU"/>
+</div>
+<div class="flex-1">
+<div class="font-label-bold text-primary-container">You (Self)</div>
+<div class="text-[11px] text-outline flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px] text-primary" data-icon="award_star" style="font-variation-settings: 'FILL' 1;">award_star</span>
+                                    Silver
+                                </div>
+</div>
+<div class="font-label-bold text-primary">2,400</div>
+</div>
+<div class="flex items-center gap-4 p-md hover:bg-gray-50 rounded-xl transition-colors">
+<span class="text-md font-bold text-outline w-6 text-center">13</span>
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container">
+<img alt="avatar" class="w-full h-full object-cover" data-alt="professional headshot of a woman with short dark hair in front of neutral background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCEBvS-s9ldQHVcVD0izDukqWfVUzxC8333QMnQGGws21084LyD2XuToiYxQPqtuWUcCBTirWoIG8yGG0hRLApvEVE2DyePbP7u2AhO8FKwAF7af39rENbcw1EmojWo1ghpkY83swmMSqW2nXeekwkgT0OWtHdWtbWdSsDK-9nKx8Ratuh-DRiymxeVsK82kZKdtQXZ7usQeUOsX3n1mMlhOQaypEJTpDPkKo5yE_q1VAQ_AeAgC-F7vuv0nLFPiAT710nacPd4AFti"/>
+</div>
+<div class="flex-1">
+<div class="font-label-bold text-label-bold">Elena Ross</div>
+<div class="text-[11px] text-outline">Silver</div>
+</div>
+<div class="font-label-bold text-primary">2,380</div>
+</div>
+</div>
+<button class="w-full mt-xl text-center text-caption font-label-bold text-primary-container hover:underline">
+                        View Full Community Standings
+                    </button>
+</section>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 shadow-[0px_-4px_12px_rgba(0,0,0,0.03)] fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-3 pb-safe rounded-t-2xl">
+<a class="flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 hover:text-[#0052CC] active:scale-90 transition-transform duration-150" href="#"><span class="material-symbols-outlined" data-icon="campaign">campaign</span>
+<span class="font-['Inter'] text-[11px] font-medium">Reports</span></a>
+<a class="flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 hover:text-[#0052CC] active:scale-90 transition-transform duration-150" href="#"><span class="material-symbols-outlined" data-icon="assignment_turned_in">assignment_turned_in</span>
+<span class="font-['Inter'] text-[11px] font-medium">My Reports</span></a>
+<a class="flex flex-col items-center justify-center bg-blue-50 dark:bg-blue-900/20 text-[#0052CC] dark:text-blue-300 rounded-xl px-2 py-1 active:scale-90 transition-transform duration-150" href="#"><span class="material-symbols-outlined" data-icon="emoji_events" style="font-variation-settings: 'FILL' 1;">emoji_events</span>
+<span class="font-['Inter'] text-[11px] font-medium">Community Impact</span></a>
+<a class="flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 hover:text-[#0052CC] active:scale-90 transition-transform duration-150" href="#"><span class="material-symbols-outlined" data-icon="psychology">psychology</span>
+<span class="font-['Inter'] text-[11px] font-medium">AI Assistant</span></a>
+<a class="flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 hover:text-[#0052CC] active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-['Inter'] text-[11px] font-medium">Profile</span>
+</a>
+</nav>
+</body></html>

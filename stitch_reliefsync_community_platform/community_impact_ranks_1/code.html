@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ReliefSync | Civic Contribution League</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-bright": "#f8f9fb",
+                        "error-container": "#ffdad6",
+                        "background": "#f8f9fb",
+                        "tertiary-container": "#006844",
+                        "surface-container-low": "#f3f4f6",
+                        "secondary-fixed": "#ffdad9",
+                        "on-primary-fixed-variant": "#0040a2",
+                        "on-error-container": "#93000a",
+                        "tertiary": "#004e32",
+                        "tertiary-fixed": "#82f9be",
+                        "on-tertiary-fixed-variant": "#005235",
+                        "outline": "#737685",
+                        "on-secondary-fixed": "#40000a",
+                        "on-secondary-container": "#5b0013",
+                        "on-primary-fixed": "#001848",
+                        "tertiary-fixed-dim": "#65dca4",
+                        "primary-fixed-dim": "#b2c5ff",
+                        "on-surface": "#191c1e",
+                        "on-secondary-fixed-variant": "#920024",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-container": "#ff5263",
+                        "error": "#ba1a1a",
+                        "surface-container": "#edeef0",
+                        "primary-container": "#0052cc",
+                        "surface-tint": "#0c56d0",
+                        "secondary": "#b81a36",
+                        "secondary-fixed-dim": "#ffb3b4",
+                        "primary-fixed": "#dae2ff",
+                        "on-background": "#191c1e",
+                        "outline-variant": "#c3c6d6",
+                        "inverse-primary": "#b2c5ff",
+                        "surface-dim": "#d9dadc",
+                        "on-tertiary": "#ffffff",
+                        "surface-variant": "#e1e2e4",
+                        "on-primary": "#ffffff",
+                        "primary": "#003d9b",
+                        "inverse-on-surface": "#f0f1f3",
+                        "on-primary-container": "#c4d2ff",
+                        "on-secondary": "#ffffff",
+                        "surface-container-high": "#e7e8ea",
+                        "on-surface-variant": "#434654",
+                        "surface": "#f8f9fb",
+                        "on-error": "#ffffff",
+                        "inverse-surface": "#2e3132",
+                        "on-tertiary-fixed": "#002113",
+                        "surface-container-highest": "#e1e2e4",
+                        "on-tertiary-container": "#72e9af"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xxl": "48px",
+                        "xl": "32px",
+                        "lg": "24px",
+                        "container-max": "1200px",
+                        "md": "16px",
+                        "sm": "12px",
+                        "gutter": "24px",
+                        "xs": "4px",
+                        "base": "8px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Inter"],
+                        "caption": ["Inter"],
+                        "h3": ["Inter"],
+                        "body-md": ["Inter"],
+                        "h2": ["Inter"],
+                        "label-bold": ["Inter"],
+                        "h1": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["14px", {"lineHeight": "1.45", "fontWeight": "400"}],
+                        "caption": ["12px", {"lineHeight": "1.2", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                        "h3": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "h2": ["32px", {"lineHeight": "1.25", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "label-bold": ["14px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                        "h1": ["40px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "1.55", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .league-progress-gradient {
+            background: linear-gradient(90deg, #8B4513 0%, #A19D94 16%, #CD7F32 33%, #C0C0C0 50%, #FFD700 66%, #E5E4E2 83%, #0052CC 100%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen pb-24 font-body-md">
+<!-- TopAppBar -->
+<header class="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 shadow-sm flex justify-between items-center w-full px-6 py-3 h-16 sticky top-0 z-50">
+<div class="flex items-center gap-4">
+<button class="text-gray-500 hover:bg-gray-50 p-2 rounded-full active:scale-95 transition-all duration-200">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+<h1 class="font-['Inter'] font-semibold text-gray-900 dark:text-white text-xl font-bold tracking-tight text-blue-700 dark:text-blue-500">ReliefSync</h1>
+</div>
+<div class="flex items-center gap-3">
+<span class="text-label-bold font-label-bold text-on-surface-variant hidden md:block">Julian Rivera</span>
+<div class="h-10 w-10 rounded-full bg-primary-fixed flex items-center justify-center border-2 border-surface-bright overflow-hidden">
+<img alt="User profile avatar" class="h-full w-full object-cover" data-alt="portrait of a professional man in his late 20s with a warm smile, soft natural outdoor lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQkCprYAI7-IWLRjKVAvZ6IvOsrANrKpCKHp5Ipa2WqpNlrokvkUb15wcFV7gDXVskHuRHPyChWmpPp6F9btZx9rBBKlz7Ty1L19dmwJKiWbILT12avqC7euJeiFEUzfiNETWczsBd57bNXd2t9VCzzYwJVNx_EYZKAsR_BFd1iEcQSbJAs8eNyUez-osjkEZudkPaGmZbUjBWXpMevGexLXtdWvhgH15GFy-4twxR8fbOciSKZSb_n1rTwF2FYHOiWl9SKMud2CTc"/>
+</div>
+</div>
+</header>
+<main class="max-w-container-max mx-auto px-6 py-8">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Left Column: Personal Rank & Trust -->
+<div class="lg:col-span-4 space-y-8">
+<!-- Personal Rank Card -->
+<section class="bg-white rounded-xl shadow-[0px_2px_4px_rgba(0,0,0,0.05)] p-lg border border-surface-container">
+<div class="flex justify-between items-start mb-6">
+<div>
+<span class="text-caption font-caption text-primary uppercase tracking-widest">Current League</span>
+<h2 class="text-h2 font-h2 text-on-surface">Silver</h2>
+</div>
+<div class="bg-surface-container-low p-3 rounded-xl border border-outline-variant">
+<span class="material-symbols-outlined text-4xl text-[#C0C0C0]" data-icon="military_tech">military_tech</span>
+</div>
+</div>
+<div class="space-y-4">
+<div class="flex justify-between items-end">
+<div class="text-body-sm font-body-sm text-on-surface-variant">Contribution Points</div>
+<div class="text-h3 font-h3 text-primary">2,450 XP</div>
+</div>
+<div class="h-3 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary-container rounded-full" style="width: 65%;"></div>
+</div>
+<div class="flex justify-between text-caption font-caption text-outline">
+<span>2,000 (Silver)</span>
+<span>3,500 (Gold)</span>
+</div>
+</div>
+<div class="mt-8 pt-6 border-t border-surface-container-high">
+<div class="flex items-center gap-3 text-secondary">
+<span class="material-symbols-outlined" data-icon="trending_up">trending_up</span>
+<span class="text-label-bold font-label-bold">+12% increase this month</span>
+</div>
+</div>
+</section>
+<!-- Trust Score Widget -->
+<section class="bg-white rounded-xl shadow-[0px_2px_4px_rgba(0,0,0,0.05)] p-lg border border-surface-container text-center">
+<h3 class="text-label-bold font-label-bold text-on-surface mb-6 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="verified_user">verified_user</span>
+                        Community Trust Score
+                    </h3>
+<div class="relative w-48 h-48 mx-auto flex items-center justify-center">
+<!-- Simple SVG Gauge -->
+<svg class="w-full h-full transform -rotate-90">
+<circle class="text-surface-container-low" cx="96" cy="96" fill="transparent" r="80" stroke="currentColor" stroke-width="12"></circle>
+<circle class="text-tertiary-container" cx="96" cy="96" fill="transparent" r="80" stroke="currentColor" stroke-dasharray="502.6" stroke-dashoffset="50.26" stroke-width="12"></circle>
+</svg>
+<div class="absolute flex flex-col items-center">
+<span class="text-h1 font-h1 text-on-surface">92</span>
+<span class="text-caption font-caption text-outline uppercase">Exceptional</span>
+</div>
+</div>
+<p class="mt-4 text-body-sm font-body-sm text-on-surface-variant px-4">
+                        Based on report accuracy, volunteer reliability, and community endorsements.
+                    </p>
+</section>
+</div>
+<!-- Right Column: Achievements & Leaderboard -->
+<div class="lg:col-span-8 space-y-8">
+<!-- League Progression Visualization -->
+<section class="bg-white rounded-xl shadow-[0px_2px_4px_rgba(0,0,0,0.05)] p-lg border border-surface-container">
+<h3 class="text-label-bold font-label-bold text-on-surface mb-6">League Hierarchy</h3>
+<div class="relative pt-4 pb-12">
+<div class="absolute top-8 left-0 w-full h-1 league-progress-gradient opacity-30 rounded-full"></div>
+<div class="grid grid-cols-7 relative">
+<!-- Wood -->
+<div class="flex flex-col items-center gap-3 group opacity-40">
+<div class="w-10 h-10 rounded-full bg-white border-2 border-outline-variant flex items-center justify-center z-10 transition-all">
+<span class="material-symbols-outlined text-body-md" data-icon="forest">forest</span>
+</div>
+<span class="text-caption font-caption text-on-surface-variant">Wood</span>
+</div>
+<!-- Iron -->
+<div class="flex flex-col items-center gap-3 group opacity-40">
+<div class="w-10 h-10 rounded-full bg-white border-2 border-outline-variant flex items-center justify-center z-10 transition-all">
+<span class="material-symbols-outlined text-body-md" data-icon="hardware">hardware</span>
+</div>
+<span class="text-caption font-caption text-on-surface-variant">Iron</span>
+</div>
+<!-- Bronze -->
+<div class="flex flex-col items-center gap-3 group opacity-60">
+<div class="w-10 h-10 rounded-full bg-white border-2 border-outline-variant flex items-center justify-center z-10 transition-all">
+<span class="material-symbols-outlined text-body-md" data-icon="shield">shield</span>
+</div>
+<span class="text-caption font-caption text-on-surface-variant">Bronze</span>
+</div>
+<!-- Silver -->
+<div class="flex flex-col items-center gap-3 group">
+<div class="w-12 h-12 -mt-1 rounded-full bg-primary-container text-white border-4 border-white shadow-lg flex items-center justify-center z-20 transition-all ring-4 ring-primary-container/20">
+<span class="material-symbols-outlined text-lg" data-icon="military_tech">military_tech</span>
+</div>
+<span class="text-label-bold font-label-bold text-primary">Silver</span>
+</div>
+<!-- Gold -->
+<div class="flex flex-col items-center gap-3 group opacity-60">
+<div class="w-10 h-10 rounded-full bg-white border-2 border-outline-variant flex items-center justify-center z-10 transition-all">
+<span class="material-symbols-outlined text-body-md" data-icon="workspace_premium">workspace_premium</span>
+</div>
+<span class="text-caption font-caption text-on-surface-variant">Gold</span>
+</div>
+<!-- Platinum -->
+<div class="flex flex-col items-center gap-3 group opacity-40">
+<div class="w-10 h-10 rounded-full bg-white border-2 border-outline-variant flex items-center justify-center z-10 transition-all">
+<span class="material-symbols-outlined text-body-md" data-icon="diamond">diamond</span>
+</div>
+<span class="text-caption font-caption text-on-surface-variant">Platinum</span>
+</div>
+<!-- Guardian -->
+<div class="flex flex-col items-center gap-3 group opacity-40">
+<div class="w-10 h-10 rounded-full bg-white border-2 border-outline-variant flex items-center justify-center z-10 transition-all">
+<span class="material-symbols-outlined text-body-md" data-icon="guardian">guardian</span>
+</div>
+<span class="text-caption font-caption text-on-surface-variant">Guardian</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Bento Grid: Achievements & Leaderboard -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<!-- Achievement Badges -->
+<section class="bg-white rounded-xl shadow-[0px_2px_4px_rgba(0,0,0,0.05)] p-lg border border-surface-container">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-label-bold font-label-bold text-on-surface">Achievements</h3>
+<button class="text-primary text-caption font-caption hover:underline">View All</button>
+</div>
+<div class="grid grid-cols-3 gap-4">
+<div class="flex flex-col items-center p-3 rounded-lg bg-surface-container-low border border-outline-variant hover:shadow-md transition-all">
+<span class="material-symbols-outlined text-3xl text-secondary mb-2" data-icon="emergency">emergency</span>
+<span class="text-[10px] font-bold text-center leading-tight">First Responder</span>
+</div>
+<div class="flex flex-col items-center p-3 rounded-lg bg-surface-container-low border border-outline-variant hover:shadow-md transition-all">
+<span class="material-symbols-outlined text-3xl text-primary mb-2" data-icon="verified">verified</span>
+<span class="text-[10px] font-bold text-center leading-tight">Top Verifier</span>
+</div>
+<div class="flex flex-col items-center p-3 rounded-lg bg-surface-container-low border border-outline-variant hover:shadow-md transition-all">
+<span class="material-symbols-outlined text-3xl text-tertiary-container mb-2" data-icon="group">group</span>
+<span class="text-[10px] font-bold text-center leading-tight">Community Hub</span>
+</div>
+<div class="flex flex-col items-center p-3 rounded-lg bg-surface-container-low border border-outline-variant opacity-40 grayscale">
+<span class="material-symbols-outlined text-3xl mb-2" data-icon="map">map</span>
+<span class="text-[10px] font-bold text-center leading-tight">Cartographer</span>
+</div>
+<div class="flex flex-col items-center p-3 rounded-lg bg-surface-container-low border border-outline-variant opacity-40 grayscale">
+<span class="material-symbols-outlined text-3xl mb-2" data-icon="volunteer_activism">volunteer_activism</span>
+<span class="text-[10px] font-bold text-center leading-tight">Resource Hero</span>
+</div>
+<div class="flex flex-col items-center p-3 rounded-lg bg-surface-container-low border border-outline-variant opacity-40 grayscale">
+<span class="material-symbols-outlined text-3xl mb-2" data-icon="speed">speed</span>
+<span class="text-[10px] font-bold text-center leading-tight">Swift Action</span>
+</div>
+</div>
+</section>
+<!-- Regional Leaderboard -->
+<section class="bg-white rounded-xl shadow-[0px_2px_4px_rgba(0,0,0,0.05)] p-lg border border-surface-container">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-label-bold font-label-bold text-on-surface">Regional Leaders</h3>
+<span class="text-caption font-caption text-outline">Portland Metro</span>
+</div>
+<div class="space-y-4">
+<!-- Leader 1 -->
+<div class="flex items-center gap-4 p-2 rounded-lg hover:bg-surface-container-low transition-colors">
+<span class="text-label-bold font-label-bold text-primary w-4">1</span>
+<div class="h-10 w-10 rounded-full bg-surface-variant overflow-hidden">
+<img alt="Leader 1" class="h-full w-full object-cover" data-alt="headshot of a confident woman leader with soft lighting and minimalist office background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZAU5I7nqY4vEJnBc4tpt2tVAkp2xAvkfymDzSPCtHLrwLGgAHnYve_GJDHXzZKB9zvMxTuqdOMIlB8QgsOR-mpP44mDg_fyDQ2j2RHVMd2KBJoTPjY2RLXHMfF8ZBU_K1YXZ3FKeZ9cXXMSl9MEJfapVGgvWHL3_MbuDvdGmU27zvY6IulOeBUdK4EySDeQIhXufmfPZZOYYshns7yyIL_sQubFawN0xUokNEf6dGwnoTzPMLuNnsF3CCM2r24ZmqNMjlZY47oCSs"/>
+</div>
+<div class="flex-1">
+<div class="text-label-bold font-label-bold text-on-surface">Sarah Connor</div>
+<div class="text-caption font-caption text-outline">Gold League</div>
+</div>
+<div class="text-label-bold font-label-bold text-on-surface">4,820</div>
+</div>
+<!-- Leader 2 -->
+<div class="flex items-center gap-4 p-2 rounded-lg hover:bg-surface-container-low transition-colors">
+<span class="text-label-bold font-label-bold text-primary w-4">2</span>
+<div class="h-10 w-10 rounded-full bg-surface-variant overflow-hidden">
+<img alt="Leader 2" class="h-full w-full object-cover" data-alt="portrait of a focused man in a casual professional setting with natural light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC8ju7KFJZPsWUKO0_HacqH43ivsdq7hTgT-irqAkVsbcWHzYwh7qcypdi_FsxDK2LXG6W7m8e7fqbqqyFSwuIXjVCK35PBn--kBYT7SyOL5dMB4j72T7E9coPObdlL_mJUnPas0KMBvL7R75txn3xyQaarQo6PTTvGZJFL5BlyLlUDV_nSRE9QgQqXzHNBLmRfJbwSUjv8e4WyH6YP1jOD3K2Mbj_8-BhsmZvqg7nxspVZtrPi-cRhxfi2G6Yo-FlvmWfEBq7pHZX6"/>
+</div>
+<div class="flex-1">
+<div class="text-label-bold font-label-bold text-on-surface">David Chen</div>
+<div class="text-caption font-caption text-outline">Gold League</div>
+</div>
+<div class="text-label-bold font-label-bold text-on-surface">4,510</div>
+</div>
+<!-- Current User (Mockup) -->
+<div class="flex items-center gap-4 p-2 rounded-lg bg-primary-fixed/30 border border-primary-container/20">
+<span class="text-label-bold font-label-bold text-primary w-4">14</span>
+<div class="h-10 w-10 rounded-full bg-primary-fixed overflow-hidden">
+<img alt="User Profile" class="h-full w-full object-cover" data-alt="portrait of a professional man in his late 20s with a warm smile, soft natural outdoor lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDiNb9Vaaaemv5hK0IAQxmEe_pXo3_r9l0gbnX09YG_D254yt9xExajodcl8BDrpGRX4TEW6yLV2k-ciMBnnjIXu972WRCHb2ykqbnHG2fQ_vMye3HJHiIHkdrH4M9JtZiLc0rbmpQOJyawI2N0jV78gXbq5XVOT8-iTJqXxt2dkzu5TWJtCoy7i74fLDihJdGNX5vNnLeAk63u4rVXsLMFTK6bjWfhuJygfR8nJ8cM1t4nmDAMkP0xNuONHYoOvrRvXxO6ainsDWPj"/>
+</div>
+<div class="flex-1">
+<div class="text-label-bold font-label-bold text-primary">Julian Rivera (You)</div>
+<div class="text-caption font-caption text-primary/70">Silver League</div>
+</div>
+<div class="text-label-bold font-label-bold text-primary">2,450</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Recent Activity / Timeline -->
+<section class="bg-white rounded-xl shadow-[0px_2px_4px_rgba(0,0,0,0.05)] p-lg border border-surface-container">
+<h3 class="text-label-bold font-label-bold text-on-surface mb-6">Recent Contributions</h3>
+<div class="space-y-6">
+<div class="flex gap-4">
+<div class="mt-1 w-8 h-8 rounded-full bg-tertiary-fixed text-tertiary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-body-md" data-icon="check_circle">check_circle</span>
+</div>
+<div>
+<p class="text-body-md font-body-md text-on-surface">Verified shelter capacity at <span class="font-bold">Westside Community Center</span></p>
+<p class="text-caption font-caption text-outline mt-1">2 hours ago • +50 XP earned</p>
+</div>
+</div>
+<div class="flex gap-4">
+<div class="mt-1 w-8 h-8 rounded-full bg-secondary-fixed text-secondary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-body-md" data-icon="report">report</span>
+</div>
+<div>
+<p class="text-body-md font-body-md text-on-surface">Reported blocked road on <span class="font-bold">Burnside St.</span></p>
+<p class="text-caption font-caption text-outline mt-1">Yesterday • +75 XP earned</p>
+</div>
+</div>
+</div>
+</section>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-2 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-t border-gray-100 dark:border-gray-800 shadow-[0_-2px_10px_rgba(0,0,0,0.02)]">
+<div class="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400 px-3 py-1 hover:text-blue-600 dark:hover:text-blue-400 active:scale-90 transition-transform duration-150">
+<span class="material-symbols-outlined" data-icon="emergency_home">emergency_home</span>
+<span class="font-['Inter'] text-[11px] font-medium">Reports</span>
+</div>
+<div class="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400 px-3 py-1 hover:text-blue-600 dark:hover:text-blue-400 active:scale-90 transition-transform duration-150">
+<span class="material-symbols-outlined" data-icon="assignment_turned_in">assignment_turned_in</span>
+<span class="font-['Inter'] text-[11px] font-medium">My Reports</span>
+</div>
+<div class="flex flex-col items-center justify-center text-blue-700 dark:text-blue-500 bg-blue-50/50 dark:bg-blue-900/20 rounded-xl px-3 py-1 active:scale-90 transition-transform duration-150">
+<span class="material-symbols-outlined" data-icon="public" data-weight="fill" style="font-variation-settings: 'FILL' 1;">public</span>
+<span class="font-['Inter'] text-[11px] font-medium">Impact</span>
+</div>
+<div class="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400 px-3 py-1 hover:text-blue-600 dark:hover:text-blue-400 active:scale-90 transition-transform duration-150">
+<span class="material-symbols-outlined" data-icon="smart_toy">smart_toy</span>
+<span class="font-['Inter'] text-[11px] font-medium">AI Assistant</span>
+</div>
+</nav>
+</body></html>

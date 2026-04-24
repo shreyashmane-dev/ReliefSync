@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ReliefSync AI Assistant</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-bright": "#f8f9fb",
+                    "error-container": "#ffdad6",
+                    "background": "#f8f9fb",
+                    "tertiary-container": "#006844",
+                    "surface-container-low": "#f3f4f6",
+                    "secondary-fixed": "#ffdad9",
+                    "on-primary-fixed-variant": "#0040a2",
+                    "on-error-container": "#93000a",
+                    "tertiary": "#004e32",
+                    "tertiary-fixed": "#82f9be",
+                    "on-tertiary-fixed-variant": "#005235",
+                    "outline": "#737685",
+                    "on-secondary-fixed": "#40000a",
+                    "on-secondary-container": "#5b0013",
+                    "on-primary-fixed": "#001848",
+                    "tertiary-fixed-dim": "#65dca4",
+                    "primary-fixed-dim": "#b2c5ff",
+                    "on-surface": "#191c1e",
+                    "on-secondary-fixed-variant": "#920024",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary-container": "#ff5263",
+                    "error": "#ba1a1a",
+                    "surface-container": "#edeef0",
+                    "primary-container": "#0052cc",
+                    "surface-tint": "#0c56d0",
+                    "secondary": "#b81a36",
+                    "secondary-fixed-dim": "#ffb3b4",
+                    "primary-fixed": "#dae2ff",
+                    "on-background": "#191c1e",
+                    "outline-variant": "#c3c6d6",
+                    "inverse-primary": "#b2c5ff",
+                    "surface-dim": "#d9dadc",
+                    "on-tertiary": "#ffffff",
+                    "surface-variant": "#e1e2e4",
+                    "on-primary": "#ffffff",
+                    "primary": "#003d9b",
+                    "inverse-on-surface": "#f0f1f3",
+                    "on-primary-container": "#c4d2ff",
+                    "on-secondary": "#ffffff",
+                    "surface-container-high": "#e7e8ea",
+                    "on-surface-variant": "#434654",
+                    "surface": "#f8f9fb",
+                    "on-error": "#ffffff",
+                    "inverse-surface": "#2e3132",
+                    "on-tertiary-fixed": "#002113",
+                    "surface-container-highest": "#e1e2e4",
+                    "on-tertiary-container": "#72e9af"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "xxl": "48px",
+                    "xl": "32px",
+                    "lg": "24px",
+                    "container-max": "1200px",
+                    "md": "16px",
+                    "sm": "12px",
+                    "gutter": "24px",
+                    "xs": "4px",
+                    "base": "8px"
+            },
+            "fontFamily": {
+                    "body-sm": ["Inter"],
+                    "caption": ["Inter"],
+                    "h3": ["Inter"],
+                    "body-md": ["Inter"],
+                    "h2": ["Inter"],
+                    "label-bold": ["Inter"],
+                    "h1": ["Inter"],
+                    "body-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "body-sm": ["14px", {"lineHeight": "1.45", "fontWeight": "400"}],
+                    "caption": ["12px", {"lineHeight": "1.2", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                    "h3": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "h2": ["32px", {"lineHeight": "1.25", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "label-bold": ["14px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                    "h1": ["40px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "1.55", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .glass-effect {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+      }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background font-body-md text-on-background min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="bg-white dark:bg-gray-900 shadow-sm border-b border-gray-100 dark:border-gray-800 flex justify-between items-center w-full px-6 py-3 h-16 sticky top-0 z-50">
+<div class="flex items-center gap-4">
+<button class="hover:bg-gray-50 dark:hover:bg-gray-800 active:scale-95 transition-all duration-200 p-2 rounded-full">
+<span class="material-symbols-outlined text-blue-700 dark:text-blue-500">menu</span>
+</button>
+<h1 class="text-xl font-bold tracking-tight text-blue-700 dark:text-blue-500 font-['Inter']">ReliefSync</h1>
+</div>
+<div class="flex items-center">
+<img alt="User Profile" class="w-10 h-10 rounded-full border-2 border-primary-fixed cursor-pointer transition-transform hover:scale-105" data-alt="Professional portrait of a middle-aged male aid coordinator in a clean studio setting with soft natural lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2GvQk2cNIQyIBPgz2dg6I61zOutsM3FVGwpdlCk4QCoCdmA7mvnpcuJXostokOKxckaN7vOQ_7UsiOesnqjmVMmx-3C5fiftc0tkxl5kyD4LpHz7uh-1Dq81sRvEeGDM-HVAWHNY_9g5-WCtOe-HOiWRWWFfo2BbgioimZiByRwL85xszD7peuKpOD-1ek-WUgCogw5F4RrJ3vXvwwt7QE7a-9N8QC6TkhGGjGdWMO9ZVu7n565WtpQlkrkRNycAtgJ8MY4KkiskN"/>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow flex flex-col max-w-container-max mx-auto w-full px-4 md:px-lg py-md mb-24 lg:grid lg:grid-cols-12 lg:gap-lg">
+<!-- Left Column: Sidebar Cards (Safety & Resources) -->
+<aside class="hidden lg:flex lg:col-span-4 flex-col gap-md">
+<!-- Safety Guidance Card -->
+<section class="bg-surface-container-lowest p-lg rounded-xl shadow-[0px_2px_4px_rgba(0,0,0,0.05)] border border-outline-variant">
+<div class="flex items-center gap-base mb-md">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">warning</span>
+<h2 class="font-h3 text-h3 text-on-surface">Safety Alerts</h2>
+</div>
+<div class="space-y-sm">
+<div class="p-sm bg-error-container/20 border-l-4 border-error rounded-r-lg">
+<p class="font-label-bold text-error">Flash Flood Warning</p>
+<p class="font-body-sm text-on-surface-variant">Low-lying areas near Silver Creek should evacuate immediately.</p>
+</div>
+<div class="p-sm bg-primary-fixed/30 border-l-4 border-primary-container rounded-r-lg">
+<p class="font-label-bold text-primary">Power Outage Update</p>
+<p class="font-body-sm text-on-surface-variant">Restoration expected in Sector 4 by 22:00 tonight.</p>
+</div>
+</div>
+<button class="w-full mt-lg py-sm px-md border-1.5 border-primary-container text-primary-container font-label-bold rounded-lg hover:bg-primary-fixed transition-colors">
+                    View Safety Checklist
+                </button>
+</section>
+<!-- Resource Help Card -->
+<section class="bg-surface-container-lowest p-lg rounded-xl shadow-[0px_2px_4px_rgba(0,0,0,0.05)] border border-outline-variant">
+<h2 class="font-h3 text-h3 text-on-surface mb-md">Nearby Services</h2>
+<div class="space-y-md">
+<div class="flex items-start gap-md p-sm hover:bg-surface-container rounded-lg transition-colors cursor-pointer">
+<div class="bg-tertiary-fixed p-xs rounded-lg">
+<span class="material-symbols-outlined text-tertiary">medical_services</span>
+</div>
+<div>
+<p class="font-label-bold text-on-surface">Community Clinic A</p>
+<p class="font-caption text-outline">0.8 miles • Open 24/7</p>
+</div>
+</div>
+<div class="flex items-start gap-md p-sm hover:bg-surface-container rounded-lg transition-colors cursor-pointer">
+<div class="bg-secondary-fixed p-xs rounded-lg">
+<span class="material-symbols-outlined text-secondary">night_shelter</span>
+</div>
+<div>
+<p class="font-label-bold text-on-surface">Central Youth Center</p>
+<p class="font-caption text-outline">1.2 miles • 15 beds left</p>
+</div>
+</div>
+</div>
+</section>
+</aside>
+<!-- Right Column: Interactive Chat Interface -->
+<div class="lg:col-span-8 flex flex-col h-[calc(100vh-12rem)] bg-surface-container-lowest rounded-2xl shadow-[0px_8px_16px_rgba(0,82,204,0.08)] border border-outline-variant relative overflow-hidden">
+<!-- Chat Header -->
+<div class="px-lg py-md border-b border-outline-variant flex items-center justify-between glass-effect sticky top-0 z-10">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 bg-primary-container rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+</div>
+<div>
+<h3 class="font-label-bold text-on-surface">ReliefSync AI</h3>
+<div class="flex items-center gap-xs">
+<span class="w-2 h-2 bg-tertiary-container rounded-full"></span>
+<span class="text-caption text-outline">Active &amp; Ready to help</span>
+</div>
+</div>
+</div>
+<button class="p-base hover:bg-surface-container rounded-full transition-colors">
+<span class="material-symbols-outlined text-outline">more_vert</span>
+</button>
+</div>
+<!-- Messages Area -->
+<div class="flex-grow overflow-y-auto p-lg space-y-xl bg-surface-bright/50">
+<!-- AI Welcome Message -->
+<div class="flex gap-md max-w-[85%]">
+<div class="w-8 h-8 rounded-full bg-primary-container flex-shrink-0 flex items-center justify-center mt-1">
+<span class="material-symbols-outlined text-white text-[18px]">smart_toy</span>
+</div>
+<div class="space-y-sm">
+<div class="bg-white p-md rounded-2xl rounded-tl-none shadow-sm border border-outline-variant">
+<p class="text-body-md text-on-surface">Hello! I'm your ReliefSync assistant. I can help you find emergency shelters, report incidents, or provide safety guidance for current conditions in your area. How can I assist you right now?</p>
+</div>
+<span class="text-caption text-outline ml-1">10:24 AM</span>
+</div>
+</div>
+<!-- User Message -->
+<div class="flex gap-md max-w-[85%] ml-auto flex-row-reverse">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest flex-shrink-0 flex items-center justify-center mt-1">
+<span class="material-symbols-outlined text-on-surface-variant text-[18px]">person</span>
+</div>
+<div class="space-y-sm text-right">
+<div class="bg-primary-container p-md rounded-2xl rounded-tr-none shadow-sm text-left">
+<p class="text-body-md text-white">Find nearest shelter with available beds for a family of four.</p>
+</div>
+<span class="text-caption text-outline mr-1">10:25 AM</span>
+</div>
+</div>
+<!-- AI Response with Map/Action Card -->
+<div class="flex gap-md max-w-[85%]">
+<div class="w-8 h-8 rounded-full bg-primary-container flex-shrink-0 flex items-center justify-center mt-1">
+<span class="material-symbols-outlined text-white text-[18px]">smart_toy</span>
+</div>
+<div class="space-y-sm">
+<div class="bg-white p-md rounded-2xl rounded-tl-none shadow-sm border border-outline-variant">
+<p class="text-body-md text-on-surface">Based on your current location in West District, the **Northside High Emergency Shelter** currently has 12 beds available and is designated for family units. It's about 1.4 miles from you.</p>
+<!-- Embedded Card inside Chat -->
+<div class="mt-md border border-outline-variant rounded-xl overflow-hidden bg-surface-bright">
+<div class="h-32 bg-gray-200 relative">
+<img alt="Map location" class="w-full h-full object-cover" data-alt="Digital map visualization showing a blue location pin over a city grid layout with simplified streets and parks" data-location="West District, Metropolis" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYPE9lwI_sfOAIclcquGvbvZemOywOH1oKQC-nOCY7Dj9frh1qZSt1WDbRriuL-z7CkBoIqn2g1Gcja6RHgDuLSlqX6w33Ni13DIXKK9yVg7zOgDVnn0Sm_kSmwO2KGPK7XDeTat75tWhJqWENYubu6zyJJLKcDj3x89MLw9F8YEbTMFNmhyUlMA-Ja1ON9SQmGSpuf5UnJcaWsDBRsKFWgrXxcrDRSrOAZds8DPHNcXoQbuRDvMb8mTQcItV8QhrUtDozO4Xg98LU"/>
+<div class="absolute inset-0 bg-black/10 flex items-center justify-center">
+<div class="bg-white p-xs rounded-full shadow-lg">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">location_on</span>
+</div>
+</div>
+</div>
+<div class="p-sm flex justify-between items-center">
+<div>
+<p class="font-label-bold text-on-surface">Northside High Shelter</p>
+<p class="font-caption text-outline">901 North Ave, West District</p>
+</div>
+<button class="bg-primary-container text-white px-md py-xs rounded-lg text-body-sm font-label-bold">Navigate</button>
+</div>
+</div>
+</div>
+<span class="text-caption text-outline ml-1">10:25 AM</span>
+</div>
+</div>
+</div>
+<!-- Suggested Prompts -->
+<div class="px-lg pb-base flex gap-sm overflow-x-auto no-scrollbar">
+<button class="whitespace-nowrap px-md py-sm bg-white border border-outline-variant rounded-full text-body-sm text-primary font-label-bold hover:bg-primary-fixed transition-all active:scale-95">
+                    How to report flooding?
+                </button>
+<button class="whitespace-nowrap px-md py-sm bg-white border border-outline-variant rounded-full text-body-sm text-primary font-label-bold hover:bg-primary-fixed transition-all active:scale-95">
+                    Request water delivery
+                </button>
+<button class="whitespace-nowrap px-md py-sm bg-white border border-outline-variant rounded-full text-body-sm text-primary font-label-bold hover:bg-primary-fixed transition-all active:scale-95">
+                    Find food banks
+                </button>
+</div>
+<!-- Chat Input -->
+<div class="p-lg pt-base border-t border-outline-variant glass-effect">
+<div class="flex items-center gap-md bg-surface-container rounded-2xl px-md py-sm border border-transparent focus-within:border-primary-container focus-within:bg-white transition-all">
+<button class="p-base text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined">add_circle</span>
+</button>
+<input class="flex-grow bg-transparent border-none focus:ring-0 text-body-md text-on-surface py-base" placeholder="Type a message..." type="text"/>
+<div class="flex items-center gap-sm">
+<button class="w-10 h-10 rounded-full bg-secondary text-white flex items-center justify-center hover:bg-on-secondary-fixed-variant active:scale-90 transition-all shadow-md">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">mic</span>
+</button>
+<button class="w-10 h-10 rounded-full bg-primary-container text-white flex items-center justify-center hover:bg-primary transition-all active:scale-90">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">send</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-2 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md shadow-[0_-2px_10px_rgba(0,0,0,0.02)]">
+<!-- Reports -->
+<a class="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400 px-3 py-1 hover:text-blue-600 active:scale-90 transition-transform duration-150 group" href="#">
+<span class="material-symbols-outlined mb-1">campaign</span>
+<span class="font-['Inter'] text-[11px] font-medium">Reports</span>
+</a>
+<!-- My Reports -->
+<a class="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400 px-3 py-1 hover:text-blue-600 active:scale-90 transition-transform duration-150 group" href="#">
+<span class="material-symbols-outlined mb-1">assignment_turned_in</span>
+<span class="font-['Inter'] text-[11px] font-medium">My Reports</span>
+</a>
+<!-- Impact -->
+<a class="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400 px-3 py-1 hover:text-blue-600 active:scale-90 transition-transform duration-150 group" href="#">
+<span class="material-symbols-outlined mb-1">emoji_events</span>
+<span class="font-['Inter'] text-[11px] font-medium">Impact</span>
+</a>
+<!-- AI Assistant (Active) -->
+<a class="flex flex-col items-center justify-center text-blue-700 dark:text-blue-500 bg-blue-50/50 dark:bg-blue-900/20 rounded-xl px-3 py-1 active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+<span class="font-['Inter'] text-[11px] font-medium">AI Assistant</span>
+</a>
+</nav>
+</body></html>

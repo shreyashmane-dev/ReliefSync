@@ -1,0 +1,39 @@
+@import "tailwindcss";
+@config "../tailwind.config.js";
+
+@layer base {
+  body {
+    @apply bg-background text-on-background font-body-md min-h-screen antialiased;
+  }
+}
+
+@layer utilities {
+  .elevation-0 { box-shadow: none; }
+  .elevation-1 { box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05); }
+  .elevation-2 { box-shadow: 0px 8px 16px rgba(0, 82, 204, 0.08); }
+  .shadow-premium { box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05); }
+  .shadow-level-1 { box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05); }
+  .shadow-level-2 { box-shadow: 0px 8px 16px rgba(0, 82, 204, 0.08); }
+
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+  .material-symbols-outlined.fill {
+    font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}

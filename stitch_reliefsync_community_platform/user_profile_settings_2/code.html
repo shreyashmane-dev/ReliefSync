@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-bright": "#f8f9fb",
+                        "error-container": "#ffdad6",
+                        "background": "#f8f9fb",
+                        "tertiary-container": "#006844",
+                        "surface-container-low": "#f3f4f6",
+                        "secondary-fixed": "#ffdad9",
+                        "on-primary-fixed-variant": "#0040a2",
+                        "on-error-container": "#93000a",
+                        "tertiary": "#004e32",
+                        "tertiary-fixed": "#82f9be",
+                        "on-tertiary-fixed-variant": "#005235",
+                        "outline": "#737685",
+                        "on-secondary-fixed": "#40000a",
+                        "on-secondary-container": "#5b0013",
+                        "on-primary-fixed": "#001848",
+                        "tertiary-fixed-dim": "#65dca4",
+                        "primary-fixed-dim": "#b2c5ff",
+                        "on-surface": "#191c1e",
+                        "on-secondary-fixed-variant": "#920024",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-container": "#ff5263",
+                        "error": "#ba1a1a",
+                        "surface-container": "#edeef0",
+                        "primary-container": "#0052cc",
+                        "surface-tint": "#0c56d0",
+                        "secondary": "#b81a36",
+                        "secondary-fixed-dim": "#ffb3b4",
+                        "primary-fixed": "#dae2ff",
+                        "on-background": "#191c1e",
+                        "outline-variant": "#c3c6d6",
+                        "inverse-primary": "#b2c5ff",
+                        "surface-dim": "#d9dadc",
+                        "on-tertiary": "#ffffff",
+                        "surface-variant": "#e1e2e4",
+                        "on-primary": "#ffffff",
+                        "primary": "#003d9b",
+                        "inverse-on-surface": "#f0f1f3",
+                        "on-primary-container": "#c4d2ff",
+                        "on-secondary": "#ffffff",
+                        "surface-container-high": "#e7e8ea",
+                        "on-surface-variant": "#434654",
+                        "surface": "#f8f9fb",
+                        "on-error": "#ffffff",
+                        "inverse-surface": "#2e3132",
+                        "on-tertiary-fixed": "#002113",
+                        "surface-container-highest": "#e1e2e4",
+                        "on-tertiary-container": "#72e9af"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xxl": "48px",
+                        "xl": "32px",
+                        "lg": "24px",
+                        "container-max": "1200px",
+                        "md": "16px",
+                        "sm": "12px",
+                        "gutter": "24px",
+                        "xs": "4px",
+                        "base": "8px"
+                    },
+                    "fontSize": {
+                        "body-sm": ["14px", {"lineHeight": "1.45", "fontWeight": "400"}],
+                        "caption": ["12px", {"lineHeight": "1.2", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                        "h3": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "h2": ["32px", {"lineHeight": "1.25", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "label-bold": ["14px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                        "h1": ["40px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "1.55", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface">
+<!-- TopAppBar Shell (Customized for Detail/Settings View) -->
+<header class="bg-white dark:bg-gray-900 shadow-sm border-b border-gray-100 dark:border-gray-800 flex justify-between items-center w-full px-6 py-3 h-16 fixed top-0 z-50">
+<div class="flex items-center gap-4">
+<button class="hover:bg-gray-50 dark:hover:bg-gray-800 active:scale-95 transition-all duration-200 p-2 rounded-full">
+<span class="material-symbols-outlined text-gray-500 dark:text-gray-400" data-icon="close">close</span>
+</button>
+<h1 class="font-['Inter'] font-semibold text-gray-900 dark:text-white text-lg">Settings</h1>
+</div>
+<div class="flex items-center">
+<span class="text-xl font-bold tracking-tight text-blue-700 dark:text-blue-500">ReliefSync</span>
+</div>
+</header>
+<main class="pt-24 pb-32 px-6 max-w-container-max mx-auto">
+<!-- User Info Header -->
+<section class="mb-xl flex flex-col md:flex-row items-center gap-lg bg-surface-container-lowest p-lg rounded-xl shadow-[0px_2px_4px_rgba(0,0,0,0.05)]">
+<div class="relative">
+<img alt="User Profile" class="w-24 h-24 rounded-full object-cover border-4 border-primary-container/10" data-alt="Close-up portrait of a professional man with a kind smile, clean lighting, outdoor urban background with soft bokeh" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA8bLv0xdjA4R673iq67k8S6uw76mH2ClZpAjROfmzD1PycRvmWKwT0DwC7TEuZJH6SpP34VbGQv5-wQvNChC95SntXS7usHz2mD-huqCapDRsEUbD2npiGorOeIwl2D2YwK6O7A5YiSSw72dBSxlz_oIa5F0KSpDSF75mu_UdYC8bPMPWLmVq5HeKvdQNGd3gH2dRVgjApQdif60r5JyNNwQ71nBIs9d39ndJpl9VNyw1VLVEgjBRJJ8G704B51e0A29g0wmVuIyJN"/>
+<div class="absolute bottom-0 right-0 bg-tertiary-container text-white p-1 rounded-full border-2 border-white">
+<span class="material-symbols-outlined text-sm" data-icon="verified" style="font-variation-settings: 'FILL' 1;">verified</span>
+</div>
+</div>
+<div class="text-center md:text-left">
+<h2 class="font-h2 text-h2 text-on-surface mb-xs">Julian Vance</h2>
+<div class="flex flex-wrap justify-center md:justify-start items-center gap-sm">
+<div class="flex items-center text-on-surface-variant font-body-sm">
+<span class="material-symbols-outlined text-[18px] mr-1" data-icon="location_on">location_on</span>
+                        Portland, Oregon
+                    </div>
+<span class="px-3 py-1 bg-primary-fixed text-primary rounded-full font-caption text-caption flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+                        Lead Responder
+                    </span>
+</div>
+</div>
+</section>
+<!-- Contribution Stats: Bento Grid Pattern -->
+<section class="mb-xxl">
+<h3 class="font-h3 text-h3 text-on-surface mb-lg">Your Impact</h3>
+<div class="grid grid-cols-2 md:grid-cols-3 gap-md">
+<div class="bg-white p-lg rounded-xl shadow-[0px_2px_4px_rgba(0,0,0,0.05)] flex flex-col items-center justify-center text-center">
+<span class="material-symbols-outlined text-primary mb-2" data-icon="assignment_late">assignment_late</span>
+<span class="font-h2 text-h2 text-on-surface">24</span>
+<span class="font-body-sm text-on-surface-variant">Reports Filed</span>
+</div>
+<div class="bg-white p-lg rounded-xl shadow-[0px_2px_4px_rgba(0,0,0,0.05)] flex flex-col items-center justify-center text-center">
+<span class="material-symbols-outlined text-tertiary mb-2" data-icon="verified_user">verified_user</span>
+<span class="font-h2 text-h2 text-on-surface">18</span>
+<span class="font-body-sm text-on-surface-variant">Reports Verified</span>
+</div>
+<div class="bg-white p-lg rounded-xl shadow-[0px_2px_4px_rgba(0,0,0,0.05)] col-span-2 md:col-span-1 flex flex-col items-center justify-center text-center">
+<span class="material-symbols-outlined text-secondary-container mb-2" data-icon="military_tech">military_tech</span>
+<span class="font-h2 text-h2 text-on-surface">1,450</span>
+<span class="font-body-sm text-on-surface-variant">Total Points</span>
+</div>
+</div>
+</section>
+<!-- Settings List -->
+<section class="space-y-md">
+<h3 class="font-h3 text-h3 text-on-surface mb-lg">General Settings</h3>
+<div class="bg-white rounded-xl shadow-[0px_2px_4px_rgba(0,0,0,0.05)] overflow-hidden divide-y divide-gray-100">
+<!-- Theme Toggle -->
+<div class="flex items-center justify-between p-lg hover:bg-surface-container-low transition-colors cursor-pointer">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="dark_mode">dark_mode</span>
+<div>
+<p class="font-label-bold text-label-bold text-on-surface">Theme</p>
+<p class="font-body-sm text-on-surface-variant">Currently using Light Mode</p>
+</div>
+</div>
+<div class="w-12 h-6 bg-gray-200 rounded-full relative p-1 flex items-center">
+<div class="w-4 h-4 bg-white rounded-full shadow-sm transform transition-transform"></div>
+</div>
+</div>
+<!-- Notifications -->
+<div class="flex items-center justify-between p-lg hover:bg-surface-container-low transition-colors cursor-pointer">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="notifications">notifications</span>
+<div>
+<p class="font-label-bold text-label-bold text-on-surface">Notifications</p>
+<p class="font-body-sm text-on-surface-variant">Emergency alerts &amp; updates</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline" data-icon="chevron_right">chevron_right</span>
+</div>
+<!-- Privacy -->
+<div class="flex items-center justify-between p-lg hover:bg-surface-container-low transition-colors cursor-pointer">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="security">security</span>
+<div>
+<p class="font-label-bold text-label-bold text-on-surface">Privacy</p>
+<p class="font-body-sm text-on-surface-variant">Location sharing &amp; data usage</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline" data-icon="chevron_right">chevron_right</span>
+</div>
+<!-- Language -->
+<div class="flex items-center justify-between p-lg hover:bg-surface-container-low transition-colors cursor-pointer">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="translate">translate</span>
+<div>
+<p class="font-label-bold text-label-bold text-on-surface">Language</p>
+<p class="font-body-sm text-on-surface-variant">English (US)</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline" data-icon="chevron_right">chevron_right</span>
+</div>
+<!-- Help & Support -->
+<div class="flex items-center justify-between p-lg hover:bg-surface-container-low transition-colors cursor-pointer">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="help">help</span>
+<div>
+<p class="font-label-bold text-label-bold text-on-surface">Help &amp; Support</p>
+<p class="font-body-sm text-on-surface-variant">Documentation &amp; community forums</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline" data-icon="chevron_right">chevron_right</span>
+</div>
+</div>
+<!-- Become a Volunteer CTA -->
+<div class="mt-xl p-lg bg-primary-fixed/30 border border-primary-fixed rounded-xl flex flex-col md:flex-row items-center justify-between gap-lg">
+<div class="flex items-center gap-md">
+<div class="bg-primary text-white p-3 rounded-full">
+<span class="material-symbols-outlined" data-icon="volunteer_activism">volunteer_activism</span>
+</div>
+<div>
+<p class="font-label-bold text-label-bold text-primary">Make a difference</p>
+<p class="font-body-sm text-on-surface-variant">Join our network of certified first responders.</p>
+</div>
+</div>
+<button class="w-full md:w-auto bg-primary text-on-primary font-label-bold px-lg py-sm rounded-lg active:scale-95 transition-all shadow-sm">
+                    Become a Volunteer
+                </button>
+</div>
+<!-- Sign Out -->
+<button class="w-full flex items-center justify-center gap-2 p-lg text-error font-label-bold hover:bg-error-container/20 transition-colors rounded-xl mt-lg">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+                Sign Out
+            </button>
+</section>
+</main>
+<!-- Bottom Navigation Bar (Suppressed on settings sub-page as per UX Goal, but provided as a floating fallback if needed - hidden by default for focus) -->
+<nav class="hidden md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-2 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md shadow-[0_-2px_10px_rgba(0,0,0,0.02)]">
+<a class="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400 px-3 py-1" href="#">
+<span class="material-symbols-outlined" data-icon="feed">feed</span>
+<span class="font-['Inter'] text-[11px] font-medium">Reports</span>
+</a>
+<a class="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400 px-3 py-1" href="#">
+<span class="material-symbols-outlined" data-icon="assignment_turned_in">assignment_turned_in</span>
+<span class="font-['Inter'] text-[11px] font-medium">My Reports</span>
+</a>
+<a class="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400 px-3 py-1" href="#">
+<span class="material-symbols-outlined" data-icon="military_tech">military_tech</span>
+<span class="font-['Inter'] text-[11px] font-medium">Impact</span>
+</a>
+<a class="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400 px-3 py-1" href="#">
+<span class="material-symbols-outlined" data-icon="psychology">psychology</span>
+<span class="font-['Inter'] text-[11px] font-medium">AI Assistant</span>
+</a>
+</nav>
+</body></html>

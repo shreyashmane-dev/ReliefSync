@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ReliefSync - AI Assisted Reporting</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed": "#002113",
+                        "surface-dim": "#d9dadc",
+                        "primary-fixed-dim": "#b2c5ff",
+                        "on-error-container": "#93000a",
+                        "primary-container": "#0052cc",
+                        "surface-container-high": "#e7e8ea",
+                        "on-primary-fixed": "#001848",
+                        "surface-container": "#edeef0",
+                        "inverse-on-surface": "#f0f1f3",
+                        "on-tertiary-container": "#72e9af",
+                        "secondary-fixed-dim": "#ffb3b4",
+                        "on-primary-fixed-variant": "#0040a2",
+                        "tertiary-container": "#006844",
+                        "on-primary-container": "#c4d2ff",
+                        "on-secondary-container": "#5b0013",
+                        "tertiary": "#004e32",
+                        "background": "#f8f9fb",
+                        "on-secondary-fixed": "#40000a",
+                        "error": "#ba1a1a",
+                        "on-background": "#191c1e",
+                        "primary-fixed": "#dae2ff",
+                        "surface-variant": "#e1e2e4",
+                        "surface-tint": "#0c56d0",
+                        "surface-container-low": "#f3f4f6",
+                        "outline": "#737685",
+                        "on-surface": "#191c1e",
+                        "error-container": "#ffdad6",
+                        "secondary": "#b81a36",
+                        "surface-container-highest": "#e1e2e4",
+                        "inverse-surface": "#2e3132",
+                        "secondary-fixed": "#ffdad9",
+                        "tertiary-fixed-dim": "#65dca4",
+                        "on-surface-variant": "#434654",
+                        "tertiary-fixed": "#82f9be",
+                        "on-error": "#ffffff",
+                        "inverse-primary": "#b2c5ff",
+                        "on-primary": "#ffffff",
+                        "surface-bright": "#f8f9fb",
+                        "on-secondary-fixed-variant": "#920024",
+                        "surface-container-lowest": "#ffffff",
+                        "outline-variant": "#c3c6d6",
+                        "primary": "#003d9b",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#005235",
+                        "secondary-container": "#ff5263",
+                        "surface": "#f8f9fb",
+                        "on-tertiary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "12px",
+                        "base": "8px",
+                        "lg": "24px",
+                        "gutter": "24px",
+                        "xs": "4px",
+                        "xxl": "48px",
+                        "xl": "32px",
+                        "container-max": "1200px",
+                        "md": "16px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "caption": ["Inter"],
+                        "h2": ["Inter"],
+                        "h1": ["Inter"],
+                        "h3": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-bold": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["14px", {"lineHeight": "1.45", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "1.55", "fontWeight": "400"}],
+                        "caption": ["12px", {"lineHeight": "1.2", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                        "h2": ["32px", {"lineHeight": "1.25", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "h1": ["40px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "h3": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "label-bold": ["14px", {"lineHeight": "1.2", "fontWeight": "600"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .mic-pulse {
+            box-shadow: 0 0 0 0 rgba(0, 82, 204, 0.4);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 82, 204, 0.4); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(0, 82, 204, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 82, 204, 0); }
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background font-body-md text-on-background min-h-screen flex flex-col">
+<!-- TopAppBar from JSON -->
+<header class="bg-white/90 dark:bg-gray-900/90 backdrop-blur-md flex justify-between items-center w-full px-4 h-16 z-50 docked full-width top-0 sticky border-b border-gray-100 dark:border-gray-800 shadow-[0px_2px_4px_rgba(0,0,0,0.05)]">
+<div class="flex items-center gap-3">
+<button class="p-2 active:scale-95 duration-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors rounded-full">
+<span class="material-symbols-outlined text-[#0052CC] dark:text-blue-400">location_on</span>
+</button>
+<h1 class="text-xl font-extrabold tracking-tight text-[#0052CC] dark:text-blue-400">ReliefSync</h1>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 active:scale-95 duration-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors rounded-full">
+<span class="material-symbols-outlined text-gray-500 dark:text-gray-400">notifications</span>
+</button>
+</div>
+</header>
+<main class="flex-grow flex flex-col overflow-hidden max-w-container-max mx-auto w-full">
+<!-- Top Half: AI Chat Interface -->
+<section class="h-1/2 flex flex-col px-lg pt-lg overflow-y-auto">
+<div class="space-y-md">
+<!-- AI Message -->
+<div class="flex gap-md max-w-[85%]">
+<div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-on-primary" data-weight="fill" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+</div>
+<div class="bg-surface-container px-md py-sm rounded-tr-xl rounded-b-xl border border-outline-variant/30">
+<p class="font-body-md text-on-surface">I've detected you're reporting a flood incident near <span class="font-label-bold text-primary">Downtown Plaza</span>. Can you describe the severity of the flood?</p>
+</div>
+</div>
+<!-- User Message (Simulated Voice Input) -->
+<div class="flex flex-row-reverse gap-md max-w-[85%] ml-auto">
+<div class="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-on-secondary" data-weight="fill" style="font-variation-settings: 'FILL' 1;">person</span>
+</div>
+<div class="bg-primary px-md py-sm rounded-tl-xl rounded-b-xl">
+<p class="font-body-md text-on-primary italic">"The water is rising fast, it's about waist-deep now and blocking the main entrance..."</p>
+</div>
+</div>
+</div>
+<!-- Listening UI Overlay -->
+<div class="mt-auto pb-lg flex flex-col items-center">
+<div class="flex items-center gap-xs mb-sm">
+<div class="h-1 w-4 bg-primary-container rounded-full"></div>
+<div class="h-3 w-4 bg-primary-container rounded-full"></div>
+<div class="h-5 w-4 bg-primary-container rounded-full"></div>
+<div class="h-2 w-4 bg-primary-container rounded-full"></div>
+<div class="h-4 w-4 bg-primary-container rounded-full"></div>
+</div>
+<button class="w-16 h-16 rounded-full bg-primary-container text-on-primary flex items-center justify-center mic-pulse shadow-lg active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">mic</span>
+</button>
+<p class="mt-sm text-caption text-outline font-label-bold tracking-widest uppercase">Listening...</p>
+</div>
+</section>
+<!-- Bottom Half: Structured Report Draft -->
+<section class="h-1/2 glass-panel border-t-2 border-primary-container/20 rounded-t-3xl shadow-2xl flex flex-col px-lg py-lg relative z-10">
+<div class="flex justify-between items-center mb-md">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary" data-weight="fill" style="font-variation-settings: 'FILL' 1;">assignment_turned_in</span>
+<h3 class="font-h3 text-on-surface">Structured Report Draft</h3>
+</div>
+<span class="bg-tertiary-fixed text-on-tertiary-fixed text-caption px-md py-xs rounded-full font-label-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">sync</span> Auto-updating
+                </span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md overflow-y-auto pb-xxl">
+<!-- Report Fields -->
+<div class="bg-white p-md rounded-xl border border-outline-variant shadow-sm flex flex-col gap-xs">
+<span class="text-caption text-outline font-label-bold uppercase">Incident Type</span>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">flood</span>
+<p class="font-body-md font-semibold">Flash Flood</p>
+</div>
+</div>
+<div class="bg-white p-md rounded-xl border border-outline-variant shadow-sm flex flex-col gap-xs">
+<span class="text-caption text-outline font-label-bold uppercase">Location</span>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">my_location</span>
+<p class="font-body-md font-semibold">Downtown Plaza, Sector 4</p>
+</div>
+</div>
+<div class="bg-white p-md rounded-xl border-2 border-primary-container bg-primary-fixed/20 shadow-sm flex flex-col gap-xs relative overflow-hidden">
+<div class="absolute top-0 right-0 p-1">
+<span class="material-symbols-outlined text-primary-container animate-pulse text-sm">edit</span>
+</div>
+<span class="text-caption text-primary-container font-label-bold uppercase">Severity</span>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-error" style="font-variation-settings: 'FILL' 1;">warning</span>
+<p class="font-body-md font-bold text-error">Critical (Waist-deep)</p>
+</div>
+</div>
+<div class="bg-white p-md rounded-xl border border-outline-variant shadow-sm flex flex-col gap-xs">
+<span class="text-caption text-outline font-label-bold uppercase">Reported By</span>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline" style="font-variation-settings: 'FILL' 1;">person_pin</span>
+<p class="font-body-md">Verified Volunteer #402</p>
+</div>
+</div>
+<div class="md:col-span-2 bg-white p-md rounded-xl border border-outline-variant shadow-sm flex flex-col gap-xs">
+<span class="text-caption text-outline font-label-bold uppercase">Description Preview</span>
+<p class="font-body-sm text-on-surface-variant italic leading-relaxed">
+                        "Rising waters detected at main entrance. Depth approx 1 meter. Building access restricted. Immediate evacuation required for ground floor..."
+                    </p>
+</div>
+</div>
+<!-- Smart Suggestions & Quick Actions -->
+<div class="absolute bottom-16 left-0 w-full px-lg">
+<div class="flex gap-sm overflow-x-auto pb-4 no-scrollbar">
+<button class="shrink-0 bg-white border border-primary-container text-primary-container font-label-bold px-md py-sm rounded-xl hover:bg-primary-container hover:text-white transition-all shadow-sm">
+                        Mention Blocked Roads
+                    </button>
+<button class="shrink-0 bg-white border border-primary-container text-primary-container font-label-bold px-md py-sm rounded-xl hover:bg-primary-container hover:text-white transition-all shadow-sm">
+                        Request Medical Aid
+                    </button>
+<button class="shrink-0 bg-white border border-primary-container text-primary-container font-label-bold px-md py-sm rounded-xl hover:bg-primary-container hover:text-white transition-all shadow-sm">
+                        Add Photos
+                    </button>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar from JSON -->
+<nav class="bg-white dark:bg-gray-900 fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-3 pb-safe border-t border-gray-100 dark:border-gray-800 shadow-[0px_-4px_12px_rgba(0,0,0,0.03)] rounded-t-2xl">
+<button class="flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 hover:text-[#0052CC] active:scale-90 transition-all duration-150">
+<span class="material-symbols-outlined">feed</span>
+<span class="font-['Inter'] text-[11px] font-medium">Reports</span>
+</button>
+<button class="flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 hover:text-[#0052CC] active:scale-90 transition-all duration-150">
+<span class="material-symbols-outlined">assignment_turned_in</span>
+<span class="font-['Inter'] text-[11px] font-medium">Tracking</span>
+</button>
+<button class="flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 hover:text-[#0052CC] active:scale-90 transition-all duration-150">
+<span class="material-symbols-outlined">military_tech</span>
+<span class="font-['Inter'] text-[11px] font-medium">Impact</span>
+</button>
+<button class="flex flex-col items-center justify-center bg-blue-50 dark:bg-blue-900/20 text-[#0052CC] dark:text-blue-300 rounded-xl px-2 py-1 active:scale-90 transition-all duration-150">
+<span class="material-symbols-outlined">smart_toy</span>
+<span class="font-['Inter'] text-[11px] font-medium">Assistant</span>
+</button>
+<button class="flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 hover:text-[#0052CC] active:scale-90 transition-all duration-150">
+<span class="material-symbols-outlined">person</span>
+<span class="font-['Inter'] text-[11px] font-medium">Profile</span>
+</button>
+</nav>
+<style>
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .pb-safe {
+            padding-bottom: env(safe-area-inset-bottom, 1rem);
+        }
+    </style>
+</body></html>

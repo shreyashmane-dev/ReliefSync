@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ReliefSync | Secure Entry</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .shadow-premium {
+            box-shadow: 0 20px 50px rgba(0, 82, 204, 0.08);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-background": "#191b23",
+                      "background": "#faf8ff",
+                      "surface-tint": "#0c56d0",
+                      "inverse-on-surface": "#f0f0fb",
+                      "surface-container": "#ededf8",
+                      "surface-dim": "#d9d9e4",
+                      "primary-fixed": "#dae2ff",
+                      "on-error": "#ffffff",
+                      "on-primary": "#ffffff",
+                      "surface-container-low": "#f3f3fd",
+                      "on-surface-variant": "#434654",
+                      "primary": "#003d9b",
+                      "primary-fixed-dim": "#b2c5ff",
+                      "on-surface": "#191b23",
+                      "error-container": "#ffdad6",
+                      "tertiary": "#7b2600",
+                      "error": "#ba1a1a",
+                      "secondary-container": "#e2241f",
+                      "surface-container-high": "#e7e7f2",
+                      "inverse-primary": "#b2c5ff",
+                      "on-primary-fixed-variant": "#0040a2",
+                      "on-tertiary-container": "#ffc6b2",
+                      "surface-container-lowest": "#ffffff",
+                      "on-secondary-container": "#fffbff",
+                      "inverse-surface": "#2e3038",
+                      "secondary-fixed-dim": "#ffb4aa",
+                      "surface-variant": "#e1e2ec",
+                      "surface-bright": "#faf8ff",
+                      "on-secondary-fixed": "#410001",
+                      "primary-container": "#0052cc",
+                      "outline-variant": "#c3c6d6",
+                      "on-primary-fixed": "#001848",
+                      "on-primary-container": "#c4d2ff",
+                      "tertiary-fixed-dim": "#ffb59b",
+                      "on-tertiary-fixed-variant": "#812800",
+                      "on-secondary": "#ffffff",
+                      "outline": "#737685",
+                      "surface-container-highest": "#e1e2ec",
+                      "surface": "#faf8ff",
+                      "on-tertiary": "#ffffff",
+                      "tertiary-fixed": "#ffdbcf",
+                      "on-tertiary-fixed": "#380d00",
+                      "secondary-fixed": "#ffdad5",
+                      "on-secondary-fixed-variant": "#930005",
+                      "tertiary-container": "#a33500",
+                      "on-error-container": "#93000a",
+                      "secondary": "#bc000a"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "margin-mobile": "20px",
+                      "gutter": "24px",
+                      "section-gap": "120px",
+                      "container-max": "1280px",
+                      "unit": "8px",
+                      "margin-desktop": "64px"
+              },
+              "fontFamily": {
+                      "headline-md": ["Inter"],
+                      "label-sm": ["Inter"],
+                      "body-md": ["Inter"],
+                      "label-bold": ["Inter"],
+                      "body-lg": ["Inter"],
+                      "display-xl": ["Inter"],
+                      "headline-lg": ["Inter"]
+              },
+              "fontSize": {
+                      "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                      "label-sm": ["12px", {"lineHeight": "1.2", "fontWeight": "500"}],
+                      "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                      "label-bold": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                      "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                      "display-xl": ["64px", {"lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "700"}],
+                      "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}]
+              }
+            },
+          },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md overflow-x-hidden">
+<!-- TopAppBar -->
+<header class="sticky top-0 z-50 w-full border-b border-white/40 bg-white/70 backdrop-blur-xl shadow-[0_20px_50px_rgba(0,82,204,0.08)]">
+<nav class="flex justify-between items-center w-full px-8 py-4 max-w-7xl mx-auto">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-blue-700 text-3xl" data-icon="emergency">emergency</span>
+<span class="text-2xl font-bold tracking-tighter text-blue-700 font-inter">ReliefSync</span>
+</div>
+<div class="hidden md:flex items-center gap-8">
+<a class="text-blue-700 border-b-2 border-blue-700 font-semibold font-inter transition-colors duration-300" href="#">Login</a>
+<a class="text-slate-600 font-medium font-inter hover:text-blue-600 transition-colors duration-300" href="#">Register</a>
+</div>
+<button class="md:hidden text-primary">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+</nav>
+</header>
+<main class="min-h-[calc(100vh-160px)] flex flex-col items-center justify-center relative px-6 py-12">
+<!-- 3D Decorative Node Background -->
+<div class="absolute inset-0 z-0 pointer-events-none flex justify-center items-center opacity-40">
+<div class="w-[800px] h-[800px] bg-gradient-to-tr from-primary-container/20 to-transparent rounded-full blur-[120px]"></div>
+</div>
+<div class="relative z-10 w-full max-w-5xl mx-auto">
+<div class="text-center mb-section-gap">
+<h1 class="font-display-xl text-display-xl text-on-background mb-4">Secure Portal Access</h1>
+<p class="font-body-lg text-body-lg text-outline max-w-2xl mx-auto">Select your entry point to access the ReliefSync coordination ecosystem. Mission-critical infrastructure for crisis management.</p>
+</div>
+<!-- Role Selection Bento Grid -->
+<div class="grid md:grid-cols-2 gap-gutter">
+<!-- User Access Card -->
+<div class="group glass-card p-10 rounded-xl shadow-premium hover:shadow-[0_40px_80px_rgba(0,82,204,0.12)] transition-all duration-500 flex flex-col justify-between border border-white/40">
+<div>
+<div class="flex items-start justify-between mb-8">
+<div class="w-16 h-16 rounded-xl bg-primary-container/10 flex items-center justify-center group-hover:bg-primary-container/20 transition-colors">
+<span class="material-symbols-outlined text-4xl text-primary-container" data-icon="person">person</span>
+</div>
+<span class="px-3 py-1 bg-surface-container rounded-full text-label-sm font-label-sm text-primary">Public &amp; Volunteer</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-on-background mb-4">User Access</h2>
+<p class="font-body-md text-body-md text-outline mb-8">Dedicated workspace for relief seekers, volunteers, and ground teams to report incidents and coordinate aid.</p>
+<ul class="space-y-3 mb-10">
+<li class="flex items-center gap-3 text-on-surface-variant font-body-md">
+<span class="material-symbols-outlined text-primary text-xl" data-icon="check_circle">check_circle</span>
+                                Report Local Emergencies
+                            </li>
+<li class="flex items-center gap-3 text-on-surface-variant font-body-md">
+<span class="material-symbols-outlined text-primary text-xl" data-icon="check_circle">check_circle</span>
+                                Real-time Resource Mapping
+                            </li>
+<li class="flex items-center gap-3 text-on-surface-variant font-body-md">
+<span class="material-symbols-outlined text-primary text-xl" data-icon="check_circle">check_circle</span>
+                                Volunteer Deployment Status
+                            </li>
+</ul>
+</div>
+<button class="w-full py-5 rounded-full bg-primary-container text-on-primary font-label-bold flex items-center justify-center gap-2 group-hover:bg-primary hover:shadow-[0_0_20px_rgba(0,82,204,0.3)] transition-all active:scale-95">
+                        Continue to Workspace
+                        <span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+<!-- Admin Access Card -->
+<div class="group glass-card p-10 rounded-xl shadow-premium hover:shadow-[0_40px_80px_rgba(0,82,204,0.12)] transition-all duration-500 flex flex-col justify-between border border-white/40 relative overflow-hidden">
+<!-- Subtle Glow Effect -->
+<div class="absolute -top-24 -right-24 w-48 h-48 bg-primary/10 rounded-full blur-3xl"></div>
+<div>
+<div class="flex items-start justify-between mb-8">
+<div class="w-16 h-16 rounded-xl bg-secondary-container/10 flex items-center justify-center group-hover:bg-secondary-container/20 transition-colors">
+<span class="material-symbols-outlined text-4xl text-secondary" data-icon="admin_panel_settings">admin_panel_settings</span>
+</div>
+<span class="px-3 py-1 bg-error-container/30 rounded-full text-label-sm font-label-sm text-error">Critical Ops</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-on-background mb-4">Admin Access</h2>
+<p class="font-body-md text-body-md text-outline mb-8">Strategic command center for logistics officers, government agencies, and NGO coordinators.</p>
+<ul class="space-y-3 mb-10">
+<li class="flex items-center gap-3 text-on-surface-variant font-body-md">
+<span class="material-symbols-outlined text-secondary text-xl" data-icon="security">security</span>
+                                Fleet &amp; Logistics Management
+                            </li>
+<li class="flex items-center gap-3 text-on-surface-variant font-body-md">
+<span class="material-symbols-outlined text-secondary text-xl" data-icon="security">security</span>
+                                Multi-agency Data Synchronization
+                            </li>
+<li class="flex items-center gap-3 text-on-surface-variant font-body-md">
+<span class="material-symbols-outlined text-secondary text-xl" data-icon="security">security</span>
+                                Policy &amp; Response Configuration
+                            </li>
+</ul>
+</div>
+<button class="w-full py-5 rounded-full border-2 border-outline/20 text-on-background font-label-bold flex items-center justify-center gap-2 hover:bg-on-background hover:text-background transition-all active:scale-95">
+                        Enterprise Authentication
+                        <span class="material-symbols-outlined" data-icon="key">key</span>
+</button>
+</div>
+</div>
+<!-- 3D Illustration Overlay Zone -->
+<div class="mt-section-gap flex flex-col items-center">
+<div class="relative w-full h-[300px] flex justify-center items-center">
+<img alt="Abstract 3D coordination nodes" class="w-full h-full object-contain max-w-3xl opacity-80 mix-blend-multiply" data-alt="Hyper-detailed 3D realistic matte-finish coordination nodes with glowing connection lines and translucent floating data panels in soft blue light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDCzKT3OPIUNtAkJ-Am9Swrj365NpBpwBZWphQNrxhBtcvsMeoy-b243xlB10_nP_1TVd20hktdvKkPLQQHCnfwWkzGPZr7i-BGbjZg5GxDNIheiHb25IUeySfsDhftbWbGwC-wP57ockzw2sFBWh9goUX2zIWmyt_GiiZN_KD-CrO0-2YUTaTgyQrYhTS_e49Rdo9sRwS9pT5TptVJGXS3XtZzH8s6VRk72Me6VneqtZYqgl0IoWvMQpua_U5iDCBbXnzE7bLcl5iO"/>
+</div>
+<div class="text-center mt-8">
+<p class="text-label-sm font-label-sm text-outline flex items-center gap-2 justify-center">
+<span class="w-2 h-2 rounded-full bg-secondary animate-pulse shadow-[0_0_8px_#bc000a]"></span>
+                        Real-time encrypted connection established
+                    </p>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full border-t border-slate-100 bg-white">
+<div class="w-full py-12 px-8 flex flex-col md:flex-row justify-between items-center max-w-7xl mx-auto">
+<div class="flex flex-col mb-8 md:mb-0">
+<span class="text-lg font-black text-slate-900 font-inter mb-2">ReliefSync</span>
+<p class="text-sm antialiased text-slate-500 font-inter">© 2024 ReliefSync. Mission-critical reliability for civic infrastructure.</p>
+</div>
+<div class="flex flex-wrap justify-center gap-8">
+<a class="text-sm font-medium text-slate-500 hover:text-blue-600 transition-opacity font-inter" href="#">Home</a>
+<a class="text-sm font-medium text-slate-500 hover:text-blue-600 transition-opacity font-inter" href="#">Features</a>
+<a class="text-sm font-medium text-slate-500 hover:text-blue-600 transition-opacity font-inter" href="#">How It Works</a>
+<a class="text-sm font-medium text-slate-500 hover:text-blue-600 transition-opacity font-inter" href="#">FAQ</a>
+<a class="text-sm font-medium text-slate-500 hover:text-blue-600 transition-opacity font-inter" href="#">Privacy Policy</a>
+</div>
+</div>
+</footer>
+</body></html>

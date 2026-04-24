@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary-fixed": "#002113",
+                    "surface-dim": "#d9dadc",
+                    "primary-fixed-dim": "#b2c5ff",
+                    "on-error-container": "#93000a",
+                    "primary-container": "#0052cc",
+                    "surface-container-high": "#e7e8ea",
+                    "on-primary-fixed": "#001848",
+                    "surface-container": "#edeef0",
+                    "inverse-on-surface": "#f0f1f3",
+                    "on-tertiary-container": "#72e9af",
+                    "secondary-fixed-dim": "#ffb3b4",
+                    "on-primary-fixed-variant": "#0040a2",
+                    "tertiary-container": "#006844",
+                    "on-primary-container": "#c4d2ff",
+                    "on-secondary-container": "#5b0013",
+                    "tertiary": "#004e32",
+                    "background": "#f8f9fb",
+                    "on-secondary-fixed": "#40000a",
+                    "error": "#ba1a1a",
+                    "on-background": "#191c1e",
+                    "primary-fixed": "#dae2ff",
+                    "surface-variant": "#e1e2e4",
+                    "surface-tint": "#0c56d0",
+                    "surface-container-low": "#f3f4f6",
+                    "outline": "#737685",
+                    "on-surface": "#191c1e",
+                    "error-container": "#ffdad6",
+                    "secondary": "#b81a36",
+                    "surface-container-highest": "#e1e2e4",
+                    "inverse-surface": "#2e3132",
+                    "secondary-fixed": "#ffdad9",
+                    "tertiary-fixed-dim": "#65dca4",
+                    "on-surface-variant": "#434654",
+                    "tertiary-fixed": "#82f9be",
+                    "on-error": "#ffffff",
+                    "inverse-primary": "#b2c5ff",
+                    "on-primary": "#ffffff",
+                    "surface-bright": "#f8f9fb",
+                    "on-secondary-fixed-variant": "#920024",
+                    "surface-container-lowest": "#ffffff",
+                    "outline-variant": "#c3c6d6",
+                    "primary": "#003d9b",
+                    "on-secondary": "#ffffff",
+                    "on-tertiary-fixed-variant": "#005235",
+                    "secondary-container": "#ff5263",
+                    "surface": "#f8f9fb",
+                    "on-tertiary": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "sm": "12px",
+                    "base": "8px",
+                    "lg": "24px",
+                    "gutter": "24px",
+                    "xs": "4px",
+                    "xxl": "48px",
+                    "xl": "32px",
+                    "container-max": "1200px",
+                    "md": "16px"
+            },
+            "fontFamily": {
+                    "body-sm": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "caption": ["Inter"],
+                    "h2": ["Inter"],
+                    "h1": ["Inter"],
+                    "h3": ["Inter"],
+                    "body-md": ["Inter"],
+                    "label-bold": ["Inter"]
+            },
+            "fontSize": {
+                    "body-sm": ["14px", {"lineHeight": "1.45", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "1.55", "fontWeight": "400"}],
+                    "caption": ["12px", {"lineHeight": "1.2", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                    "h2": ["32px", {"lineHeight": "1.25", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "h1": ["40px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "h3": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "label-bold": ["14px", {"lineHeight": "1.2", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body-md min-h-screen">
+<header class="bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 shadow-[0px_2px_4px_rgba(0,0,0,0.05)] docked full-width top-0 sticky flex justify-between items-center w-full px-4 h-16 z-50">
+<div class="flex items-center gap-base">
+<span class="material-symbols-outlined text-[#0052CC] dark:text-blue-400">location_on</span>
+<span class="text-xl font-extrabold tracking-tight text-[#0052CC] dark:text-blue-400 font-['Inter']">ReliefSync</span>
+</div>
+<div class="flex items-center gap-md">
+<button class="hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors p-2 rounded-full active:scale-95 duration-200">
+<span class="material-symbols-outlined text-gray-500">notifications</span>
+</button>
+</div>
+</header>
+<main class="max-w-container-max mx-auto px-4 pt-lg pb-xxl">
+<section class="flex flex-col md:flex-row gap-lg items-center md:items-start mb-xl">
+<div class="relative">
+<div class="w-24 h-24 rounded-full border-4 border-white shadow-md overflow-hidden bg-surface-container">
+<img alt="User Profile Picture" class="w-full h-full object-cover" data-alt="professional headshot of a smiling man in his 30s with short hair, wearing a clean casual shirt, against a soft daylight office background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBiSvDjjkd-ZGBKWJW3yfQeOj146D1Jhp0NEztJ4vGikuN6Gnv5dfUhQjR06mi-jF23nqTDAmtWp1k_hBQxr2WpJGgc_OXwgOfJl4NtmToN0fwRgzt_DoUbsyIW8Xx34gwOUpzIHxDwlcuxkhoUKZaY8ir0f4OI6LvEkNm0o5F6fb0NqY6cUbOFNzIlX2HqpiM7v1Dfu6srKYUhtllIQFc6umUG3mtuWFdQi6c-3g7UEvYGpdphIlJ9RhCI2oPeYH6O1Z0qsAMNBEA1"/>
+</div>
+<div class="absolute -bottom-2 -right-2 bg-white dark:bg-gray-800 p-1.5 rounded-full shadow-sm border border-gray-100">
+<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1;">verified</span>
+</div>
+</div>
+<div class="flex-1 text-center md:text-left">
+<h1 class="font-h2 text-h2 text-on-surface">Marcus Sterling</h1>
+<div class="mt-2 flex flex-wrap justify-center md:justify-start gap-2">
+<span class="inline-flex items-center px-3 py-1 rounded-full bg-[#0052CC]/10 text-[#0052CC] text-caption font-label-bold">
+<span class="material-symbols-outlined text-[16px] mr-1" style="font-variation-settings: 'FILL' 1;">military_tech</span>
+                        Silver Guardian
+                    </span>
+<span class="inline-flex items-center px-3 py-1 rounded-full bg-tertiary-fixed text-on-tertiary-fixed text-caption font-label-bold">
+                        Top 5% Responder
+                    </span>
+</div>
+</div>
+</section>
+<section class="grid grid-cols-1 md:grid-cols-3 gap-lg mb-xl">
+<div class="bg-white dark:bg-gray-800 p-lg rounded-xl shadow-[0px_2px_4px_rgba(0,0,0,0.05)] flex flex-col items-center justify-center border-l-4 border-primary">
+<span class="text-h3 font-h3 text-on-surface">42</span>
+<span class="text-caption font-caption text-outline uppercase tracking-wider mt-1">Reports Filed</span>
+</div>
+<div class="bg-white dark:bg-gray-800 p-lg rounded-xl shadow-[0px_2px_4px_rgba(0,0,0,0.05)] flex flex-col items-center justify-center border-l-4 border-[#0052CC]">
+<span class="text-h3 font-h3 text-on-surface">38</span>
+<span class="text-caption font-caption text-outline uppercase tracking-wider mt-1">Reports Verified</span>
+</div>
+<div class="bg-white dark:bg-gray-800 p-lg rounded-xl shadow-[0px_2px_4px_rgba(0,0,0,0.05)] flex flex-col items-center justify-center border-l-4 border-tertiary-container">
+<span class="text-h3 font-h3 text-on-surface">1,250</span>
+<span class="text-caption font-caption text-outline uppercase tracking-wider mt-1">Points Earned</span>
+</div>
+</section>
+<section class="mb-xl">
+<div class="bg-primary-container text-white p-lg rounded-xl flex flex-col md:flex-row items-center justify-between gap-md shadow-lg">
+<div>
+<h3 class="text-h3 font-h3 mb-1">Impact the Community</h3>
+<p class="text-body-sm font-body-sm text-on-primary-container">Get verified as a volunteer to assist in direct relief logistics.</p>
+</div>
+<button class="bg-white text-[#0052CC] px-xl py-md rounded-lg font-label-bold hover:bg-gray-100 transition-colors active:scale-95 duration-200">
+                    Become a Volunteer
+                </button>
+</div>
+</section>
+<section class="bg-white dark:bg-gray-800 rounded-xl shadow-[0px_2px_4px_rgba(0,0,0,0.05)] overflow-hidden">
+<div class="p-lg border-b border-gray-100 dark:border-gray-700">
+<h3 class="font-label-bold text-body-lg">Account Settings</h3>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center justify-between p-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer group">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">palette</span>
+<div>
+<p class="font-label-bold text-body-md">Theme</p>
+<p class="text-caption font-caption text-outline">Switch between light and dark mode</p>
+</div>
+</div>
+<div class="w-12 h-6 bg-surface-container-highest rounded-full p-1 flex items-center">
+<div class="w-4 h-4 bg-white rounded-full shadow-sm"></div>
+</div>
+</div>
+<div class="flex items-center justify-between p-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer group">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">notifications_active</span>
+<div>
+<p class="font-label-bold text-body-md">Notifications</p>
+<p class="text-caption font-caption text-outline">Manage alerts and news updates</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</div>
+<div class="flex items-center justify-between p-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer group">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">shield</span>
+<div>
+<p class="font-label-bold text-body-md">Privacy</p>
+<p class="text-caption font-caption text-outline">Control your data and visibility</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</div>
+<div class="flex items-center justify-between p-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer group">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">language</span>
+<div>
+<p class="font-label-bold text-body-md">Language</p>
+<p class="text-caption font-caption text-outline">English (United States)</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</div>
+<div class="flex items-center justify-between p-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer group">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">help_center</span>
+<div>
+<p class="font-label-bold text-body-md">Help &amp; Support</p>
+<p class="text-caption font-caption text-outline">Contact us or read documentation</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</div>
+</div>
+</section>
+<section class="mt-xl flex justify-center">
+<button class="text-error font-label-bold flex items-center gap-xs hover:bg-error-container/20 px-lg py-md rounded-xl transition-colors">
+<span class="material-symbols-outlined">logout</span>
+                Sign Out
+            </button>
+</section>
+</main>
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-3 pb-safe bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 shadow-[0px_-4px_12px_rgba(0,0,0,0.03)] rounded-t-2xl">
+<a class="flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 hover:text-[#0052CC] transition-colors active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined">feed</span>
+<span class="font-['Inter'] text-[11px] font-medium">Reports</span>
+</a>
+<a class="flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 hover:text-[#0052CC] transition-colors active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined">assignment_turned_in</span>
+<span class="font-['Inter'] text-[11px] font-medium">Tracking</span>
+</a>
+<a class="flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 hover:text-[#0052CC] transition-colors active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined">military_tech</span>
+<span class="font-['Inter'] text-[11px] font-medium">Impact</span>
+</a>
+<a class="flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 hover:text-[#0052CC] transition-colors active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined">smart_toy</span>
+<span class="font-['Inter'] text-[11px] font-medium">Assistant</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-blue-50 dark:bg-blue-900/20 text-[#0052CC] dark:text-blue-300 rounded-xl px-2 py-1 transition-colors active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="font-['Inter'] text-[11px] font-medium">Profile</span>
+</a>
+</nav>
+</body></html>

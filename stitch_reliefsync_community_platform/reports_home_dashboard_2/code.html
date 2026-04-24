@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ReliefSync Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-bright": "#f8f9fb",
+                        "error-container": "#ffdad6",
+                        "background": "#f8f9fb",
+                        "tertiary-container": "#006844",
+                        "surface-container-low": "#f3f4f6",
+                        "secondary-fixed": "#ffdad9",
+                        "on-primary-fixed-variant": "#0040a2",
+                        "on-error-container": "#93000a",
+                        "tertiary": "#004e32",
+                        "tertiary-fixed": "#82f9be",
+                        "on-tertiary-fixed-variant": "#005235",
+                        "outline": "#737685",
+                        "on-secondary-fixed": "#40000a",
+                        "on-secondary-container": "#5b0013",
+                        "on-primary-fixed": "#001848",
+                        "tertiary-fixed-dim": "#65dca4",
+                        "primary-fixed-dim": "#b2c5ff",
+                        "on-surface": "#191c1e",
+                        "on-secondary-fixed-variant": "#920024",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-container": "#ff5263",
+                        "error": "#ba1a1a",
+                        "surface-container": "#edeef0",
+                        "primary-container": "#0052cc",
+                        "surface-tint": "#0c56d0",
+                        "secondary": "#b81a36",
+                        "secondary-fixed-dim": "#ffb3b4",
+                        "primary-fixed": "#dae2ff",
+                        "on-background": "#191c1e",
+                        "outline-variant": "#c3c6d6",
+                        "inverse-primary": "#b2c5ff",
+                        "surface-dim": "#d9dadc",
+                        "on-tertiary": "#ffffff",
+                        "surface-variant": "#e1e2e4",
+                        "on-primary": "#ffffff",
+                        "primary": "#003d9b",
+                        "inverse-on-surface": "#f0f1f3",
+                        "on-primary-container": "#c4d2ff",
+                        "on-secondary": "#ffffff",
+                        "surface-container-high": "#e7e8ea",
+                        "on-surface-variant": "#434654",
+                        "surface": "#f8f9fb",
+                        "on-error": "#ffffff",
+                        "inverse-surface": "#2e3132",
+                        "on-tertiary-fixed": "#002113",
+                        "surface-container-highest": "#e1e2e4",
+                        "on-tertiary-container": "#72e9af"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xxl": "48px",
+                        "xl": "32px",
+                        "lg": "24px",
+                        "container-max": "1200px",
+                        "md": "16px",
+                        "sm": "12px",
+                        "gutter": "24px",
+                        "xs": "4px",
+                        "base": "8px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Inter"],
+                        "caption": ["Inter"],
+                        "h3": ["Inter"],
+                        "body-md": ["Inter"],
+                        "h2": ["Inter"],
+                        "label-bold": ["Inter"],
+                        "h1": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["14px", {"lineHeight": "1.45", "fontWeight": "400"}],
+                        "caption": ["12px", {"lineHeight": "1.2", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                        "h3": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "h2": ["32px", {"lineHeight": "1.25", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "label-bold": ["14px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                        "h1": ["40px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "1.55", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+        }
+        @media (max-width: 768px) {
+            .bento-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-surface-bright text-on-surface font-body-md selection:bg-primary-fixed selection:text-primary">
+<header class="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 shadow-sm fixed top-0 left-0 right-0 z-50 flex justify-between items-center w-full px-6 py-3 h-16">
+<div class="flex items-center gap-4">
+<button class="active:scale-95 transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-800 p-2 rounded-full">
+<span class="material-symbols-outlined text-gray-500 dark:text-gray-400">menu</span>
+</button>
+<h1 class="text-xl font-bold tracking-tight text-blue-700 dark:text-blue-500 font-['Inter']">ReliefSync</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-gray-500 hover:bg-gray-50 p-2 rounded-full transition-all">notifications</button>
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-container/20">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="Close up portrait of a professional man with friendly expression in high-key studio lighting with soft gray background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC0JSzqjn-DAGX6USF5LeCJsXRTKtvH8vBFvVeJuk29naqQ1Fx3hq7PoBSVn3axIegucKeZym3SZYyUssMNYPzucXCI7MGCmj_bD_Y3OK260J7q1lXJilT6tHgNZ2fJ5m_sBh3U5drYAuaqm2FpsL4Vkf5aelBn2yjhO4gFixa74dO-ezZiJBRX8OvVI8AHqwNcv_TF6jFF_QUf0r4_MMVj-nZdJw0Gp_wRtHmX68PgbL1ltQ4Gh1idLxb4VY5d3WKeDycKoMe4ORyr"/>
+</div>
+</div>
+</header>
+<main class="max-w-container-max mx-auto px-6 pt-24 pb-32">
+<section class="mb-xl">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-md">
+<div>
+<h2 class="font-h2 text-h2 text-on-surface">Hello, Marcus</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Stay informed. Active incidents near your location.</p>
+</div>
+<div class="relative flex-grow md:max-w-md">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full pl-12 pr-4 py-3 bg-surface-container-lowest border border-outline-variant rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-all outline-none" placeholder="Search reports, locations, or assistance..." type="text"/>
+</div>
+</div>
+</section>
+<section class="mb-xl overflow-x-auto no-scrollbar py-2">
+<div class="flex gap-sm min-w-max">
+<button class="flex items-center gap-2 px-4 py-2 bg-primary text-on-primary rounded-full font-label-bold shadow-md active:scale-95 transition-all">
+<span class="material-symbols-outlined text-sm">emergency</span>
+                    All Reports
+                </button>
+<button class="flex items-center gap-2 px-4 py-2 bg-surface-container-lowest text-on-surface border border-outline-variant rounded-full font-label-bold hover:bg-surface-container-low transition-all">
+<span class="material-symbols-outlined text-sm text-secondary">medical_services</span>
+                    Medical
+                </button>
+<button class="flex items-center gap-2 px-4 py-2 bg-surface-container-lowest text-on-surface border border-outline-variant rounded-full font-label-bold hover:bg-surface-container-low transition-all">
+<span class="material-symbols-outlined text-sm text-error">local_fire_department</span>
+                    Fire
+                </button>
+<button class="flex items-center gap-2 px-4 py-2 bg-surface-container-lowest text-on-surface border border-outline-variant rounded-full font-label-bold hover:bg-surface-container-low transition-all">
+<span class="material-symbols-outlined text-sm text-primary">flood</span>
+                    Flood
+                </button>
+<button class="flex items-center gap-2 px-4 py-2 bg-surface-container-lowest text-on-surface border border-outline-variant rounded-full font-label-bold hover:bg-surface-container-low transition-all">
+<span class="material-symbols-outlined text-sm text-on-tertiary-fixed-variant">thunderstorm</span>
+                    Storm
+                </button>
+<button class="flex items-center gap-2 px-4 py-2 bg-surface-container-lowest text-on-surface border border-outline-variant rounded-full font-label-bold hover:bg-surface-container-low transition-all">
+<span class="material-symbols-outlined text-sm text-outline">more_horiz</span>
+                    Other
+                </button>
+</div>
+</section>
+<section class="mb-xxl">
+<h3 class="font-h3 text-h3 mb-lg">Nearby Crisis Summary</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg">
+<div class="bg-surface-container-lowest p-lg rounded-xl border-l-4 border-error shadow-[0px_2px_4px_rgba(0,0,0,0.05)] hover:shadow-lg transition-shadow group">
+<div class="flex justify-between items-start mb-md">
+<span class="px-3 py-1 bg-error-container text-on-error-container text-caption rounded-full font-label-bold">CRITICAL</span>
+<span class="text-caption text-outline">2 mins ago</span>
+</div>
+<h4 class="font-label-bold text-lg mb-xs">Structure Fire - Oak St.</h4>
+<p class="font-body-sm text-on-surface-variant mb-md line-clamp-2">Large fire reported in commercial zone. Fire department en route. Avoid the 400 block of Oak Street.</p>
+<div class="flex items-center justify-between mt-auto">
+<div class="flex items-center gap-1 text-primary">
+<span class="material-symbols-outlined text-sm">verified_user</span>
+<span class="text-caption">24 Verifications</span>
+</div>
+<span class="text-caption font-label-bold text-on-surface">0.4 miles away</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-lg rounded-xl border-l-4 border-primary shadow-[0px_2px_4px_rgba(0,0,0,0.05)] hover:shadow-lg transition-shadow">
+<div class="flex justify-between items-start mb-md">
+<span class="px-3 py-1 bg-primary-fixed text-primary text-caption rounded-full font-label-bold">STABLE</span>
+<span class="text-caption text-outline">15 mins ago</span>
+</div>
+<h4 class="font-label-bold text-lg mb-xs">Localized Flooding</h4>
+<p class="font-body-sm text-on-surface-variant mb-md line-clamp-2">High water levels at Riverbed crossing. Road closed to small vehicles. Alternate routes advised.</p>
+<div class="flex items-center justify-between mt-auto">
+<div class="flex items-center gap-1 text-primary">
+<span class="material-symbols-outlined text-sm">verified_user</span>
+<span class="text-caption">8 Verifications</span>
+</div>
+<span class="text-caption font-label-bold text-on-surface">1.2 miles away</span>
+</div>
+</div>
+<div class="hidden lg:block bg-surface-container-lowest p-lg rounded-xl border-l-4 border-tertiary shadow-[0px_2px_4px_rgba(0,0,0,0.05)] hover:shadow-lg transition-shadow">
+<div class="flex justify-between items-start mb-md">
+<span class="px-3 py-1 bg-tertiary-fixed text-on-tertiary-fixed-variant text-caption rounded-full font-label-bold">RESOLVED</span>
+<span class="text-caption text-outline">1 hour ago</span>
+</div>
+<h4 class="font-label-bold text-lg mb-xs">Medical Emergency</h4>
+<p class="font-body-sm text-on-surface-variant mb-md line-clamp-2">Incident cleared at the Central Plaza. Traffic flowing normally. Medical team has departed.</p>
+<div class="flex items-center justify-between mt-auto">
+<div class="flex items-center gap-1 text-tertiary">
+<span class="material-symbols-outlined text-sm">check_circle</span>
+<span class="text-caption">Community Verified</span>
+</div>
+<span class="text-caption font-label-bold text-on-surface">2.8 miles away</span>
+</div>
+</div>
+</div>
+</section>
+<section class="mb-xxl">
+<div class="flex items-center justify-between mb-lg">
+<h3 class="font-h3 text-h3">Community Reports Feed</h3>
+<div class="flex gap-xs">
+<button class="p-2 bg-surface-container-high rounded-lg hover:bg-surface-container-highest transition-all">
+<span class="material-symbols-outlined">tune</span>
+</button>
+<button class="p-2 bg-surface-container-high rounded-lg hover:bg-surface-container-highest transition-all">
+<span class="material-symbols-outlined">map</span>
+</button>
+</div>
+</div>
+<div class="flex gap-sm mb-lg">
+<button class="px-4 py-1 bg-primary-fixed text-primary rounded-full text-caption font-label-bold">Priority</button>
+<button class="px-4 py-1 bg-surface-container-high text-on-surface-variant rounded-full text-caption font-label-bold">Type</button>
+<button class="px-4 py-1 bg-surface-container-high text-on-surface-variant rounded-full text-caption font-label-bold">Time</button>
+</div>
+<div class="space-y-md">
+<div class="bg-surface-container-lowest p-md rounded-xl shadow-sm border border-outline-variant/30 flex gap-md items-center">
+<div class="w-16 h-16 rounded-lg bg-error-container flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-error text-3xl" style="font-variation-settings: 'FILL' 1;">emergency_share</span>
+</div>
+<div class="flex-grow">
+<div class="flex items-center gap-2 mb-1">
+<span class="text-caption font-label-bold text-error uppercase tracking-wider">Critical</span>
+<span class="text-[10px] text-outline">• 5m ago</span>
+</div>
+<h4 class="font-label-bold text-on-surface">Gas Leak Alert - West District</h4>
+<p class="text-caption text-on-surface-variant">Evacuation in progress for Sector 4. Responders on site.</p>
+</div>
+<div class="text-right shrink-0">
+<p class="text-caption font-label-bold text-on-surface">0.8km</p>
+<span class="text-[10px] text-primary bg-primary-fixed px-2 py-0.5 rounded-full">Verified</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-md rounded-xl shadow-sm border border-outline-variant/30 flex gap-md items-center">
+<div class="w-16 h-16 rounded-lg bg-primary-fixed flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary text-3xl">water_damage</span>
+</div>
+<div class="flex-grow">
+<div class="flex items-center gap-2 mb-1">
+<span class="text-caption font-label-bold text-primary uppercase tracking-wider">Information</span>
+<span class="text-[10px] text-outline">• 12m ago</span>
+</div>
+<h4 class="font-label-bold text-on-surface">Broken Water Main</h4>
+<p class="text-caption text-on-surface-variant">Significant water on roadway. Utility crews notified.</p>
+</div>
+<div class="text-right shrink-0">
+<p class="text-caption font-label-bold text-on-surface">1.5km</p>
+<span class="text-[10px] text-outline bg-surface-container-high px-2 py-0.5 rounded-full">Pending</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-md rounded-xl shadow-sm border border-outline-variant/30 flex gap-md items-center">
+<div class="w-16 h-16 rounded-lg bg-tertiary-fixed flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-tertiary text-3xl">volunteer_activism</span>
+</div>
+<div class="flex-grow">
+<div class="flex items-center gap-2 mb-1">
+<span class="text-caption font-label-bold text-tertiary uppercase tracking-wider">Community</span>
+<span class="text-[10px] text-outline">• 45m ago</span>
+</div>
+<h4 class="font-label-bold text-on-surface">Supplies Distribution Point</h4>
+<p class="text-caption text-on-surface-variant">Water and blankets available at St. Jude's Community Center.</p>
+</div>
+<div class="text-right shrink-0">
+<p class="text-caption font-label-bold text-on-surface">3.2km</p>
+<span class="text-[10px] text-primary bg-primary-fixed px-2 py-0.5 rounded-full">Verified</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+<button class="fixed bottom-24 right-6 w-14 h-14 bg-error text-on-error rounded-full shadow-2xl flex items-center justify-center active:scale-90 transition-transform duration-150 z-40 hover:brightness-110">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">add</span>
+</button>
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-2 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-t border-gray-100 dark:border-gray-800 shadow-[0_-2px_10px_rgba(0,0,0,0.02)]">
+<a class="flex flex-col items-center justify-center text-blue-700 dark:text-blue-500 bg-blue-50/50 dark:bg-blue-900/20 rounded-xl px-3 py-1 active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">campaign</span>
+<span class="font-['Inter'] text-[11px] font-medium">Reports</span>
+</a>
+<a class="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400 px-3 py-1 hover:text-blue-600 dark:hover:text-blue-400 active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined">assignment_turned_in</span>
+<span class="font-['Inter'] text-[11px] font-medium">My Reports</span>
+</a>
+<a class="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400 px-3 py-1 hover:text-blue-600 dark:hover:text-blue-400 active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined">emoji_events</span>
+<span class="font-['Inter'] text-[11px] font-medium">Impact</span>
+</a>
+<a class="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400 px-3 py-1 hover:text-blue-600 dark:hover:text-blue-400 active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined">smart_toy</span>
+<span class="font-['Inter'] text-[11px] font-medium">AI Assistant</span>
+</a>
+</nav>
+</body></html>

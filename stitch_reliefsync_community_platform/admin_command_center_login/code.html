@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-background": "#191b23",
+                    "background": "#faf8ff",
+                    "surface-tint": "#0c56d0",
+                    "inverse-on-surface": "#f0f0fb",
+                    "surface-container": "#ededf8",
+                    "surface-dim": "#d9d9e4",
+                    "primary-fixed": "#dae2ff",
+                    "on-error": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "surface-container-low": "#f3f3fd",
+                    "on-surface-variant": "#434654",
+                    "primary": "#003d9b",
+                    "primary-fixed-dim": "#b2c5ff",
+                    "on-surface": "#191b23",
+                    "error-container": "#ffdad6",
+                    "tertiary": "#7b2600",
+                    "error": "#ba1a1a",
+                    "secondary-container": "#e2241f",
+                    "surface-container-high": "#e7e7f2",
+                    "inverse-primary": "#b2c5ff",
+                    "on-primary-fixed-variant": "#0040a2",
+                    "on-tertiary-container": "#ffc6b2",
+                    "surface-container-lowest": "#ffffff",
+                    "on-secondary-container": "#fffbff",
+                    "inverse-surface": "#2e3038",
+                    "secondary-fixed-dim": "#ffb4aa",
+                    "surface-variant": "#e1e2ec",
+                    "surface-bright": "#faf8ff",
+                    "on-secondary-fixed": "#410001",
+                    "primary-container": "#0052cc",
+                    "outline-variant": "#c3c6d6",
+                    "on-primary-fixed": "#001848",
+                    "on-primary-container": "#c4d2ff",
+                    "tertiary-fixed-dim": "#ffb59b",
+                    "on-tertiary-fixed-variant": "#812800",
+                    "on-secondary": "#ffffff",
+                    "outline": "#737685",
+                    "surface-container-highest": "#e1e2ec",
+                    "surface": "#faf8ff",
+                    "on-tertiary": "#ffffff",
+                    "tertiary-fixed": "#ffdbcf",
+                    "on-tertiary-fixed": "#380d00",
+                    "secondary-fixed": "#ffdad5",
+                    "on-secondary-fixed-variant": "#930005",
+                    "tertiary-container": "#a33500",
+                    "on-error-container": "#93000a",
+                    "secondary": "#bc000a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-mobile": "20px",
+                    "gutter": "24px",
+                    "section-gap": "120px",
+                    "container-max": "1280px",
+                    "unit": "8px",
+                    "margin-desktop": "64px"
+            },
+            "fontFamily": {
+                    "headline-md": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "body-md": ["Inter"],
+                    "label-bold": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "display-xl": ["Inter"],
+                    "headline-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                    "label-sm": ["12px", {"lineHeight": "1.2", "fontWeight": "500"}],
+                    "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "label-bold": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "display-xl": ["64px", {"lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "700"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glow-blue {
+            box-shadow: 0 0 20px rgba(0, 82, 204, 0.15);
+        }
+        .ambient-shadow {
+            box-shadow: 0 20px 50px rgba(0, 82, 204, 0.08);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background font-body-md text-on-background min-h-screen flex flex-col">
+<!-- TopAppBar from JSON - Navigation Suppressed for Login/Transactional -->
+<header class="sticky top-0 z-50 flex justify-between items-center w-full px-8 py-4 max-w-7xl mx-auto bg-white/70 backdrop-blur-xl border-b border-white/40 shadow-[0_20px_50px_rgba(0,82,204,0.08)]">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-blue-700 text-2xl" data-icon="emergency">emergency</span>
+<h1 class="text-2xl font-bold tracking-tighter text-blue-700 font-inter">ReliefSync</h1>
+</div>
+<div class="hidden md:flex gap-6">
+<span class="text-slate-600 font-medium font-inter">System Status: Secure</span>
+</div>
+</header>
+<main class="flex-grow flex items-center justify-center relative overflow-hidden px-margin-mobile md:px-margin-desktop py-12">
+<!-- 3D Decorative Element 1 -->
+<div class="absolute -top-24 -left-24 w-96 h-96 opacity-20 pointer-events-none">
+<img class="w-full h-full object-contain" data-alt="A 3D realistic translucent glass node with glowing blue data threads connecting points, high-fidelity matte finish" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBI8_isMsnO-xvX_6Vl5wFHfb2oowAr6iwxwmJAfD0MYmAuUjZknD6seu1HYYomCFwnBranJy6LC9Uq7NQBdUoKmx2T9uO5edAHWFPh8AEGE8KgEFsZTE6KMWsPNz6Y6zybr3MNf6BR7pRXlg31N2DNQ3XSX3hFB_qLusypoitAkEjJ-tgAidVJuLJhsD7GzdS96HvfVvMg7ZyxCnN2gceKa8N9uOD6imAvT5MgTx6C8rbCtIOBX50bRf6Y3RQS1DBkr7A_fb0Cz8lV"/>
+</div>
+<!-- 3D Decorative Element 2 -->
+<div class="absolute -bottom-32 -right-32 w-[500px] h-[500px] opacity-20 pointer-events-none">
+<img class="w-full h-full object-contain" data-alt="A futuristic 3D metallic shield with holographic grid lines and a soft blue glow, reflecting studio lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDgt7C9K7r_zYiHzdUPplDAEL-Xm5x6fG8sO6_e1znka2nfmpy9u0z3Roxap6-GzfPZShxxldsQg-0kIrvcQZ4ZNT0EPJMbYhf7PReLlLCNXPMp6-sotjPJZ8JFaQ6-vI481paRLgbjEvQYdph7KFhYHNC5aeFTWRIo1S3vT-Szo0OOHHKe_PMEtrLerPSHP2-VZLds6dH3XBY5A-TIANg2tn6g-lJKKduu7wgCwMjcjLGdrh1cWLUnTJjlR8Sv3mQGSUeuf45tyr1k"/>
+</div>
+<div class="w-full max-w-md z-10">
+<!-- Login Card -->
+<div class="glass-card ambient-shadow rounded-xl p-8 md:p-10 flex flex-col gap-8">
+<div class="text-center">
+<div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary-container/10 mb-6">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="admin_panel_settings">admin_panel_settings</span>
+</div>
+<h2 class="text-headline-lg font-headline-lg text-on-background mb-2">ReliefSync Admin</h2>
+<p class="text-on-surface-variant font-body-md">Enter your credentials to access the command center</p>
+</div>
+<form class="flex flex-col gap-6">
+<div class="flex flex-col gap-2">
+<label class="text-label-bold font-label-bold text-on-surface ml-1" for="email">Admin Email</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline text-xl" data-icon="mail">mail</span>
+<input class="w-full pl-12 pr-4 py-4 bg-[#F5F7FA] border-transparent rounded-lg focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all outline-none text-body-md" id="email" placeholder="name@reliefsync.gov" type="email"/>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-label-bold font-label-bold text-on-surface ml-1" for="password">Password</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline text-xl" data-icon="lock">lock</span>
+<input class="w-full pl-12 pr-4 py-4 bg-[#F5F7FA] border-transparent rounded-lg focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all outline-none text-body-md" id="password" placeholder="••••••••••••" type="password"/>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<label class="flex items-center gap-2 cursor-pointer">
+<input class="w-4 h-4 rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/>
+<span class="text-label-sm font-label-sm text-on-surface-variant">Remember session</span>
+</label>
+<a class="text-label-sm font-label-sm text-primary hover:underline" href="#">Forgot password?</a>
+</div>
+<button class="w-full bg-primary-container text-white py-4 px-6 rounded-full font-label-bold text-lg shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all active:scale-[0.98] flex items-center justify-center gap-3 mt-2" type="submit">
+                        Access Command Center
+                        <span class="material-symbols-outlined" data-icon="chevron_right">chevron_right</span>
+</button>
+</form>
+<div class="flex items-center gap-4 py-2">
+<div class="h-[1px] flex-grow bg-slate-200"></div>
+<span class="text-label-sm font-label-sm text-outline uppercase tracking-widest">Enterprise Security</span>
+<div class="h-[1px] flex-grow bg-slate-200"></div>
+</div>
+<div class="flex justify-center gap-8 opacity-60">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" data-icon="encrypted">encrypted</span>
+<span class="text-label-sm font-label-sm">SSL Secure</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" data-icon="verified_user">verified_user</span>
+<span class="text-label-sm font-label-sm">2FA Ready</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer from JSON - Contextual Logic applied -->
+<footer class="w-full py-12 px-8 flex flex-col md:flex-row justify-between items-center max-w-7xl mx-auto border-t border-slate-100 bg-white">
+<div class="mb-6 md:mb-0">
+<h3 class="text-lg font-black text-slate-900 font-inter">ReliefSync</h3>
+<p class="text-sm font-inter antialiased text-slate-500 mt-2">© 2024 ReliefSync. Mission-critical reliability for civic infrastructure.</p>
+</div>
+<div class="flex flex-wrap justify-center gap-8">
+<a class="text-sm font-inter text-slate-500 hover:text-blue-600 transition-opacity" href="#">Privacy Policy</a>
+<a class="text-sm font-inter text-slate-500 hover:text-blue-600 transition-opacity" href="#">Security Protocols</a>
+<a class="text-sm font-inter text-slate-500 hover:text-blue-600 transition-opacity" href="#">Support</a>
+</div>
+</footer>
+</body></html>
