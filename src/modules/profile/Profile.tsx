@@ -562,7 +562,7 @@ export const Profile = () => {
                     </span>
                     <input
                       type={field.type}
-                      value={form[field.key as keyof ProfileFormState]}
+                      value={form[field.key as keyof ProfileFormState] as string}
                       onChange={(event) => setForm((current) => ({ ...current, [field.key]: event.target.value }))}
                       style={{ width: '100%', padding: '11px 14px 11px 40px', borderRadius: 10, border: '1.5px solid #e1e2e4', fontSize: 14, fontFamily: 'Inter, sans-serif', outline: 'none', boxSizing: 'border-box' }}
                     />
