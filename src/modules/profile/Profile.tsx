@@ -12,7 +12,7 @@ import { collection, doc, onSnapshot, query, serverTimestamp, updateDoc, where }
 import { deleteObject, getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { auth, db, storage } from '../../core/firebase/config';
 import { useStore } from '../../core/store/useStore';
-import { computeTrustScore, getEarnedBadges } from '../../core/utils/impact';
+import { computeTrustScore, getEarnedBadges, computeImpactPoints, getLeague } from '../../core/utils/impact';
 import { getInitials, normalizePhoneNumber } from '../../core/utils/user';
 
 interface ProfileFormState {
@@ -306,6 +306,9 @@ export const Profile = () => {
   const confirmationCount = reports.reduce((total, report) => total + (Array.isArray(report.verifiedBy) ? report.verifiedBy.length : 0), 0);
   const trustedReporter = badges.find((badge) => badge.key === 'trusted-reporter')?.earned;
 
+  const points = computeImpactPoints({ reports, phoneVerified: Boolean(user?.phoneVerified) });
+  const league = getLeague(points);
+
   const renderAvatar = (size: number) => {
     if (user?.photoURL) {
       return (
@@ -373,8 +376,20 @@ export const Profile = () => {
           {!editing ? (
             <>
               <div>
-                <h2 style={{ fontSize: 24, fontWeight: 800, margin: 0, marginBottom: 4 }}>{user?.name || 'User'}</h2>
-                {form.bio && <p style={{ fontSize: 14, color: '#737685', margin: '4px 0 0' }}>{form.bio}</p>}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 4, flexWrap: 'wrap' }}>
+                  <h2 style={{ fontSize: 24, fontWeight: 800, margin: 0 }}>{user?.name || 'User'}</h2>
+                  <span style={{ color: '#e2e8f0', fontSize: 20 }}>•</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4, background: `${league.current.color}15`, color: league.current.color, padding: '4px 10px', borderRadius: 12, border: `1px solid ${league.current.color}40`, ...(league.current.name === 'Shikhar' ? { boxShadow: `0 0 12px ${league.current.color}50` } : {}) }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: 16 }}>{league.current.icon}</span>
+                    <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase' }}>{league.current.name}</span>
+                  </div>
+                </div>
+                {form.bio && <p style={{ fontSize: 15, color: '#475569', margin: '6px 0 0' }}>{form.bio}</p>}
+                {league.next && (
+                  <p style={{ fontSize: 13, color: '#64748b', margin: '8px 0 0', fontWeight: 600 }}>
+                    {league.pointsToNext} XP to reach <span style={{ color: league.next.color }}>{league.next.name}</span>
+                  </p>
+                )}
                 {form.location_text && (
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, marginTop: 6, fontSize: 13, color: '#737685' }}>
                     <span className="material-symbols-outlined" style={{ fontSize: 15 }}>location_on</span>

@@ -14,6 +14,7 @@ import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { db, storage } from '../../core/firebase/config';
 import { useStore } from '../../core/store/useStore';
 import { getInitials } from '../../core/utils/user';
+import { SmartLocationField, type LocationData } from './SmartLocationField';
 
 const CATEGORIES = [
   { label: 'Medical', icon: 'medical_services', color: '#b81a36' },
@@ -70,11 +71,17 @@ export const ReportsHome = () => {
   const [confirmingReportId, setConfirmingReportId] = useState<string | null>(null);
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
 
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<{
+    title: string;
+    category: string;
+    severity: string;
+    location: LocationData | null;
+    description: string;
+  }>({
     title: '',
     category: 'Medical',
     severity: 'Medium',
-    location: '',
+    location: null,
     description: '',
   });
 
@@ -166,7 +173,7 @@ export const ReportsHome = () => {
 
       setShowModal(false);
       setSelectedImages([]);
-      setForm({ title: '', category: 'Medical', severity: 'Medium', location: '', description: '' });
+      setForm({ title: '', category: 'Medical', severity: 'Medium', location: null, description: '' });
 
       // Show a warning AFTER modal closes if some photos were skipped
       if (failedUploads > 0) {
@@ -234,10 +241,18 @@ export const ReportsHome = () => {
     const matchCategory = filter === 'All' || report.category === filter;
     const matchStatus = statusFilter === 'all' || report.status === statusFilter;
     const searchValue = search.toLowerCase();
+
+    const locStr =
+      typeof report.location === 'object' && report.location !== null
+        ? report.location.address
+        : typeof report.location === 'string'
+        ? report.location
+        : '';
+
     const matchSearch =
       !searchValue ||
       report.title?.toLowerCase().includes(searchValue) ||
-      report.location?.toLowerCase().includes(searchValue) ||
+      locStr?.toLowerCase().includes(searchValue) ||
       report.description?.toLowerCase().includes(searchValue);
 
     return matchCategory && matchStatus && matchSearch;
@@ -518,7 +533,7 @@ export const ReportsHome = () => {
                       <span className="material-symbols-outlined" style={{ fontSize: 15 }}>
                         location_on
                       </span>
-                      {report.location}
+                      {typeof report.location === 'object' && report.location !== null ? report.location.address : report.location}
                     </div>
                   )}
                 </div>
@@ -721,21 +736,10 @@ export const ReportsHome = () => {
                 </div>
               </div>
 
-              <div>
-                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#434654', marginBottom: 6 }}>Location *</label>
-                <div style={{ position: 'relative' }}>
-                  <span className="material-symbols-outlined" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', fontSize: 18, color: '#737685', pointerEvents: 'none' }}>
-                    location_on
-                  </span>
-                  <input
-                    required
-                    value={form.location}
-                    onChange={(event) => setForm((current) => ({ ...current, location: event.target.value }))}
-                    placeholder="Street address or area name"
-                    style={{ width: '100%', padding: '12px 14px 12px 40px', borderRadius: 12, border: '1.5px solid #e1e2e4', fontSize: 15, fontFamily: 'Inter, sans-serif', outline: 'none', boxSizing: 'border-box' }}
-                  />
-                </div>
-              </div>
+              <SmartLocationField
+                value={form.location}
+                onChange={(loc) => setForm((current) => ({ ...current, location: loc }))}
+              />
 
               <div>
                 <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#434654', marginBottom: 6 }}>Description</label>

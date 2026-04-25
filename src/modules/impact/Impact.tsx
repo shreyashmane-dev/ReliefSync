@@ -84,11 +84,14 @@ export const Impact = () => {
         <div className="md:col-span-8 bg-surface-container-lowest rounded-xl shadow-[0px_2px_4px_rgba(0,0,0,0.05)] p-lg flex flex-col justify-between min-h-[240px]">
           <div className="flex justify-between items-start mb-md gap-md flex-wrap">
             <div className="flex items-center gap-md">
-              <div className="w-[56px] h-[56px] rounded-full bg-surface-container flex items-center justify-center border-4 border-outline-variant">
-                <span className="material-symbols-outlined text-[32px] text-outline-variant">workspace_premium</span>
+              <div
+                className={`w-[56px] h-[56px] rounded-full flex items-center justify-center border-4 ${league.current.name === 'Shikhar' ? 'shadow-[0_0_15px_rgba(239,68,68,0.5)]' : ''}`}
+                style={{ backgroundColor: `${league.current.color}15`, borderColor: league.current.color }}
+              >
+                <span className="material-symbols-outlined text-[32px]" style={{ color: league.current.color, fontVariationSettings: "'FILL' 1" }}>{league.current.icon}</span>
               </div>
               <div>
-                <p className="font-label-bold text-label-bold text-on-surface-variant uppercase tracking-wide">Current League</p>
+                <p className="font-label-bold text-label-bold text-on-surface-variant uppercase tracking-wide">Current Rank</p>
                 <h2 className="font-h3 text-h3 text-on-surface">{league.current.name}</h2>
               </div>
             </div>
@@ -122,7 +125,7 @@ export const Impact = () => {
               <p className="font-body-md text-body-md text-on-surface-variant">
                 {league.next ? (
                   <>
-                    <strong className="text-on-surface font-semibold">{league.pointsToNext} points</strong> away from {league.next.name}
+                    <strong className="text-on-surface font-semibold">{league.pointsToNext} XP</strong> to reach {league.next.name}
                   </>
                 ) : (
                   <strong className="text-on-surface font-semibold">Top league reached</strong>
@@ -221,11 +224,22 @@ export const Impact = () => {
                     {getInitials(entry.name)}
                   </div>
                 )}
-                <div className="flex-1">
-                  <p className="font-label-bold text-label-bold text-on-surface">{entry.id === user?.id ? 'You' : entry.name}</p>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <p className="font-label-bold text-label-bold text-on-surface truncate">{entry.id === user?.id ? 'You' : entry.name}</p>
+                    <div
+                      className={`flex items-center justify-center rounded-full flex-shrink-0 ${getLeague(entry.points).current.name === 'Shikhar' ? 'shadow-[0_0_8px_rgba(239,68,68,0.4)]' : ''}`}
+                      style={{ width: 16, height: 16, backgroundColor: `${getLeague(entry.points).current.color}20`, border: `1px solid ${getLeague(entry.points).current.color}40` }}
+                      title={getLeague(entry.points).current.name}
+                    >
+                      <span className="material-symbols-outlined" style={{ fontSize: 10, color: getLeague(entry.points).current.color, fontVariationSettings: "'FILL' 1" }}>
+                        {getLeague(entry.points).current.icon}
+                      </span>
+                    </div>
+                  </div>
                   <p className="font-caption text-caption text-on-surface-variant">Trust {entry.trust}/100</p>
                 </div>
-                <span className="font-label-bold text-label-bold text-primary">{entry.points} pts</span>
+                <span className="font-label-bold text-label-bold text-primary">{entry.points} XP</span>
               </div>
             ))}
           </div>

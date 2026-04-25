@@ -7,13 +7,12 @@ export interface ImpactReport {
 }
 
 export const LEAGUES = [
-  { name: 'Wood', minPoints: 0 },
-  { name: 'Iron', minPoints: 120 },
-  { name: 'Bronze', minPoints: 260 },
-  { name: 'Silver', minPoints: 480 },
-  { name: 'Gold', minPoints: 760 },
-  { name: 'Platinum', minPoints: 1100 },
-  { name: 'Guardian', minPoints: 1600 },
+  { name: 'Prarambh', minPoints: 0, color: '#86efac', icon: 'eco' },
+  { name: 'Udaan', minPoints: 120, color: '#3b82f6', icon: 'flight_takeoff' },
+  { name: 'Sankalp', minPoints: 260, color: '#f59e0b', icon: 'handshake' },
+  { name: 'Drishti', minPoints: 480, color: '#a855f7', icon: 'visibility' },
+  { name: 'Prabhav', minPoints: 760, color: '#f97316', icon: 'bolt' },
+  { name: 'Shikhar', minPoints: 1100, color: '#ef4444', icon: 'workspace_premium' },
 ] as const;
 
 const getVerificationCount = (report: ImpactReport) => {
