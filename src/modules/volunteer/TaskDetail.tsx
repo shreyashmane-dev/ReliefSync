@@ -7,7 +7,6 @@ import { GoogleMap, useJsApiLoader, MarkerF } from '@react-google-maps/api';
 
 const libraries: ("places" | "geometry")[] = ['places'];
 
-import { VolunteerAssistant } from './VolunteerAssistant';
 import { BackupRequestModal } from './BackupRequestModal';
 
 export const TaskDetail = () => {

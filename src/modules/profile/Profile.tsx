@@ -23,6 +23,8 @@ interface ProfileFormState {
   location_text: string;
   name: string;
   skillsText: string;
+  isAnonymous: boolean;
+  anonymousHandle: string;
 }
 
 const buildProfileForm = (user: any): ProfileFormState => ({
@@ -180,6 +182,8 @@ export const Profile = () => {
         location_text: form.location_text.trim(),
         emergencyContacts,
         skills,
+        isAnonymous: form.isAnonymous,
+        anonymousHandle: form.anonymousHandle,
         updatedAt: serverTimestamp(),
       };
 
@@ -196,6 +200,8 @@ export const Profile = () => {
         location_text: updates.location_text,
         emergencyContacts,
         skills,
+        isAnonymous: updates.isAnonymous,
+        anonymousHandle: updates.anonymousHandle,
       });
       setEditing(false);
       setFlashMessage('Profile saved successfully.');

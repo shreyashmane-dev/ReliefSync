@@ -6,13 +6,9 @@ import {
   where,
   onSnapshot,
   orderBy,
-  doc,
-  updateDoc,
-  serverTimestamp,
 } from 'firebase/firestore';
 import { db } from '../../core/firebase/config';
 import { useStore } from '../../core/store/useStore';
-import { useIsMobile } from '../../core/hooks/useIsMobile';
 
 const MISSION_STATUS = {
   assigned: { label: 'Assigned', color: '#737685', bg: '#f1f5f9', icon: 'bookmark' },
@@ -24,7 +20,6 @@ const MISSION_STATUS = {
 export const VolunteerTasks = () => {
   const { user } = useStore();
   const navigate = useNavigate();
-  const isMobile = useIsMobile();
   const [tasks, setTasks] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<'active' | 'completed'>('active');
   const [loading, setLoading] = useState(true);

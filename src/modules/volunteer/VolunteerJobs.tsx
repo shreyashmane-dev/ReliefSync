@@ -11,7 +11,6 @@ import {
 } from 'firebase/firestore';
 import { db } from '../../core/firebase/config';
 import { useStore } from '../../core/store/useStore';
-import { useIsMobile } from '../../core/hooks/useIsMobile';
 
 const SEVERITY_COLORS: Record<string, string> = {
   Critical: '#ba1a1a',
@@ -29,7 +28,6 @@ const SEVERITY_BG: Record<string, string> = {
 
 export const VolunteerJobs = () => {
   const { user } = useStore();
-  const isMobile = useIsMobile();
   const [jobs, setJobs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [claimingId, setClaimingId] = useState<string | null>(null);
