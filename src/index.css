@@ -99,3 +99,28 @@
     padding-bottom: max(1rem, env(safe-area-inset-bottom));
   }
 }
+
+/* Google Places Autocomplete Suggestions Fix */
+.pac-container {
+  z-index: 9999 !important;
+  border-radius: 12px;
+  border: 1px solid #e1e2e4;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  margin-top: 4px;
+  font-family: 'Inter', sans-serif !important;
+}
+
+.pac-item {
+  padding: 10px 14px;
+  cursor: pointer;
+  border-top: 1px solid #f1f5f9;
+}
+
+.pac-item:first-child {
+  border-top: none;
+}
+
+.pac-item-query {
+  font-size: 14px;
+  color: #191c1e;
+}

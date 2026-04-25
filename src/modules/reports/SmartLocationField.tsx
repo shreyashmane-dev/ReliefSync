@@ -29,14 +29,22 @@ export const SmartLocationField: React.FC<SmartLocationFieldProps> = ({ value, o
   const defaultCenter = { lat: 20.5937, lng: 78.9629 };
   const center = value?.lat && value?.lng ? { lat: value.lat, lng: value.lng } : defaultCenter;
 
+  // Sync local input with props when value changes from outside (e.g., reset or external update)
   useEffect(() => {
-    if (value?.address && value.address !== addressInput) {
+    if (value?.address) {
       setAddressInput(value.address);
-    } else if (!value?.address) {
+    } else {
       setAddressInput('');
       setIsOpen(false);
     }
-  }, [value, addressInput]);
+  }, [value?.address]);
+
+  // Debugging: Confirm Places API loaded
+  useEffect(() => {
+    if (isLoaded && window.google) {
+      console.log('Google Maps Places Library Loaded:', !!window.google.maps.places);
+    }
+  }, [isLoaded]);
 
   const handlePlaceChanged = () => {
     if (autocompleteRef.current !== null) {
@@ -97,19 +105,26 @@ export const SmartLocationField: React.FC<SmartLocationFieldProps> = ({ value, o
 
   if (loadError) {
     return (
-      <div style={{ color: '#b91c1c', fontSize: 13 }}>
+      <div style={{ color: '#b91c1c', fontSize: 13, background: '#fef2f2', padding: 12, borderRadius: 8, border: '1px solid #fee2e2' }}>
         Error loading maps. Please check your API key and connection.
       </div>
     );
   }
 
   if (!isLoaded) {
-    return <div style={{ fontSize: 13, color: '#737685' }}>Loading smart location field...</div>;
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#737685', padding: '12px 0' }}>
+        <span className="material-symbols-outlined animate-spin" style={{ fontSize: 18 }}>progress_activity</span>
+        Loading smart location field...
+      </div>
+    );
   }
 
   return (
     <div style={{ position: 'relative' }}>
-      <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#434654', marginBottom: 6 }}>Location *</label>
+      <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#434654', marginBottom: 6 }}>
+        Reporting Location *
+      </label>
       <div style={{ position: 'relative' }}>
         <span className="material-symbols-outlined" style={{ position: 'absolute', left: 12, top: 12, fontSize: 18, color: '#737685', pointerEvents: 'none', zIndex: 2 }}>
           location_on
@@ -117,30 +132,52 @@ export const SmartLocationField: React.FC<SmartLocationFieldProps> = ({ value, o
         <Autocomplete
           onLoad={(autocomplete) => { autocompleteRef.current = autocomplete; }}
           onPlaceChanged={handlePlaceChanged}
+          options={{ types: ['geocode'] }}
         >
           <input
             required
+            type="text"
             value={addressInput}
-            onChange={(e) => setAddressInput(e.target.value)}
+            onChange={(e) => {
+              setAddressInput(e.target.value);
+              // Allow manual typing even if autocomplete isn't used
+              if (e.target.value === '') {
+                onChange({ address: '', lat: 0, lng: 0 });
+              }
+            }}
             onFocus={() => setIsOpen(true)}
             placeholder="Search or select reporting location"
-            style={{ width: '100%', padding: '12px 40px', borderRadius: 12, border: '1.5px solid #e1e2e4', fontSize: 15, color: '#191c1e', fontFamily: 'Inter, sans-serif', outline: 'none', boxSizing: 'border-box' }}
+            style={{ 
+              width: '100%', 
+              padding: '12px 40px', 
+              borderRadius: 12, 
+              border: '1.5px solid #e1e2e4', 
+              fontSize: 15, 
+              color: '#000000', // Explicit black text
+              backgroundColor: '#ffffff', // Explicit white background
+              fontFamily: 'Inter, sans-serif', 
+              outline: 'none', 
+              boxSizing: 'border-box',
+              caretColor: '#000000', // Visible cursor
+              opacity: 1,
+              zIndex: 1
+            }}
           />
         </Autocomplete>
         <button
           type="button"
           onClick={handleCurrentLocation}
           title="Use my location"
-          style={{ position: 'absolute', right: 8, top: 6, background: '#f8f9fb', border: '1px solid #e1e2e4', borderRadius: 8, padding: '4px 6px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          style={{ position: 'absolute', right: 8, top: 6, background: '#f8f9fb', border: '1px solid #e1e2e4', borderRadius: 8, padding: '4px 6px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2 }}
         >
           <span className="material-symbols-outlined" style={{ fontSize: 18, color: '#0052cc' }}>my_location</span>
         </button>
       </div>
 
       {isOpen && (
-        <div style={{ marginTop: 8, borderRadius: 12, border: '1px solid #e1e2e4', overflow: 'hidden', animation: 'fadeIn 0.2s ease-in-out' }}>
+        <div style={{ marginTop: 12, borderRadius: 16, border: '1px solid #e1e2e4', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.08)', animation: 'fadeIn 0.2s ease-out' }}>
           <GoogleMap
-            mapContainerStyle={{ width: '100%', height: 180 }}
+            mapContainerStyle={{ width: '100%', height: 200 }}
             center={center}
             zoom={value?.lat ? 16 : 4}
             onClick={handleMapClick}
@@ -150,17 +187,19 @@ export const SmartLocationField: React.FC<SmartLocationFieldProps> = ({ value, o
               mapTypeControl: false,
               fullscreenControl: false,
               zoomControl: true,
+              disableDefaultUI: false,
+              gestureHandling: 'greedy'
             }}
           >
             {value?.lat && value?.lng && <MarkerF position={{ lat: value.lat, lng: value.lng }} />}
           </GoogleMap>
-          <div style={{ padding: '8px 12px', background: '#f8f9fb', fontSize: 12, color: '#737685', textAlign: 'center', borderTop: '1px solid #e1e2e4' }}>
-            Adjust pin if needed
+          <div style={{ padding: '10px 14px', background: '#f8f9fb', fontSize: 12, color: '#737685', textAlign: 'center', borderTop: '1px solid #e1e2e4', fontWeight: 500 }}>
+            Adjust pin by clicking on the map
           </div>
         </div>
       )}
       <style>{`
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
       `}</style>
     </div>
   );
