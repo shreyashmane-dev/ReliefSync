@@ -2,21 +2,27 @@
 @config "../tailwind.config.js";
 
 @layer base {
-  html {
-    -webkit-text-size-adjust: 100%;
-  }
-
-  * {
-    box-sizing: border-box;
+  html,
+  body {
+    height: auto;
+    min-height: 100%;
+    margin: 0;
+    padding: 0;
   }
 
   body {
-    @apply bg-background text-on-background font-body-md min-h-screen antialiased;
+    @apply bg-background text-on-background font-body-md antialiased;
+    width: 100%;
     overflow-x: hidden;
+    overflow-y: auto;
+    background: #f8f9fb;
   }
 
   #root {
     min-height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
   }
 
   img {
@@ -28,6 +34,29 @@
   select,
   button {
     font: inherit;
+  }
+
+  button,
+  [role='button'],
+  a,
+  input,
+  textarea,
+  select {
+    touch-action: manipulation;
+  }
+
+  textarea {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 767px) {
+  @layer base {
+    input,
+    textarea,
+    select {
+      font-size: 16px;
+    }
   }
 }
 
@@ -59,5 +88,14 @@
   .hide-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+  }
+
+  .safe-px {
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+
+  .safe-pb {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
   }
 }

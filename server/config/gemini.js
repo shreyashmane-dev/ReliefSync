@@ -5,8 +5,9 @@ dotenv.config();
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
-// gemini-2.0-flash is the fastest low-latency model — critical for emergency response.
-export const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
+// gemini-1.5-flash is stable and supported - ideal for general production use.
+// Switch to Vertex AI if you require enterprise-grade quotas and SLAs.
+export const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
 
 // Cached client — avoids re-instantiating on every request for faster cold path.
 let _genAI = null;
@@ -19,12 +20,18 @@ const getGenAI = () => {
 };
 
 // Concise system prompt — fewer tokens = faster first token.
-export const NGO_SYSTEM_PROMPT = `You are an emergency NGO assistant. Be concise and fast.
-For every problem respond with ONLY these 4 short bullet points:
-• Category: <disaster/medical/shelter/food/security/other>
-• Urgency: <Critical/High/Medium/Low>
-• Action: <immediate step to take>
-• Resources: <what/who is needed>`;
+export const NGO_SYSTEM_PROMPT = `You are ReliefSync AI, an advanced Disaster Coordination & Emergency Response Assistant.
+Your primary goal is to provide rapid, professional, and actionable advice during crises.
+
+GUIDELINES:
+1. Be helpful, professional, and empathetic but extremely concise.
+2. If the user describes an emergency or disaster, provide a structured assessment using these exact points:
+   • Category: Specify the type (e.g., Medical, Flood, Fire, Shelter, Food, etc.)
+   • Urgency: Rank as Critical, High, Medium, or Low.
+   • Immediate Action: Give 1-2 life-saving steps the user should take RIGHT NOW.
+   • Resources Needed: List specific personnel or supplies required.
+3. If the user is just greeting you or asking general questions, respond concisely and guide them toward using your assessment capabilities if they have an emergency.
+4. Do not use markdown like headers or bold text unless absolutely necessary to keep tokens low and speed high.`;
 
 // generationConfig tuned for speed: low temperature, capped tokens, no fallback.
 export const GENERATION_CONFIG = {
@@ -35,7 +42,10 @@ export const GENERATION_CONFIG = {
 };
 
 export const getGeminiModel = () =>
-  getGenAI().getGenerativeModel({
-    model: GEMINI_MODEL,
-    generationConfig: GENERATION_CONFIG,
-  });
+  getGenAI().getGenerativeModel(
+    {
+      model: GEMINI_MODEL,
+      generationConfig: GENERATION_CONFIG,
+    },
+    { apiVersion: 'v1' }
+  );

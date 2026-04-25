@@ -12,6 +12,7 @@ import {
 } from 'firebase/firestore';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { db, storage } from '../../core/firebase/config';
+import { useIsMobile } from '../../core/hooks/useIsMobile';
 import { useStore } from '../../core/store/useStore';
 import { getInitials } from '../../core/utils/user';
 import { SmartLocationField, type LocationData } from './SmartLocationField';
@@ -57,8 +58,18 @@ const getFirebaseErrorDetails = (error: unknown) => {
   };
 };
 
+const getLocationLabel = (location: unknown) => {
+  if (typeof location === 'string') return location;
+  if (typeof location === 'object' && location !== null) {
+    const nextLocation = location as Record<string, unknown>;
+    if (typeof nextLocation.address === 'string') return nextLocation.address;
+  }
+  return '';
+};
+
 export const ReportsHome = () => {
   const { user } = useStore();
+  const isMobile = useIsMobile();
   const [reports, setReports] = useState<any[]>([]);
   const [filter, setFilter] = useState('All');
   const [statusFilter, setStatusFilter] = useState<(typeof STATUS_OPTIONS)[number]>('all');
@@ -67,10 +78,11 @@ export const ReportsHome = () => {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [imageUploadWarning, setImageUploadWarning] = useState<string | null>(null);
-  const [confirmationMessage, setConfirmationMessage] = useState<{ type: 'error' | 'success'; text: string } | null>(null);
+  const [confirmationMessage, setConfirmationMessage] = useState<{ type: 'error' | 'success'; text: string } | null>(
+    null,
+  );
   const [confirmingReportId, setConfirmingReportId] = useState<string | null>(null);
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
-
   const [form, setForm] = useState<{
     title: string;
     category: string;
@@ -116,7 +128,6 @@ export const ReportsHome = () => {
     setSelectedImages((current) => current.filter((file) => file.name !== name));
   };
 
-  // Uploads images one-by-one, never throws — returns URLs of whichever uploads succeed.
   const uploadReportImagesSafe = async (): Promise<{ urls: string[]; failed: number }> => {
     if (!user?.id || selectedImages.length === 0) return { urls: [], failed: 0 };
 
@@ -149,7 +160,6 @@ export const ReportsHome = () => {
     setSubmitError(null);
     setImageUploadWarning(null);
     try {
-      // Upload images safely — submission never blocked by photo errors
       const { urls: imageUrls, failed: failedUploads } = await uploadReportImagesSafe();
 
       await addDoc(collection(db, 'reports'), {
@@ -175,10 +185,9 @@ export const ReportsHome = () => {
       setSelectedImages([]);
       setForm({ title: '', category: 'Medical', severity: 'Medium', location: null, description: '' });
 
-      // Show a warning AFTER modal closes if some photos were skipped
       if (failedUploads > 0) {
         setImageUploadWarning(
-          `Report submitted! However, ${failedUploads} photo${failedUploads > 1 ? 's' : ''} could not be uploaded — update Firebase Storage rules to allow report_media uploads.`
+          `Report submitted! However, ${failedUploads} photo${failedUploads > 1 ? 's' : ''} could not be uploaded. Update Firebase Storage rules to allow report_media uploads.`,
         );
         setTimeout(() => setImageUploadWarning(null), 8000);
       }
@@ -224,8 +233,7 @@ export const ReportsHome = () => {
     } catch (error) {
       console.error('Error confirming report:', error);
       const { code, message } = getFirebaseErrorDetails(error);
-      const isPermissionError =
-        code === 'permission-denied' || message?.toLowerCase().includes('permission');
+      const isPermissionError = code === 'permission-denied' || message?.toLowerCase().includes('permission');
       setConfirmationMessage({
         type: 'error',
         text: isPermissionError
@@ -241,18 +249,12 @@ export const ReportsHome = () => {
     const matchCategory = filter === 'All' || report.category === filter;
     const matchStatus = statusFilter === 'all' || report.status === statusFilter;
     const searchValue = search.toLowerCase();
-
-    const locStr =
-      typeof report.location === 'object' && report.location !== null
-        ? report.location.address
-        : typeof report.location === 'string'
-        ? report.location
-        : '';
+    const locStr = getLocationLabel(report.location);
 
     const matchSearch =
       !searchValue ||
       report.title?.toLowerCase().includes(searchValue) ||
-      locStr?.toLowerCase().includes(searchValue) ||
+      locStr.toLowerCase().includes(searchValue) ||
       report.description?.toLowerCase().includes(searchValue);
 
     return matchCategory && matchStatus && matchSearch;
@@ -273,24 +275,52 @@ export const ReportsHome = () => {
 
   return (
     <>
-      <div style={{ marginBottom: 24 }}>
-        <h1 style={{ fontSize: 32, fontWeight: 800, margin: 0, marginBottom: 4, letterSpacing: '-0.5px' }}>
+      <div style={{ marginBottom: isMobile ? 20 : 24 }}>
+        <h1
+          style={{
+            fontSize: isMobile ? 28 : 32,
+            fontWeight: 800,
+            margin: 0,
+            marginBottom: 4,
+            letterSpacing: '-0.5px',
+            lineHeight: 1.08,
+          }}
+        >
           Hello, {user?.name?.split(' ')[0] || 'there'}
         </h1>
-        <p style={{ fontSize: 16, color: '#737685', margin: 0 }}>
+        <p style={{ fontSize: isMobile ? 15 : 16, color: '#737685', margin: 0, maxWidth: 720, lineHeight: 1.55 }}>
           Live Firebase reports, community confirmations, and media-backed field updates.
         </p>
       </div>
 
-      {/* Warning banner: shows after modal closes if some images were skipped */}
       {imageUploadWarning && (
-        <div style={{ background: '#fffbeb', border: '1px solid #fde68a', color: '#92400e', padding: '12px 16px', borderRadius: 12, fontSize: 14, fontWeight: 600, display: 'flex', alignItems: 'flex-start', gap: 10 }}>
-          <span className="material-symbols-outlined" style={{ fontSize: 20, color: '#d97706', flexShrink: 0, marginTop: 1 }}>warning</span>
+        <div
+          style={{
+            background: '#fffbeb',
+            border: '1px solid #fde68a',
+            color: '#92400e',
+            padding: '12px 16px',
+            borderRadius: 12,
+            fontSize: 14,
+            fontWeight: 600,
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: 10,
+          }}
+        >
+          <span
+            className="material-symbols-outlined"
+            style={{ fontSize: 20, color: '#d97706', flexShrink: 0, marginTop: 1 }}
+          >
+            warning
+          </span>
           <div>
             <div>{imageUploadWarning}</div>
-            <div style={{ marginTop: 6, fontWeight: 500, fontSize: 13 }}>
-              Fix in Firebase Console → Storage → Rules: add{' '}
-              <code style={{ background: '#fef3c7', padding: '1px 6px', borderRadius: 4 }}>report_media/{'{userId}'}/**</code>{' '}
+            <div style={{ marginTop: 6, fontWeight: 500, fontSize: 13, lineHeight: 1.5 }}>
+              Fix in Firebase Console -&gt; Storage -&gt; Rules: add{' '}
+              <code style={{ background: '#fef3c7', padding: '1px 6px', borderRadius: 4 }}>
+                report_media/{'{userId}'}/**
+              </code>{' '}
               with write permission for authenticated users.
             </div>
           </div>
@@ -310,6 +340,7 @@ export const ReportsHome = () => {
             display: 'flex',
             alignItems: 'center',
             gap: 8,
+            marginTop: imageUploadWarning ? 14 : 0,
             marginBottom: 16,
           }}
         >
@@ -320,11 +351,19 @@ export const ReportsHome = () => {
         </div>
       )}
 
-      <div style={{ display: 'flex', gap: 12, marginBottom: 20, flexWrap: 'wrap' }}>
-        <div style={{ position: 'relative', flex: 1, minWidth: 200 }}>
+      <div style={{ display: 'flex', gap: 12, marginBottom: 20, flexWrap: 'wrap', alignItems: 'stretch' }}>
+        <div style={{ position: 'relative', flex: '1 1 260px', minWidth: isMobile ? '100%' : 220 }}>
           <span
             className="material-symbols-outlined"
-            style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#737685', fontSize: 20, pointerEvents: 'none' }}
+            style={{
+              position: 'absolute',
+              left: 14,
+              top: '50%',
+              transform: 'translateY(-50%)',
+              color: '#737685',
+              fontSize: 20,
+              pointerEvents: 'none',
+            }}
           >
             search
           </span>
@@ -358,6 +397,8 @@ export const ReportsHome = () => {
             color: '#191c1e',
             fontFamily: 'Inter, sans-serif',
             cursor: 'pointer',
+            flex: isMobile ? '1 1 160px' : '0 0 auto',
+            minWidth: isMobile ? 'calc(50% - 6px)' : 0,
           }}
         >
           <option value="All">All Categories</option>
@@ -380,6 +421,8 @@ export const ReportsHome = () => {
             color: '#191c1e',
             fontFamily: 'Inter, sans-serif',
             cursor: 'pointer',
+            flex: isMobile ? '1 1 160px' : '0 0 auto',
+            minWidth: isMobile ? 'calc(50% - 6px)' : 0,
           }}
         >
           <option value="all">All Status</option>
@@ -389,7 +432,10 @@ export const ReportsHome = () => {
         </select>
       </div>
 
-      <div style={{ display: 'flex', gap: 10, overflowX: 'auto', marginBottom: 28, paddingBottom: 4 }}>
+      <div
+        className="hide-scrollbar"
+        style={{ display: 'flex', gap: 10, overflowX: 'auto', marginBottom: 28, paddingBottom: 4, scrollSnapType: 'x proximity' }}
+      >
         {[{ label: 'All', icon: 'apps', color: '#0052cc' }, ...CATEGORIES].map((category) => (
           <button
             key={category.label}
@@ -409,6 +455,7 @@ export const ReportsHome = () => {
               whiteSpace: 'nowrap',
               flexShrink: 0,
               fontFamily: 'Inter, sans-serif',
+              scrollSnapAlign: 'start',
             }}
           >
             <span className="material-symbols-outlined" style={{ fontSize: 16 }}>
@@ -419,7 +466,14 @@ export const ReportsHome = () => {
         ))}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12, marginBottom: 28 }}>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, minmax(0, 1fr))',
+          gap: 12,
+          marginBottom: 28,
+        }}
+      >
         {[
           { label: 'Total Reports', value: reports.length, icon: 'assignment', color: '#0052cc' },
           {
@@ -453,7 +507,9 @@ export const ReportsHome = () => {
               {stat.icon}
             </span>
             <div style={{ fontSize: 28, fontWeight: 800, color: '#191c1e', lineHeight: 1 }}>{stat.value}</div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: '#737685', letterSpacing: '0.05em', marginTop: 4 }}>{stat.label}</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: '#737685', letterSpacing: '0.05em', marginTop: 4 }}>
+              {stat.label}
+            </div>
           </div>
         ))}
       </div>
@@ -486,6 +542,7 @@ export const ReportsHome = () => {
           const verificationCount = Array.isArray(report.verifiedBy) ? report.verifiedBy.length : 0;
           const alreadyVerified = Boolean(user?.id && Array.isArray(report.verifiedBy) && report.verifiedBy.includes(user.id));
           const canConfirm = Boolean(user?.id && report.userId !== user.id && !alreadyVerified);
+          const locationLabel = getLocationLabel(report.location);
 
           return (
             <div
@@ -493,7 +550,7 @@ export const ReportsHome = () => {
               style={{
                 background: '#fff',
                 borderRadius: 16,
-                padding: '20px 20px 20px 24px',
+                padding: isMobile ? '18px 16px 18px 20px' : '20px 20px 20px 24px',
                 border: '1px solid #f1f5f9',
                 boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
                 position: 'relative',
@@ -503,10 +560,20 @@ export const ReportsHome = () => {
                 gap: 14,
               }}
             >
-              <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, background: severityColor[report.severity] || '#737685', borderRadius: '4px 0 0 4px' }} />
+              <div
+                style={{
+                  position: 'absolute',
+                  left: 0,
+                  top: 0,
+                  bottom: 0,
+                  width: 4,
+                  background: severityColor[report.severity] || '#737685',
+                  borderRadius: '4px 0 0 4px',
+                }}
+              />
 
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
-                <div style={{ flex: 1 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap' }}>
+                <div style={{ flex: '1 1 280px', minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
                     <span
                       style={{
@@ -521,36 +588,72 @@ export const ReportsHome = () => {
                     >
                       {report.severity}
                     </span>
-                    <span style={{ padding: '3px 10px', borderRadius: 9999, background: '#f1f5f9', color: '#434654', fontSize: 11, fontWeight: 700 }}>
+                    <span
+                      style={{
+                        padding: '3px 10px',
+                        borderRadius: 9999,
+                        background: '#f1f5f9',
+                        color: '#434654',
+                        fontSize: 11,
+                        fontWeight: 700,
+                      }}
+                    >
                       {report.category}
                     </span>
                     <span style={{ fontSize: 12, color: '#9ca3af' }}>{formatTime(report.createdAt)}</span>
                   </div>
-                  <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0, marginBottom: 4, color: '#191c1e' }}>{report.title}</h3>
-                  {report.description && <p style={{ fontSize: 13, color: '#434654', margin: 0, lineHeight: 1.5 }}>{report.description}</p>}
-                  {report.location && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 6, fontSize: 13, color: '#737685' }}>
-                      <span className="material-symbols-outlined" style={{ fontSize: 15 }}>
+                  <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0, marginBottom: 4, color: '#191c1e', lineHeight: 1.4 }}>
+                    {report.title}
+                  </h3>
+                  {report.description && (
+                    <p style={{ fontSize: 13, color: '#434654', margin: 0, lineHeight: 1.6, wordBreak: 'break-word' }}>
+                      {report.description}
+                    </p>
+                  )}
+                  {locationLabel && (
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: 4,
+                        marginTop: 6,
+                        fontSize: 13,
+                        color: '#737685',
+                        minWidth: 0,
+                      }}
+                    >
+                      <span className="material-symbols-outlined" style={{ fontSize: 15, marginTop: 1, flexShrink: 0 }}>
                         location_on
                       </span>
-                      {typeof report.location === 'object' && report.location !== null ? report.location.address : report.location}
+                      <span style={{ wordBreak: 'break-word' }}>{locationLabel}</span>
                     </div>
                   )}
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6, flexShrink: 0 }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: isMobile ? 'row' : 'column',
+                    alignItems: isMobile ? 'center' : 'flex-end',
+                    justifyContent: 'space-between',
+                    gap: 8,
+                    flexShrink: 0,
+                    width: isMobile ? '100%' : 'auto',
+                  }}
+                >
                   <span
                     style={{
                       padding: '4px 10px',
                       borderRadius: 9999,
                       fontSize: 12,
                       fontWeight: 700,
-                      background: report.status === 'pending' ? '#f1f5f9' : report.status === 'active' ? '#dae2ff' : '#dcfce7',
+                      background:
+                        report.status === 'pending' ? '#f1f5f9' : report.status === 'active' ? '#dae2ff' : '#dcfce7',
                       color: report.status === 'pending' ? '#737685' : report.status === 'active' ? '#0052cc' : '#15803d',
                     }}
                   >
                     {report.status === 'pending' ? 'Pending' : report.status === 'active' ? 'Active' : 'Resolved'}
                   </span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
                     {report.userPhotoURL ? (
                       <img
                         src={report.userPhotoURL}
@@ -570,24 +673,39 @@ export const ReportsHome = () => {
                           justifyContent: 'center',
                           fontSize: 11,
                           fontWeight: 700,
+                          flexShrink: 0,
                         }}
                       >
                         {getInitials(report.userName)}
                       </div>
                     )}
-                    <span style={{ fontSize: 11, color: '#9ca3af' }}>{report.userName || 'Community user'}</span>
+                    <span style={{ fontSize: 11, color: '#9ca3af', wordBreak: 'break-word' }}>
+                      {report.userName || 'Community user'}
+                    </span>
                   </div>
                 </div>
               </div>
 
               {Array.isArray(report.imageUrls) && report.imageUrls.length > 0 && (
-                <div style={{ display: 'grid', gridTemplateColumns: report.imageUrls.length > 1 ? 'repeat(2, 1fr)' : '1fr', gap: 10 }}>
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: report.imageUrls.length > 1 && !isMobile ? 'repeat(2, 1fr)' : '1fr',
+                    gap: 10,
+                  }}
+                >
                   {report.imageUrls.slice(0, 4).map((imageUrl: string) => (
                     <img
                       key={imageUrl}
                       src={imageUrl}
                       alt="Report evidence"
-                      style={{ width: '100%', height: 148, objectFit: 'cover', borderRadius: 14, border: '1px solid #e5e7eb' }}
+                      style={{
+                        width: '100%',
+                        height: isMobile ? 180 : 148,
+                        objectFit: 'cover',
+                        borderRadius: 14,
+                        border: '1px solid #e5e7eb',
+                      }}
                     />
                   ))}
                 </div>
@@ -616,6 +734,7 @@ export const ReportsHome = () => {
                       cursor: 'pointer',
                       fontFamily: 'Inter, sans-serif',
                       opacity: confirmingReportId === report.id ? 0.7 : 1,
+                      width: isMobile ? '100%' : 'auto',
                     }}
                   >
                     {confirmingReportId === report.id ? 'Confirming...' : 'Confirm Report'}
@@ -631,6 +750,8 @@ export const ReportsHome = () => {
                       color: '#15803d',
                       fontSize: 12,
                       fontWeight: 700,
+                      width: isMobile ? '100%' : 'auto',
+                      textAlign: isMobile ? 'center' : 'left',
                     }}
                   >
                     You confirmed this
@@ -646,10 +767,10 @@ export const ReportsHome = () => {
         onClick={() => setShowModal(true)}
         style={{
           position: 'fixed',
-          bottom: 96,
-          right: 24,
-          width: 56,
-          height: 56,
+          bottom: isMobile ? 'calc(5.75rem + env(safe-area-inset-bottom))' : 32,
+          right: isMobile ? 16 : 24,
+          width: isMobile ? 60 : 56,
+          height: isMobile ? 60 : 56,
           borderRadius: 16,
           background: '#b81a36',
           border: 'none',
@@ -670,48 +791,135 @@ export const ReportsHome = () => {
       </button>
 
       {showModal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(25,28,30,0.6)', backdropFilter: 'blur(6px)', zIndex: 100, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
-          <div style={{ background: '#fff', borderRadius: '24px 24px 0 0', width: '100%', maxWidth: 600, maxHeight: '90vh', overflowY: 'auto', padding: '0 0 32px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 24px 16px', borderBottom: '1px solid #f1f5f9', position: 'sticky', top: 0, background: '#fff', zIndex: 1 }}>
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(25,28,30,0.6)',
+            backdropFilter: 'blur(6px)',
+            zIndex: 100,
+            display: 'flex',
+            alignItems: isMobile ? 'flex-end' : 'center',
+            justifyContent: 'center',
+            padding: isMobile ? 0 : 24,
+          }}
+        >
+          <div
+            style={{
+              background: '#fff',
+              borderRadius: isMobile ? '24px 24px 0 0' : 24,
+              width: '100%',
+              maxWidth: 600,
+              maxHeight: isMobile ? '92dvh' : 'min(90vh, 820px)',
+              overflowY: 'auto',
+              padding: '0 0 32px',
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                gap: 12,
+                padding: isMobile ? '18px 16px 14px' : '20px 24px 16px',
+                borderBottom: '1px solid #f1f5f9',
+                position: 'sticky',
+                top: 0,
+                background: '#fff',
+                zIndex: 1,
+              }}
+            >
               <div>
                 <h2 style={{ fontSize: 20, fontWeight: 800, margin: 0 }}>Report an Incident</h2>
                 <p style={{ fontSize: 13, color: '#737685', margin: '4px 0 0' }}>
                   Submit a new emergency report with optional evidence photos.
                 </p>
               </div>
-              <button onClick={() => setShowModal(false)} style={{ width: 36, height: 36, borderRadius: '50%', background: '#f1f5f9', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <button
+                onClick={() => setShowModal(false)}
+                style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: '50%',
+                  background: '#f1f5f9',
+                  border: 'none',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}
+              >
                 <span className="material-symbols-outlined" style={{ fontSize: 20 }}>
                   close
                 </span>
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 18 }}>
+            <form onSubmit={handleSubmit} style={{ padding: isMobile ? '18px 16px' : '20px 24px', display: 'flex', flexDirection: 'column', gap: 18 }}>
               {submitError && (
-                <div style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#b91c1c', padding: '12px 16px', borderRadius: 12, fontSize: 14, fontWeight: 600, display: 'flex', alignItems: 'flex-start', gap: 8 }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: 18, marginTop: 2 }}>error</span>
+                <div
+                  style={{
+                    background: '#fef2f2',
+                    border: '1px solid #fecaca',
+                    color: '#b91c1c',
+                    padding: '12px 16px',
+                    borderRadius: 12,
+                    fontSize: 14,
+                    fontWeight: 600,
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: 8,
+                  }}
+                >
+                  <span className="material-symbols-outlined" style={{ fontSize: 18, marginTop: 2 }}>
+                    error
+                  </span>
                   <div style={{ flex: 1 }}>{submitError}</div>
                 </div>
               )}
-              
+
               <div>
-                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#434654', marginBottom: 6 }}>Incident Title *</label>
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#434654', marginBottom: 6 }}>
+                  Incident Title *
+                </label>
                 <input
                   required
                   value={form.title}
                   onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))}
                   placeholder="e.g. Flash Flood on Route 9"
-                  style={{ width: '100%', padding: '12px 14px', borderRadius: 12, border: '1.5px solid #e1e2e4', fontSize: 15, fontFamily: 'Inter, sans-serif', outline: 'none', boxSizing: 'border-box' }}
+                  style={{
+                    width: '100%',
+                    padding: '12px 14px',
+                    borderRadius: 12,
+                    border: '1.5px solid #e1e2e4',
+                    fontSize: 15,
+                    fontFamily: 'Inter, sans-serif',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                  }}
                 />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 14 }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#434654', marginBottom: 6 }}>Category *</label>
+                  <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#434654', marginBottom: 6 }}>
+                    Category *
+                  </label>
                   <select
                     value={form.category}
                     onChange={(event) => setForm((current) => ({ ...current, category: event.target.value }))}
-                    style={{ width: '100%', padding: '12px 14px', borderRadius: 12, border: '1.5px solid #e1e2e4', fontSize: 15, fontFamily: 'Inter, sans-serif', background: '#fff', cursor: 'pointer', boxSizing: 'border-box' }}
+                    style={{
+                      width: '100%',
+                      padding: '12px 14px',
+                      borderRadius: 12,
+                      border: '1.5px solid #e1e2e4',
+                      fontSize: 15,
+                      fontFamily: 'Inter, sans-serif',
+                      background: '#fff',
+                      cursor: 'pointer',
+                      boxSizing: 'border-box',
+                    }}
                   >
                     {CATEGORIES.map((category) => (
                       <option key={category.label} value={category.label}>
@@ -721,11 +929,23 @@ export const ReportsHome = () => {
                   </select>
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#434654', marginBottom: 6 }}>Severity *</label>
+                  <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#434654', marginBottom: 6 }}>
+                    Severity *
+                  </label>
                   <select
                     value={form.severity}
                     onChange={(event) => setForm((current) => ({ ...current, severity: event.target.value }))}
-                    style={{ width: '100%', padding: '12px 14px', borderRadius: 12, border: '1.5px solid #e1e2e4', fontSize: 15, fontFamily: 'Inter, sans-serif', background: '#fff', cursor: 'pointer', boxSizing: 'border-box' }}
+                    style={{
+                      width: '100%',
+                      padding: '12px 14px',
+                      borderRadius: 12,
+                      border: '1.5px solid #e1e2e4',
+                      fontSize: 15,
+                      fontFamily: 'Inter, sans-serif',
+                      background: '#fff',
+                      cursor: 'pointer',
+                      boxSizing: 'border-box',
+                    }}
                   >
                     {SEVERITY.map((severity) => (
                       <option key={severity} value={severity}>
@@ -736,24 +956,35 @@ export const ReportsHome = () => {
                 </div>
               </div>
 
-              <SmartLocationField
-                value={form.location}
-                onChange={(loc) => setForm((current) => ({ ...current, location: loc }))}
-              />
+              <SmartLocationField value={form.location} onChange={(loc) => setForm((current) => ({ ...current, location: loc }))} />
 
               <div>
-                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#434654', marginBottom: 6 }}>Description</label>
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#434654', marginBottom: 6 }}>
+                  Description
+                </label>
                 <textarea
                   value={form.description}
                   onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))}
                   rows={3}
                   placeholder="Describe the situation, number of people affected, resources needed..."
-                  style={{ width: '100%', padding: '12px 14px', borderRadius: 12, border: '1.5px solid #e1e2e4', fontSize: 15, fontFamily: 'Inter, sans-serif', resize: 'vertical', outline: 'none', boxSizing: 'border-box' }}
+                  style={{
+                    width: '100%',
+                    padding: '12px 14px',
+                    borderRadius: 12,
+                    border: '1.5px solid #e1e2e4',
+                    fontSize: 15,
+                    fontFamily: 'Inter, sans-serif',
+                    resize: 'vertical',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                  }}
                 />
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#434654', marginBottom: 8 }}>Evidence Photos</label>
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#434654', marginBottom: 8 }}>
+                  Evidence Photos
+                </label>
                 <label
                   style={{
                     display: 'flex',
@@ -767,6 +998,7 @@ export const ReportsHome = () => {
                     background: '#f8fafc',
                     color: '#334155',
                     fontWeight: 600,
+                    textAlign: 'center',
                   }}
                 >
                   <span className="material-symbols-outlined">add_a_photo</span>
@@ -775,10 +1007,21 @@ export const ReportsHome = () => {
                 </label>
 
                 {selectedImagePreviews.length > 0 && (
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, marginTop: 12 }}>
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: isMobile ? 'repeat(2, minmax(0, 1fr))' : 'repeat(2, 1fr)',
+                      gap: 10,
+                      marginTop: 12,
+                    }}
+                  >
                     {selectedImagePreviews.map((image) => (
-                      <div key={image.name} style={{ position: 'relative' }}>
-                        <img src={image.url} alt={image.name} style={{ width: '100%', height: 112, objectFit: 'cover', borderRadius: 12 }} />
+                      <div key={image.name} style={{ position: 'relative', minWidth: 0 }}>
+                        <img
+                          src={image.url}
+                          alt={image.name}
+                          style={{ width: '100%', height: isMobile ? 120 : 112, objectFit: 'cover', borderRadius: 12 }}
+                        />
                         <button
                           type="button"
                           onClick={() => removeSelectedImage(image.name)}
@@ -829,7 +1072,11 @@ export const ReportsHome = () => {
                   fontFamily: 'Inter, sans-serif',
                 }}
               >
-                {submitting && <span className="material-symbols-outlined" style={{ fontSize: 18, animation: 'spin 1s linear infinite' }}>progress_activity</span>}
+                {submitting && (
+                  <span className="material-symbols-outlined" style={{ fontSize: 18, animation: 'spin 1s linear infinite' }}>
+                    progress_activity
+                  </span>
+                )}
                 <span className="material-symbols-outlined" style={{ fontSize: 18, fontVariationSettings: "'FILL' 1" }}>
                   crisis_alert
                 </span>

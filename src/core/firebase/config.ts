@@ -21,5 +21,5 @@ export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const rtdb = getDatabase(app);
 export const storage = getStorage(app);
-// Analytics only works in browser environments
-export const analytics = typeof window !== 'undefined' ? getAnalytics(app) : null;
+// Analytics only works in browser environments, and is disabled in dev to prevent tracking blockers from throwing errors in the console.
+export const analytics = typeof window !== 'undefined' && !import.meta.env.DEV ? getAnalytics(app) : null;

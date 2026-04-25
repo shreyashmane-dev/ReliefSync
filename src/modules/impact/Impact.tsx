@@ -75,54 +75,56 @@ export const Impact = () => {
 
   return (
     <>
-      <div className="mb-lg">
-        <h1 className="font-h2 text-h2 text-on-surface">Community Impact Dashboard</h1>
-        <p className="font-body-lg text-body-lg text-on-surface-variant mt-xs">Real-time contribution metrics derived from live reports and verified profile activity.</p>
+      <div className="mb-2 md:mb-lg">
+        <h1 className="text-[1.9rem] leading-tight md:font-h2 md:text-h2 text-on-surface font-extrabold">Community Impact Dashboard</h1>
+        <p className="font-body-md md:font-body-lg md:text-body-lg text-on-surface-variant mt-xs max-w-3xl">
+          Real-time contribution metrics derived from live reports and verified profile activity.
+        </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-lg">
-        <div className="md:col-span-8 bg-surface-container-lowest rounded-xl shadow-[0px_2px_4px_rgba(0,0,0,0.05)] p-lg flex flex-col justify-between min-h-[240px]">
+        <div className="md:col-span-8 bg-surface-container-lowest rounded-xl shadow-[0px_2px_4px_rgba(0,0,0,0.05)] p-4 md:p-lg flex flex-col justify-between min-h-[240px] overflow-hidden">
           <div className="flex justify-between items-start mb-md gap-md flex-wrap">
             <div className="flex items-center gap-md">
               <div
-                className={`w-[56px] h-[56px] rounded-full flex items-center justify-center border-4 ${league.current.name === 'Shikhar' ? 'shadow-[0_0_15px_rgba(239,68,68,0.5)]' : ''}`}
+                className={`w-14 h-14 rounded-full flex items-center justify-center border-4 shrink-0 ${league.current.name === 'Shikhar' ? 'shadow-[0_0_15px_rgba(239,68,68,0.5)]' : ''}`}
                 style={{ backgroundColor: `${league.current.color}15`, borderColor: league.current.color }}
               >
                 <span className="material-symbols-outlined text-[32px]" style={{ color: league.current.color, fontVariationSettings: "'FILL' 1" }}>{league.current.icon}</span>
               </div>
-              <div>
+              <div className="min-w-0">
                 <p className="font-label-bold text-label-bold text-on-surface-variant uppercase tracking-wide">Current Rank</p>
-                <h2 className="font-h3 text-h3 text-on-surface">{league.current.name}</h2>
+                <h2 className="text-2xl md:font-h3 md:text-h3 text-on-surface break-words">{league.current.name}</h2>
               </div>
             </div>
-            <div className="text-right">
+            <div className="text-left sm:text-right w-full sm:w-auto">
               <p className="font-label-bold text-label-bold text-on-surface-variant uppercase tracking-wide">Total Points</p>
               <p className="font-h2 text-h2 text-primary">{impactPoints}</p>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-md mb-lg">
-            <div className="rounded-lg bg-surface-container p-md">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-md mb-lg">
+            <div className="rounded-lg bg-surface-container p-md min-w-0">
               <p className="font-label-bold text-label-bold text-on-surface-variant uppercase tracking-wide">Reports Submitted</p>
               <p className="font-h3 text-h3 text-on-surface mt-xs">{myReports.length}</p>
             </div>
-            <div className="rounded-lg bg-surface-container p-md">
+            <div className="rounded-lg bg-surface-container p-md min-w-0">
               <p className="font-label-bold text-label-bold text-on-surface-variant uppercase tracking-wide">Community Confirmations</p>
               <p className="font-h3 text-h3 text-on-surface mt-xs">{confirmedCount}</p>
             </div>
-            <div className="rounded-lg bg-surface-container p-md">
+            <div className="rounded-lg bg-surface-container p-md min-w-0">
               <p className="font-label-bold text-label-bold text-on-surface-variant uppercase tracking-wide">Resolved Cases</p>
               <p className="font-h3 text-h3 text-on-surface mt-xs">{resolvedCount}</p>
             </div>
-            <div className="rounded-lg bg-surface-container p-md">
+            <div className="rounded-lg bg-surface-container p-md min-w-0">
               <p className="font-label-bold text-label-bold text-on-surface-variant uppercase tracking-wide">Verified Identity</p>
               <p className="font-h3 text-h3 text-on-surface mt-xs">{user?.phoneVerified ? 'Yes' : 'Pending'}</p>
             </div>
           </div>
 
           <div className="mt-auto">
-            <div className="flex justify-between items-end mb-sm">
-              <p className="font-body-md text-body-md text-on-surface-variant">
+            <div className="flex justify-between items-end gap-4 mb-sm flex-wrap">
+              <p className="font-body-sm md:font-body-md md:text-body-md text-on-surface-variant min-w-0">
                 {league.next ? (
                   <>
                     <strong className="text-on-surface font-semibold">{league.pointsToNext} XP</strong> to reach {league.next.name}
@@ -139,7 +141,7 @@ export const Impact = () => {
           </div>
         </div>
 
-        <div className="md:col-span-4 bg-surface-container-lowest rounded-xl shadow-[0px_2px_4px_rgba(0,0,0,0.05)] p-lg flex flex-col items-center justify-center text-center min-h-[240px]">
+        <div className="md:col-span-4 bg-surface-container-lowest rounded-xl shadow-[0px_2px_4px_rgba(0,0,0,0.05)] p-4 md:p-lg flex flex-col items-center justify-center text-center min-h-[240px] overflow-hidden">
           <div className="relative w-[120px] h-[120px] flex items-center justify-center mb-md">
             <svg className="absolute inset-0 w-full h-full transform -rotate-90" viewBox="0 0 100 100">
               <circle className="text-surface-variant" cx="50" cy="50" fill="none" r="45" stroke="currentColor" strokeWidth="8"></circle>
@@ -166,18 +168,18 @@ export const Impact = () => {
           </p>
         </div>
 
-        <div className="md:col-span-8 bg-surface-container-lowest rounded-xl shadow-[0px_2px_4px_rgba(0,0,0,0.05)] p-lg">
-          <div className="flex justify-between items-center mb-lg">
+        <div className="md:col-span-8 bg-surface-container-lowest rounded-xl shadow-[0px_2px_4px_rgba(0,0,0,0.05)] p-4 md:p-lg overflow-hidden">
+          <div className="flex justify-between items-center gap-3 flex-wrap mb-lg">
             <h3 className="font-h3 text-h3 text-on-surface">Badges & Milestones</h3>
             <span className="font-label-bold text-label-bold text-primary">{badges.filter((badge) => badge.earned).length} earned</span>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-md">
+          <div className="grid [grid-template-columns:repeat(auto-fit,minmax(140px,1fr))] gap-md auto-rows-fr">
             {badges.map((badge) => (
               <div
                 key={badge.key}
                 className={`flex flex-col items-center text-center p-md rounded-lg transition-colors ${
                   badge.earned ? 'hover:bg-surface-container-low' : 'opacity-50 grayscale'
-                }`}
+                } h-full min-w-0`}
               >
                 <div
                   className="w-[64px] h-[64px] rounded-full flex items-center justify-center mb-sm shadow-sm border"
@@ -198,7 +200,7 @@ export const Impact = () => {
           </div>
         </div>
 
-        <div className="md:col-span-4 bg-surface-container-lowest rounded-xl shadow-[0px_2px_4px_rgba(0,0,0,0.05)] p-lg">
+        <div className="md:col-span-4 bg-surface-container-lowest rounded-xl shadow-[0px_2px_4px_rgba(0,0,0,0.05)] p-4 md:p-lg overflow-hidden">
           <h3 className="font-h3 text-h3 text-on-surface mb-md">Regional Leaderboard</h3>
           <p className="font-caption text-caption text-on-surface-variant mb-lg uppercase tracking-wider">Live points from ReliefSync activity</p>
           <div className="flex flex-col gap-sm">
@@ -212,7 +214,7 @@ export const Impact = () => {
                 key={entry.id}
                 className={`flex items-center gap-md p-sm rounded-lg transition-colors ${
                   entry.id === user?.id ? 'bg-primary-container/5 border border-primary-container/20' : 'hover:bg-surface-container-low'
-                }`}
+                } flex-wrap sm:flex-nowrap`}
               >
                 <span className={`font-label-bold text-label-bold w-[20px] text-center ${entry.id === user?.id ? 'text-primary' : 'text-on-surface-variant'}`}>
                   {index + 1}
@@ -239,7 +241,7 @@ export const Impact = () => {
                   </div>
                   <p className="font-caption text-caption text-on-surface-variant">Trust {entry.trust}/100</p>
                 </div>
-                <span className="font-label-bold text-label-bold text-primary">{entry.points} XP</span>
+                <span className="font-label-bold text-label-bold text-primary ml-auto">{entry.points} XP</span>
               </div>
             ))}
           </div>
