@@ -89,13 +89,19 @@ export const ReportsHome = () => {
     severity: string;
     location: LocationData | null;
     description: string;
+    isAnonymous: boolean;
   }>({
     title: '',
     category: 'Medical',
     severity: 'Medium',
     location: null,
     description: '',
+    isAnonymous: user?.isAnonymous || false,
   });
+
+  useEffect(() => {
+    setForm(prev => ({ ...prev, isAnonymous: user?.isAnonymous || false }));
+  }, [user]);
 
   useEffect(() => {
     const q = query(collection(db, 'reports'), orderBy('createdAt', 'desc'));
@@ -166,8 +172,9 @@ export const ReportsHome = () => {
         ...form,
         status: 'pending',
         userId: user.id,
-        userName: user.name,
-        userPhotoURL: user.photoURL ?? null,
+        userName: form.isAnonymous ? (user.anonymousHandle || 'Anonymous Handler') : user.name,
+        userPhotoURL: form.isAnonymous ? null : (user.photoURL ?? null),
+        isAnonymous: form.isAnonymous,
         imageUrls,
         verifiedBy: [],
         createdAt: serverTimestamp(),
@@ -183,7 +190,7 @@ export const ReportsHome = () => {
 
       setShowModal(false);
       setSelectedImages([]);
-      setForm({ title: '', category: 'Medical', severity: 'Medium', location: null, description: '' });
+      setForm({ title: '', category: 'Medical', severity: 'Medium', location: null, description: '', isAnonymous: user.isAnonymous || false });
 
       if (failedUploads > 0) {
         setImageUploadWarning(
@@ -600,13 +607,27 @@ export const ReportsHome = () => {
                     >
                       {report.category}
                     </span>
-                    <span style={{ fontSize: 12, color: '#9ca3af' }}>{formatTime(report.createdAt)}</span>
+                    <span style={{ fontSize: 13, color: '#737685', fontWeight: 500 }}>
+                      in {locationLabel}
+                    </span>
                   </div>
-                  <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0, marginBottom: 4, color: '#191c1e', lineHeight: 1.4 }}>
-                    {report.title}
-                  </h3>
+                  <h3 style={{ fontSize: 17, fontWeight: 800, color: '#191c1e', marginBottom: 6, lineHeight: 1.3 }}>{report.title}</h3>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                     {report.isAnonymous ? (
+                        <div style={{ width: 20, height: 20, borderRadius: '50%', background: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                           <span className="material-symbols-outlined" style={{ fontSize: 14, color: '#64748b' }}>visibility_off</span>
+                        </div>
+                     ) : (
+                        report.userPhotoURL ? <img src={report.userPhotoURL} style={{ width: 20, height: 20, borderRadius: '50%' }} /> : <div style={{ width: 20, height: 20, borderRadius: '50%', background: '#0052cc', color: '#fff', fontSize: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{getInitials(report.userName)}</div>
+                     )}
+                     <span style={{ fontSize: 12, fontWeight: 700, color: '#434654' }}>
+                        {report.isAnonymous ? `@${report.userName}` : report.userName}
+                     </span>
+                     <div style={{ width: 3, height: 3, borderRadius: '50%', background: '#cbd5e1' }} />
+                     <span style={{ fontSize: 12, fontWeight: 500, color: '#737685' }}>{formatTime(report.createdAt)}</span>
+                  </div>
                   {report.description && (
-                    <p style={{ fontSize: 13, color: '#434654', margin: 0, lineHeight: 1.6, wordBreak: 'break-word' }}>
+                    <p style={{ fontSize: 13, color: '#434654', margin: '10px 0 0', lineHeight: 1.6, wordBreak: 'break-word' }}>
                       {report.description}
                     </p>
                   )}
@@ -719,47 +740,66 @@ export const ReportsHome = () => {
                   {verificationCount} community confirmation{verificationCount === 1 ? '' : 's'}
                 </div>
 
-                {canConfirm && (
+                <div style={{ display: 'flex', gap: 10 }}>
                   <button
                     onClick={() => handleConfirmReport(report.id)}
-                    disabled={confirmingReportId === report.id}
+                    disabled={confirmingReportId === report.id || !canConfirm}
                     style={{
-                      padding: '10px 14px',
-                      borderRadius: 10,
-                      border: '1px solid #bbf7d0',
-                      background: '#f0fdf4',
-                      color: '#15803d',
-                      fontWeight: 700,
+                      flex: 1,
+                      height: 48,
+                      borderRadius: 12,
+                      background: alreadyVerified ? '#f0fdf4' : '#0052cc',
+                      color: alreadyVerified ? '#15803d' : '#fff',
+                      border: alreadyVerified ? '1px solid #bbf7d0' : 'none',
                       fontSize: 13,
-                      cursor: 'pointer',
-                      fontFamily: 'Inter, sans-serif',
-                      opacity: confirmingReportId === report.id ? 0.7 : 1,
-                      width: isMobile ? '100%' : 'auto',
-                    }}
-                  >
-                    {confirmingReportId === report.id ? 'Confirming...' : 'Confirm Report'}
-                  </button>
-                )}
-
-                {alreadyVerified && (
-                  <span
-                    style={{
-                      padding: '8px 12px',
-                      borderRadius: 10,
-                      background: '#ecfdf5',
-                      color: '#15803d',
-                      fontSize: 12,
                       fontWeight: 700,
-                      width: isMobile ? '100%' : 'auto',
-                      textAlign: isMobile ? 'center' : 'left',
+                      cursor: alreadyVerified || !user ? 'default' : 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 8,
+                      opacity: canConfirm || alreadyVerified ? 1 : 0.5,
+                      fontFamily: 'Inter, sans-serif',
                     }}
                   >
-                    You confirmed this
-                  </span>
-                )}
+                    <span className="material-symbols-outlined" style={{ fontSize: 18, fontVariationSettings: alreadyVerified ? "'FILL' 1" : "" }}>
+                      {alreadyVerified ? 'verified_user' : 'check_circle'}
+                    </span>
+                    {confirmingReportId === report.id ? '...' : alreadyVerified ? 'Verified' : 'Confirm'}
+                  </button>
+
+                  <button
+                    onClick={async () => {
+                      if (!user?.id) return;
+                      const watchers = Array.isArray(report.watchers) ? report.watchers : [];
+                      const isWatching = watchers.includes(user.id);
+                      const updated = isWatching 
+                        ? watchers.filter((id: string) => id !== user.id)
+                        : [...watchers, user.id];
+                      
+                      await updateDoc(doc(db, 'reports', report.id), { watchers: updated });
+                    }}
+                    style={{
+                      width: 48,
+                      height: 48,
+                      borderRadius: 12,
+                      background: Array.isArray(report.watchers) && user && report.watchers.includes(user.id) ? '#fff7ed' : '#f8fafc',
+                      border: '1px solid #e2e8f0',
+                      color: Array.isArray(report.watchers) && user && report.watchers.includes(user.id) ? '#ea580c' : '#64748b',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: user ? 'pointer' : 'default',
+                    }}
+                  >
+                    <span className="material-symbols-outlined" style={{ fontSize: 20, fontVariationSettings: Array.isArray(report.watchers) && user && report.watchers.includes(user.id) ? "'FILL' 1" : "" }}>
+                      notifications_active
+                    </span>
+                  </button>
+                </div>
               </div>
             </div>
-          );
+          )
         })}
       </div>
 
@@ -1051,23 +1091,76 @@ export const ReportsHome = () => {
                 )}
               </div>
 
+              <div
+                onClick={() => setForm(f => ({ ...f, isAnonymous: !f.isAnonymous }))}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
+                  padding: '14px 16px',
+                  borderRadius: 16,
+                  background: form.isAnonymous ? '#f0f9ff' : '#f8fafc',
+                  border: `1px solid ${form.isAnonymous ? '#bae6fd' : '#e2e8f0'}`,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+              >
+                <div style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 12,
+                  background: form.isAnonymous ? '#0052cc' : '#e2e8f0',
+                  color: form.isAnonymous ? '#fff' : '#64748b',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'all 0.2s'
+                }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: 20 }}>
+                    {form.isAnonymous ? 'visibility_off' : 'visibility'}
+                  </span>
+                </div>
+                <div style={{ flex: 1 }}>
+                  <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#1e293b' }}>
+                    Post Anonymously
+                  </p>
+                  <p style={{ margin: 0, fontSize: 11, color: '#64748b' }}>
+                    {form.isAnonymous ? `Using alias: @${user?.anonymousHandle || 'Anonymous'}` : 'Your real name and photo will be visible.'}
+                  </p>
+                </div>
+                <div style={{
+                  width: 20,
+                  height: 20,
+                  borderRadius: '50%',
+                  border: `2px solid ${form.isAnonymous ? '#0052cc' : '#cbd5e1'}`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: form.isAnonymous ? '#0052cc' : 'transparent'
+                }}>
+                  {form.isAnonymous && <span className="material-symbols-outlined" style={{ fontSize: 14, color: '#fff' }}>check</span>}
+                </div>
+              </div>
+
               <button
                 type="submit"
                 disabled={submitting}
                 style={{
                   width: '100%',
                   padding: '16px',
-                  borderRadius: 14,
-                  background: '#b81a36',
+                  borderRadius: 16,
                   border: 'none',
+                  background: '#0052cc',
                   color: '#fff',
                   fontSize: 16,
-                  fontWeight: 700,
+                  fontWeight: 800,
                   cursor: submitting ? 'not-allowed' : 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: 8,
+                  gap: 10,
+                  boxShadow: '0 8px 24px rgba(0,82,204,0.25)',
+                  marginTop: 8,
                   opacity: submitting ? 0.7 : 1,
                   fontFamily: 'Inter, sans-serif',
                 }}

@@ -11,6 +11,15 @@ import { Impact } from './modules/impact/Impact';
 import { Assistant } from './modules/assistant/Assistant';
 import { Profile } from './modules/profile/Profile';
 
+// Volunteer Modules
+import { VolunteerJobs } from './modules/volunteer/VolunteerJobs';
+import { VolunteerTasks } from './modules/volunteer/VolunteerTasks';
+import { TaskDetail } from './modules/volunteer/TaskDetail';
+import { CompletionForm } from './modules/volunteer/CompletionForm';
+import { VolunteerImpact } from './modules/volunteer/VolunteerImpact';
+import { VolunteerAssistant } from './modules/volunteer/VolunteerAssistant';
+import { VolunteerOnboarding } from './modules/volunteer/VolunteerOnboarding';
+
 // Auth & Landing Routes
 import { LandingPage } from './modules/landing/LandingPage';
 import { AuthLayout } from './modules/auth/AuthLayout';
@@ -70,32 +79,32 @@ const App = () => {
 
   return (
     <BrowserRouter>
+      {user && <VolunteerOnboarding />}
       <Routes>
         {/* If user is NOT logged in, route to auth layout */}
         {!user ? (
-          <>
-            <Route path="/" element={<AuthLayout />}>
-              <Route index element={<LandingPage />} />
-              <Route path="auth" element={<AuthEntry />} />
-              <Route path="auth/signin" element={<UserSignIn />} />
-              <Route path="auth/signup" element={<UserSignUp />} />
-              <Route path="auth/phone" element={<PhoneAuth />} />
-              <Route path="auth/admin" element={<AdminLogin />} />
-            </Route>
+          <Route path="/" element={<AuthLayout />}>
+            <Route index element={<LandingPage />} />
+            <Route path="auth" element={<AuthEntry />} />
+            <Route path="auth/signin" element={<UserSignIn />} />
+            <Route path="auth/signup" element={<UserSignUp />} />
+            <Route path="auth/phone" element={<PhoneAuth />} />
+            <Route path="auth/admin" element={<AdminLogin />} />
             <Route path="*" element={<Navigate to="/" replace />} />
-          </>
+          </Route>
         ) : (
-          /* If true, route to main layout */
-          <>
-            <Route path="/" element={<Layout />}>
-              <Route index element={<ReportsHome />} />
-              <Route path="my-reports" element={<MyReports />} />
-              <Route path="impact" element={<Impact />} />
-              <Route path="assistant" element={<Assistant />} />
-              <Route path="profile" element={<Profile />} />
-            </Route>
+          /* If local/volunteer is logged in, route to main layout */
+          <Route path="/" element={<Layout />}>
+            <Route index element={user.role === 'volunteer' ? <VolunteerJobs /> : <ReportsHome />} />
+            <Route path="my-reports" element={<MyReports />} />
+            <Route path="my-tasks" element={<VolunteerTasks />} />
+            <Route path="my-tasks/:taskId" element={<TaskDetail />} />
+            <Route path="my-tasks/:taskId/complete" element={<CompletionForm />} />
+            <Route path="impact" element={user.role === 'volunteer' ? <VolunteerImpact /> : <Impact />} />
+            <Route path="assistant" element={user.role === 'volunteer' ? <VolunteerAssistant /> : <Assistant />} />
+            <Route path="profile" element={<Profile />} />
             <Route path="*" element={<Navigate to="/" replace />} />
-          </>
+          </Route>
         )}
       </Routes>
     </BrowserRouter>

@@ -32,6 +32,8 @@ const buildProfileForm = (user: any): ProfileFormState => ({
   emergencyContact1: user?.emergencyContacts?.[0] || '',
   emergencyContact2: user?.emergencyContacts?.[1] || '',
   skillsText: Array.isArray(user?.skills) ? user.skills.join(', ') : '',
+  isAnonymous: Boolean(user?.isAnonymous),
+  anonymousHandle: user?.anonymousHandle || '',
 });
 
 export const Profile = () => {
@@ -609,6 +611,76 @@ export const Profile = () => {
         </div>
       </div>
 
+      {/* Privacy & Identity Mode Card */}
+      <div style={sectionCardStyle}>
+        <div style={{ padding: '16px 20px', borderBottom: '1px solid #f8f9fb', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+           <div>
+              <h3 style={{ fontSize: 12, fontWeight: 700, color: '#737685', margin: 0, letterSpacing: '0.08em', textTransform: 'uppercase' }}>Privacy & Identity</h3>
+              <p style={{ margin: '4px 0 0', fontSize: 13, color: '#475569' }}>Anonymous reporting mode for sensitive situations.</p>
+           </div>
+           <button 
+            onClick={async () => {
+               if (!user?.id) return;
+               const next = !user.isAnonymous;
+               await updateDoc(doc(db, 'users', user.id), { isAnonymous: next });
+               setUser({ ...user, isAnonymous: next });
+               setFlashMessage(next ? 'Anonymous reporting mode enabled.' : 'Public identity mode restored.');
+            }}
+            style={{ 
+              backgroundColor: user?.isAnonymous ? '#f0fdf4' : '#fff',
+              border: `1px solid ${user?.isAnonymous ? '#22c55e' : '#e2e8f0'}`,
+              color: user?.isAnonymous ? '#15803d' : '#64748b',
+              padding: '6px 12px',
+              borderRadius: 12,
+              fontSize: 12,
+              fontWeight: 700,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6
+            }}
+          >
+            <span className="material-symbols-outlined" style={{ fontSize: 16 }}>{user?.isAnonymous ? 'visibility_off' : 'visibility'}</span>
+            {user?.isAnonymous ? 'Stealth Mode ON' : 'Stealth Mode OFF'}
+          </button>
+        </div>
+        
+        <div style={{ padding: '20px' }}>
+           <div className="flex flex-col gap-4">
+              <div>
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#737685', marginBottom: 6 }}>Anonymous Alias (Custom Handle)</label>
+                <div style={{ display: 'flex', gap: 10 }}>
+                   <div style={{ position: 'relative', flex: 1 }}>
+                      <span className="material-symbols-outlined" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', fontSize: 18, color: '#9ca3af' }}>alternate_email</span>
+                      <input 
+                        value={form.anonymousHandle}
+                        onChange={e => setForm({...form, anonymousHandle: e.target.value.replace(/[^a-zA-Z0-9]/g, '')})}
+                        placeholder="GuardianEcho24"
+                        style={{ width: '100%', padding: '11px 14px 11px 40px', borderRadius: 10, border: '1.5px solid #e1e2e4', fontSize: 14, fontFamily: 'Inter, sans-serif' }}
+                      />
+                   </div>
+                   {!editing && (
+                     <button 
+                      onClick={async () => {
+                        if (!user?.id) return;
+                        await updateDoc(doc(db, 'users', user.id), { anonymousHandle: form.anonymousHandle });
+                        setUser({ ...user, anonymousHandle: form.anonymousHandle });
+                        setFlashMessage('Anonymous handle updated.');
+                      }}
+                      className="px-4 py-2 rounded-xl bg-blue-700 text-white text-[12px] font-bold"
+                     >
+                       Update
+                     </button>
+                   )}
+                </div>
+                <p style={{ marginTop: 8, fontSize: 11, color: '#94a3b8', lineHeight: 1.5 }}>
+                  This handle will be shown instead of your real name when Anonymous Mode is active. 
+                  Choose something unique and neutral.
+                </p>
+              </div>
+           </div>
+        </div>
+      </div>
+
       <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, minmax(0, 1fr))', gap: 12 }}>
         {[
           { label: 'Reports Submitted', value: reports.length, accent: '#0052cc', icon: 'assignment' },
@@ -636,6 +708,41 @@ export const Profile = () => {
           <span style={{ padding: '6px 10px', borderRadius: 9999, background: user?.phoneVerified ? '#dcfce7' : '#fff7ed', color: user?.phoneVerified ? '#15803d' : '#c2410c', fontSize: 12, fontWeight: 800 }}>
             {user?.phoneVerified ? 'Verified' : 'Pending'}
           </span>
+        </div>
+
+        {/* Developer Mode Toggle */}
+        <div style={{ padding: '16px 20px', background: '#f8fafc', borderTop: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div className="flex flex-col gap-1">
+            <h4 className="text-xs font-black text-blue-700 uppercase tracking-widest">Developer Mode</h4>
+            <p className="text-[11px] text-slate-500 font-medium">Switch to Field Operations Console (Volunteer Mode)</p>
+          </div>
+          <div className="flex gap-2">
+            <button 
+              onClick={async () => {
+                if (!user?.id) return;
+                const newRole = user.role === 'volunteer' ? 'user' : 'volunteer';
+                await updateDoc(doc(db, 'users', user.id), { role: newRole });
+                setUser({ ...user, role: newRole });
+                setFlashMessage(`Role switched to ${newRole}. View updated console.`);
+              }}
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${user?.role === 'volunteer' ? 'bg-blue-700 text-white' : 'bg-slate-200 text-slate-600'}`}
+            >
+              {user?.role === 'volunteer' ? 'Activated' : 'Activate'}
+            </button>
+            {user?.role === 'volunteer' && (
+              <button 
+                onClick={async () => {
+                  if (!user?.id) return;
+                  await updateDoc(doc(db, 'users', user.id), { volunteerTourSeen: false });
+                  setUser({ ...user, volunteerTourSeen: false });
+                }}
+                className="w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-400 flex items-center justify-center active:scale-95 transition-transform"
+                title="Replay Field Tour"
+              >
+                <span className="material-symbols-outlined text-[18px]">replay</span>
+              </button>
+            )}
+          </div>
         </div>
 
         <div style={{ padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 14 }}>

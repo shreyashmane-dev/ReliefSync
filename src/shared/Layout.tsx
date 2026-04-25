@@ -6,7 +6,14 @@ export const Layout = () => {
   const { pathname } = useLocation();
   const { user } = useStore();
 
-  const navItems = [
+  const isVolunteer = user?.role === 'volunteer';
+
+  const navItems = isVolunteer ? [
+    { path: '/', icon: 'dashboard', label: 'Jobs' },
+    { path: '/my-tasks', icon: 'task', label: 'My Tasks' },
+    { path: '/impact', icon: 'analytics', label: 'Impact' },
+    { path: '/assistant', icon: 'smart_toy', label: 'AI Assistant' },
+  ] : [
     { path: '/', icon: 'assignment', label: 'Reports' },
     { path: '/my-reports', icon: 'folder_shared', label: 'My Reports' },
     { path: '/impact', icon: 'analytics', label: 'Impact' },
@@ -22,6 +29,13 @@ export const Layout = () => {
             <span className="material-symbols-outlined text-blue-700 dark:text-blue-400 fill text-[24px]">emergency</span>
             <span className="text-lg md:text-xl font-extrabold tracking-tight text-blue-700 dark:text-blue-500">ReliefSync</span>
           </div>
+
+          {isVolunteer && (
+            <div className="hidden lg:flex flex-col ml-4">
+              <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest leading-none">Field Ops Console</span>
+              <span className="text-sm font-bold text-slate-700">Welcome, {user?.name.split(' ')[0]}</span>
+            </div>
+          )}
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-lg">
