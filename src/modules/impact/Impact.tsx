@@ -12,11 +12,11 @@ export const Impact = () => {
 
   useEffect(() => {
     const unsubReports = onSnapshot(collection(db, 'reports'), (snapshot) => {
-      setAllReports(snapshot.docs.map((reportDoc) => ({ id: reportDoc.id, ...reportDoc.data() })));
+      setAllReports(snapshot.docs.map((reportDoc) => ({ ...reportDoc.data(), id: reportDoc.id })));
     });
 
     const unsubUsers = onSnapshot(collection(db, 'users'), (snapshot) => {
-      setAllUsers(snapshot.docs.map((userDoc) => ({ id: userDoc.id, ...userDoc.data() })));
+      setAllUsers(snapshot.docs.map((userDoc) => ({ ...userDoc.data(), id: userDoc.id })));
     });
 
     return () => {

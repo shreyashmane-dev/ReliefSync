@@ -64,7 +64,7 @@ export const Profile = () => {
 
     const reportsQuery = query(collection(db, 'reports'), where('userId', '==', user.id));
     const unsubscribe = onSnapshot(reportsQuery, (snapshot) => {
-      setReports(snapshot.docs.map((reportDoc) => ({ id: reportDoc.id, ...reportDoc.data() })));
+      setReports(snapshot.docs.map((reportDoc) => ({ ...reportDoc.data(), id: reportDoc.id })));
     });
 
     return () => unsubscribe();

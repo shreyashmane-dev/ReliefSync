@@ -40,7 +40,7 @@ export const MyReports = () => {
     const unsubscribe = onSnapshot(
       reportsQuery,
       (snapshot) => {
-        const nextReports: any[] = snapshot.docs.map((reportDoc) => ({ id: reportDoc.id, ...reportDoc.data() }));
+        const nextReports: any[] = snapshot.docs.map((reportDoc) => ({ ...reportDoc.data(), id: reportDoc.id }));
         setReports(nextReports);
         setFeedbackDrafts((current) => {
           const nextDrafts = { ...current };

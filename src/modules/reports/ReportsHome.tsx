@@ -41,6 +41,21 @@ const severityBg: Record<string, string> = {
   Low: '#dcfce7',
 };
 
+const getFirebaseErrorDetails = (error: unknown) => {
+  if (typeof error === 'object' && error !== null) {
+    const details = error as Record<string, unknown>;
+    return {
+      code: typeof details.code === 'string' ? details.code : undefined,
+      message: typeof details.message === 'string' ? details.message : undefined,
+    };
+  }
+
+  return {
+    code: undefined,
+    message: error instanceof Error ? error.message : undefined,
+  };
+};
+
 export const ReportsHome = () => {
   const { user } = useStore();
   const [reports, setReports] = useState<any[]>([]);
@@ -51,6 +66,7 @@ export const ReportsHome = () => {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [imageUploadWarning, setImageUploadWarning] = useState<string | null>(null);
+  const [confirmationMessage, setConfirmationMessage] = useState<{ type: 'error' | 'success'; text: string } | null>(null);
   const [confirmingReportId, setConfirmingReportId] = useState<string | null>(null);
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
 
@@ -65,7 +81,7 @@ export const ReportsHome = () => {
   useEffect(() => {
     const q = query(collection(db, 'reports'), orderBy('createdAt', 'desc'));
     const unsub = onSnapshot(q, (snap) => {
-      setReports(snap.docs.map((reportDoc) => ({ id: reportDoc.id, ...reportDoc.data() })));
+      setReports(snap.docs.map((reportDoc) => ({ ...reportDoc.data(), id: reportDoc.id })));
     });
     return () => unsub();
   }, []);
@@ -107,8 +123,9 @@ export const ReportsHome = () => {
           await uploadBytes(fileRef, file);
           const url = await getDownloadURL(fileRef);
           urls.push(url);
-        } catch (err: any) {
-          console.warn('Image upload skipped:', file.name, err?.message);
+        } catch (err) {
+          const { message } = getFirebaseErrorDetails(err);
+          console.warn('Image upload skipped:', file.name, message);
           failed += 1;
         }
       }),
@@ -158,12 +175,13 @@ export const ReportsHome = () => {
         );
         setTimeout(() => setImageUploadWarning(null), 8000);
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error submitting report:', error);
-      if (error?.code === 'permission-denied' || error?.message?.includes('permission')) {
+      const { code, message } = getFirebaseErrorDetails(error);
+      if (code === 'permission-denied' || message?.includes('permission')) {
         setSubmitError('Permission denied. Make sure you are logged in and Firestore rules allow report creation.');
       } else {
-        setSubmitError(error.message || 'Failed to submit report. Please check your connection.');
+        setSubmitError(message || 'Failed to submit report. Please check your connection.');
       }
     } finally {
       setSubmitting(false);
@@ -171,16 +189,42 @@ export const ReportsHome = () => {
   };
 
   const handleConfirmReport = async (reportId: string) => {
-    if (!user?.id) return;
+    if (!user?.id) {
+      setConfirmationMessage({ type: 'error', text: 'Please sign in before confirming a report.' });
+      return;
+    }
 
     setConfirmingReportId(reportId);
+    setConfirmationMessage(null);
     try {
       await updateDoc(doc(db, 'reports', reportId), {
         verifiedBy: arrayUnion(user.id),
         updatedAt: serverTimestamp(),
       });
+      setReports((currentReports) =>
+        currentReports.map((report) => {
+          if (report.id !== reportId) return report;
+
+          const verifiedBy = Array.isArray(report.verifiedBy) ? report.verifiedBy : [];
+          return {
+            ...report,
+            verifiedBy: verifiedBy.includes(user.id) ? verifiedBy : [...verifiedBy, user.id],
+          };
+        }),
+      );
+      setConfirmationMessage({ type: 'success', text: 'Report confirmed.' });
+      window.setTimeout(() => setConfirmationMessage(null), 2600);
     } catch (error) {
       console.error('Error confirming report:', error);
+      const { code, message } = getFirebaseErrorDetails(error);
+      const isPermissionError =
+        code === 'permission-denied' || message?.toLowerCase().includes('permission');
+      setConfirmationMessage({
+        type: 'error',
+        text: isPermissionError
+          ? 'Firebase rules blocked the confirmation update. Allow authenticated users to update verifiedBy on reports.'
+          : message || 'Could not confirm this report. Please try again.',
+      });
     } finally {
       setConfirmingReportId(null);
     }
@@ -235,6 +279,29 @@ export const ReportsHome = () => {
               with write permission for authenticated users.
             </div>
           </div>
+        </div>
+      )}
+
+      {confirmationMessage && (
+        <div
+          style={{
+            background: confirmationMessage.type === 'error' ? '#fef2f2' : '#f0fdf4',
+            border: `1px solid ${confirmationMessage.type === 'error' ? '#fecaca' : '#bbf7d0'}`,
+            color: confirmationMessage.type === 'error' ? '#b91c1c' : '#166534',
+            padding: '12px 16px',
+            borderRadius: 12,
+            fontSize: 14,
+            fontWeight: 600,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            marginBottom: 16,
+          }}
+        >
+          <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
+            {confirmationMessage.type === 'error' ? 'error' : 'check_circle'}
+          </span>
+          {confirmationMessage.text}
         </div>
       )}
 
