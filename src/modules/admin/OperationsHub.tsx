@@ -5,7 +5,6 @@ import { db } from '../../core/firebase/config';
 export const OperationsHub = () => {
   const [reports, setReports] = useState<any[]>([]);
   const [volunteerCount, setVolunteerCount] = useState(0);
-  const [loading, setLoading] = useState(true);
   const [broadcastMsg, setBroadcastMsg] = useState('');
   const [isBroadcasting, setIsBroadcasting] = useState(false);
 
@@ -31,7 +30,6 @@ export const OperationsHub = () => {
     const qReports = query(collection(db, 'reports'), orderBy('createdAt', 'desc'), limit(50));
     const unsubReports = onSnapshot(qReports, (snap) => {
       setReports(snap.docs.map(d => ({ id: d.id, ...d.data() })));
-      setLoading(false);
     });
 
     const unsubVolunteers = onSnapshot(collection(db, 'volunteers'), (snap) => {

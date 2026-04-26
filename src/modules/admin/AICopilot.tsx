@@ -1,5 +1,3 @@
-import { useState } from 'react';
-
 export const AICopilot = () => {
   return (
     <div className="flex flex-col gap-8">

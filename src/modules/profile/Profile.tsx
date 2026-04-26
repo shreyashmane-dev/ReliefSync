@@ -4,7 +4,6 @@ import { signOut, updateProfile } from 'firebase/auth';
 import { collection, doc, onSnapshot, query, serverTimestamp, updateDoc, where } from 'firebase/firestore';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { auth, db, storage } from '../../core/firebase/config';
-import { useIsMobile } from '../../core/hooks/useIsMobile';
 import { useStore } from '../../core/store/useStore';
 import { getLeague } from '../../core/utils/impact';
 import { getInitials } from '../../core/utils/user';
@@ -12,7 +11,6 @@ import { getInitials } from '../../core/utils/user';
 export const Profile = () => {
   const { user, setUser } = useStore();
   const navigate = useNavigate();
-  const isMobile = useIsMobile();
   const fileRef = useRef<HTMLInputElement>(null);
 
   const [saving, setSaving] = useState(false);

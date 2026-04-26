@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import { useIsMobile } from '../../core/hooks/useIsMobile';
 
 interface Message {
   id: string;
@@ -16,7 +15,6 @@ const SUGGESTIONS = [
 ];
 
 export const Assistant = () => {
-  const isMobile = useIsMobile();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',

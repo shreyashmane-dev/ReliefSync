@@ -4,13 +4,10 @@ import { db } from '../../core/firebase/config';
 
 export const BackupCoordination = () => {
   const [requests, setRequests] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     const q = query(collection(db, 'backupRequests'), orderBy('createdAt', 'desc'), limit(20));
     return onSnapshot(q, (snap) => {
       setRequests(snap.docs.map(d => ({ id: d.id, ...d.data() })));
-      setLoading(false);
     });
   }, []);
 

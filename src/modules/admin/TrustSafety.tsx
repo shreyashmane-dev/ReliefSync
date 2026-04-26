@@ -4,13 +4,10 @@ import { db } from '../../core/firebase/config';
 
 export const TrustSafety = () => {
   const [reports, setReports] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     const q = query(collection(db, 'reports'), orderBy('createdAt', 'desc'), limit(50));
     return onSnapshot(q, (snap) => {
       setReports(snap.docs.map(d => ({ id: d.id, ...d.data() })));
-      setLoading(false);
     });
   }, []);
 

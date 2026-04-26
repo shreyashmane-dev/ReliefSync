@@ -1,18 +1,14 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
   addDoc,
-  arrayUnion,
   collection,
-  doc,
   onSnapshot,
   orderBy,
   query,
   serverTimestamp,
-  updateDoc,
 } from 'firebase/firestore';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { db, storage } from '../../core/firebase/config';
-import { useIsMobile } from '../../core/hooks/useIsMobile';
 import { useStore } from '../../core/store/useStore';
 import { getInitials } from '../../core/utils/user';
 import { SmartLocationField, type LocationData } from './SmartLocationField';
@@ -37,7 +33,6 @@ const severityColors: Record<string, { main: string; bg: string }> = {
 
 export const ReportsHome = () => {
   const { user } = useStore();
-  const isMobile = useIsMobile();
   const [reports, setReports] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState('All');

@@ -6,12 +6,9 @@ import {
   onSnapshot,
   orderBy,
   query,
-  serverTimestamp,
-  updateDoc,
   where,
 } from 'firebase/firestore';
 import { db } from '../../core/firebase/config';
-import { useIsMobile } from '../../core/hooks/useIsMobile';
 import { useStore } from '../../core/store/useStore';
 
 const severityColors: Record<string, { main: string; bg: string }> = {
@@ -29,7 +26,6 @@ const statusMap: Record<string, { label: string; color: string; progress: number
 
 export const MyReports = () => {
   const { user } = useStore();
-  const isMobile = useIsMobile();
   const [reports, setReports] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('all');
