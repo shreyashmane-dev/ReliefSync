@@ -22,7 +22,17 @@ export const UserSignIn = () => {
     try {
       const cred = await signInWithEmailAndPassword(auth, email, password);
       const snap = await getDoc(doc(db, 'users', cred.user.uid));
-      let data = { id: cred.user.uid, name: cred.user.displayName || 'User', email: cred.user.email || email, role: 'user' as const, impactScore: 0, location: null };
+      let data = {
+        id: cred.user.uid,
+        name: cred.user.displayName || 'User',
+        email: cred.user.email || email,
+        role: 'user' as const,
+        responderActive: false,
+        isVolunteerApproved: false,
+        volunteerRegistered: false,
+        impactScore: 0,
+        location: null,
+      };
       if (snap.exists()) data = { ...data, ...snap.data() } as any;
       setUser(data);
       navigate('/');
@@ -40,7 +50,17 @@ export const UserSignIn = () => {
       const cred = await signInWithPopup(auth, new GoogleAuthProvider());
       const ref = doc(db, 'users', cred.user.uid);
       const snap = await getDoc(ref);
-      let data = { id: cred.user.uid, name: cred.user.displayName || 'User', email: cred.user.email || '', role: 'user' as const, impactScore: 0, location: null };
+      let data = {
+        id: cred.user.uid,
+        name: cred.user.displayName || 'User',
+        email: cred.user.email || '',
+        role: 'user' as const,
+        responderActive: false,
+        isVolunteerApproved: false,
+        volunteerRegistered: false,
+        impactScore: 0,
+        location: null,
+      };
       if (snap.exists()) data = { ...data, ...snap.data() } as any;
       else await setDoc(ref, data);
       setUser(data);

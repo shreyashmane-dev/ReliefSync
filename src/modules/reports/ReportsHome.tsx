@@ -18,71 +18,34 @@ import { getInitials } from '../../core/utils/user';
 import { SmartLocationField, type LocationData } from './SmartLocationField';
 
 const CATEGORIES = [
-  { label: 'Medical', icon: 'medical_services', color: '#b81a36' },
-  { label: 'Fire', icon: 'local_fire_department', color: '#f97316' },
-  { label: 'Flood', icon: 'water_drop', color: '#0052cc' },
-  { label: 'Shelter', icon: 'home_work', color: '#004e32' },
-  { label: 'Earthquake', icon: 'crisis_alert', color: '#7c3aed' },
-  { label: 'Other', icon: 'more_horiz', color: '#737685' },
+  { label: 'Medical', icon: 'medical_services', color: '#dc2626', bg: '#fef2f2' },
+  { label: 'Fire', icon: 'local_fire_department', color: '#f97316', bg: '#fff7ed' },
+  { label: 'Flood', icon: 'water_drop', color: '#2563eb', bg: '#eff6ff' },
+  { label: 'Shelter', icon: 'home_work', color: '#059669', bg: '#ecfdf5' },
+  { label: 'Earthquake', icon: 'crisis_alert', color: '#7c3aed', bg: '#f5f3ff' },
+  { label: 'Other', icon: 'more_horiz', color: '#4b5563', bg: '#f9fafb' },
 ];
 
 const SEVERITY = ['Critical', 'High', 'Medium', 'Low'];
-const STATUS_OPTIONS = ['all', 'pending', 'active', 'resolved'] as const;
 
-const severityColor: Record<string, string> = {
-  Critical: '#ba1a1a',
-  High: '#f97316',
-  Medium: '#eab308',
-  Low: '#22c55e',
-};
-
-const severityBg: Record<string, string> = {
-  Critical: '#ffdad6',
-  High: '#ffedd5',
-  Medium: '#fef9c3',
-  Low: '#dcfce7',
-};
-
-const getFirebaseErrorDetails = (error: unknown) => {
-  if (typeof error === 'object' && error !== null) {
-    const details = error as Record<string, unknown>;
-    return {
-      code: typeof details.code === 'string' ? details.code : undefined,
-      message: typeof details.message === 'string' ? details.message : undefined,
-    };
-  }
-
-  return {
-    code: undefined,
-    message: error instanceof Error ? error.message : undefined,
-  };
-};
-
-const getLocationLabel = (location: unknown) => {
-  if (typeof location === 'string') return location;
-  if (typeof location === 'object' && location !== null) {
-    const nextLocation = location as Record<string, unknown>;
-    if (typeof nextLocation.address === 'string') return nextLocation.address;
-  }
-  return '';
+const severityColors: Record<string, { main: string; bg: string }> = {
+  Critical: { main: '#dc2626', bg: '#fef2f2' },
+  High: { main: '#ea580c', bg: '#fff7ed' },
+  Medium: { main: '#ca8a04', bg: '#fefce8' },
+  Low: { main: '#16a34a', bg: '#f0fdf4' },
 };
 
 export const ReportsHome = () => {
   const { user } = useStore();
   const isMobile = useIsMobile();
   const [reports, setReports] = useState<any[]>([]);
-  const [filter, setFilter] = useState('All');
-  const [statusFilter, setStatusFilter] = useState<(typeof STATUS_OPTIONS)[number]>('all');
+  const [loading, setLoading] = useState(true);
+  const [activeCategory, setActiveCategory] = useState('All');
   const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState<string | null>(null);
-  const [imageUploadWarning, setImageUploadWarning] = useState<string | null>(null);
-  const [confirmationMessage, setConfirmationMessage] = useState<{ type: 'error' | 'success'; text: string } | null>(
-    null,
-  );
-  const [confirmingReportId, setConfirmingReportId] = useState<string | null>(null);
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
+  
   const [form, setForm] = useState<{
     title: string;
     category: string;
@@ -96,1090 +59,347 @@ export const ReportsHome = () => {
     severity: 'Medium',
     location: null,
     description: '',
-    isAnonymous: user?.isAnonymous || false,
+    isAnonymous: false,
   });
 
   useEffect(() => {
-    setForm(prev => ({ ...prev, isAnonymous: user?.isAnonymous || false }));
-  }, [user]);
-
-  useEffect(() => {
     const q = query(collection(db, 'reports'), orderBy('createdAt', 'desc'));
-    const unsub = onSnapshot(q, (snap) => {
-      setReports(snap.docs.map((reportDoc) => ({ ...reportDoc.data(), id: reportDoc.id })));
+    return onSnapshot(q, (snap) => {
+      setReports(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      setLoading(false);
     });
-    return () => unsub();
   }, []);
 
-  const selectedImagePreviews = useMemo(
-    () => selectedImages.map((file) => ({ name: file.name, url: URL.createObjectURL(file) })),
-    [selectedImages],
-  );
+  const myReports = useMemo(() => reports.filter(r => r.userId === user?.id), [reports, user]);
 
-  useEffect(() => {
-    return () => {
-      selectedImagePreviews.forEach((image) => URL.revokeObjectURL(image.url));
-    };
-  }, [selectedImagePreviews]);
+  const filteredReports = useMemo(() => {
+    return reports.filter(r => {
+      const matchCat = activeCategory === 'All' || r.category === activeCategory;
+      const matchSearch = !search || 
+        r.title?.toLowerCase().includes(search.toLowerCase()) || 
+        r.description?.toLowerCase().includes(search.toLowerCase());
+      return matchCat && matchSearch;
+    });
+  }, [reports, activeCategory, search]);
 
-  const handleImageSelection = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const incomingFiles = Array.from(event.target.files ?? []);
-    if (incomingFiles.length === 0) return;
-
-    setSelectedImages((current) => [...current, ...incomingFiles].slice(0, 4));
-    event.target.value = '';
+  const handleImageSelection = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    setSelectedImages(prev => [...prev, ...files].slice(0, 4));
   };
 
-  const removeSelectedImage = (name: string) => {
-    setSelectedImages((current) => current.filter((file) => file.name !== name));
-  };
-
-  const uploadReportImagesSafe = async (): Promise<{ urls: string[]; failed: number }> => {
-    if (!user?.id || selectedImages.length === 0) return { urls: [], failed: 0 };
-
-    let failed = 0;
+  const uploadImages = async () => {
     const urls: string[] = [];
-
-    await Promise.all(
-      selectedImages.map(async (file, index) => {
-        try {
-          const fileRef = ref(storage, `report_media/${user.id}/${Date.now()}-${index}-${file.name}`);
-          await uploadBytes(fileRef, file);
-          const url = await getDownloadURL(fileRef);
-          urls.push(url);
-        } catch (err) {
-          const { message } = getFirebaseErrorDetails(err);
-          console.warn('Image upload skipped:', file.name, message);
-          failed += 1;
-        }
-      }),
-    );
-
-    return { urls, failed };
+    for (const file of selectedImages) {
+      const path = `report_media/${user?.id}/${Date.now()}-${file.name}`;
+      const fileRef = ref(storage, path);
+      await uploadBytes(fileRef, file);
+      urls.push(await getDownloadURL(fileRef));
+    }
+    return urls;
   };
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     if (!user) return;
-
     setSubmitting(true);
-    setSubmitError(null);
-    setImageUploadWarning(null);
     try {
-      const { urls: imageUrls, failed: failedUploads } = await uploadReportImagesSafe();
-
+      const imageUrls = await uploadImages();
       await addDoc(collection(db, 'reports'), {
         ...form,
-        status: 'pending',
         userId: user.id,
-        userName: form.isAnonymous ? (user.anonymousHandle || 'Anonymous Handler') : user.name,
-        userPhotoURL: form.isAnonymous ? null : (user.photoURL ?? null),
-        isAnonymous: form.isAnonymous,
+        userName: form.isAnonymous ? 'Anonymous' : user.name,
+        userPhotoURL: form.isAnonymous ? null : user.photoURL,
         imageUrls,
+        status: 'open',
         verifiedBy: [],
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
-        timeline: [
-          {
-            key: 'submitted',
-            label: 'Report submitted',
-            at: new Date().toISOString(),
-          },
-        ],
       });
-
       setShowModal(false);
+      setForm({ title: '', category: 'Medical', severity: 'Medium', location: null, description: '', isAnonymous: false });
       setSelectedImages([]);
-      setForm({ title: '', category: 'Medical', severity: 'Medium', location: null, description: '', isAnonymous: user.isAnonymous || false });
-
-      if (failedUploads > 0) {
-        setImageUploadWarning(
-          `Report submitted! However, ${failedUploads} photo${failedUploads > 1 ? 's' : ''} could not be uploaded. Update Firebase Storage rules to allow report_media uploads.`,
-        );
-        setTimeout(() => setImageUploadWarning(null), 8000);
-      }
-    } catch (error) {
-      console.error('Error submitting report:', error);
-      const { code, message } = getFirebaseErrorDetails(error);
-      if (code === 'permission-denied' || message?.includes('permission')) {
-        setSubmitError('Permission denied. Make sure you are logged in and Firestore rules allow report creation.');
-      } else {
-        setSubmitError(message || 'Failed to submit report. Please check your connection.');
-      }
+    } catch (err) {
+      console.error(err);
+      alert('Failed to submit report. Please try again.');
     } finally {
       setSubmitting(false);
     }
   };
 
-  const handleConfirmReport = async (reportId: string) => {
-    if (!user?.id) {
-      setConfirmationMessage({ type: 'error', text: 'Please sign in before confirming a report.' });
-      return;
-    }
-
-    setConfirmingReportId(reportId);
-    setConfirmationMessage(null);
-    try {
-      await updateDoc(doc(db, 'reports', reportId), {
-        verifiedBy: arrayUnion(user.id),
-        updatedAt: serverTimestamp(),
-      });
-      setReports((currentReports) =>
-        currentReports.map((report) => {
-          if (report.id !== reportId) return report;
-
-          const verifiedBy = Array.isArray(report.verifiedBy) ? report.verifiedBy : [];
-          return {
-            ...report,
-            verifiedBy: verifiedBy.includes(user.id) ? verifiedBy : [...verifiedBy, user.id],
-          };
-        }),
-      );
-      setConfirmationMessage({ type: 'success', text: 'Report confirmed.' });
-      window.setTimeout(() => setConfirmationMessage(null), 2600);
-    } catch (error) {
-      console.error('Error confirming report:', error);
-      const { code, message } = getFirebaseErrorDetails(error);
-      const isPermissionError = code === 'permission-denied' || message?.toLowerCase().includes('permission');
-      setConfirmationMessage({
-        type: 'error',
-        text: isPermissionError
-          ? 'Firebase rules blocked the confirmation update. Allow authenticated users to update verifiedBy on reports.'
-          : message || 'Could not confirm this report. Please try again.',
-      });
-    } finally {
-      setConfirmingReportId(null);
-    }
-  };
-
-  const filtered = reports.filter((report) => {
-    const matchCategory = filter === 'All' || report.category === filter;
-    const matchStatus = statusFilter === 'all' || report.status === statusFilter;
-    const searchValue = search.toLowerCase();
-    const locStr = getLocationLabel(report.location);
-
-    const matchSearch =
-      !searchValue ||
-      report.title?.toLowerCase().includes(searchValue) ||
-      locStr.toLowerCase().includes(searchValue) ||
-      report.description?.toLowerCase().includes(searchValue);
-
-    return matchCategory && matchStatus && matchSearch;
-  });
-
-  const formatTime = (timestamp: any) => {
-    if (!timestamp?.toDate) return 'Just now';
-
-    const date = timestamp.toDate();
-    const diff = (Date.now() - date.getTime()) / 1000;
-
-    if (diff < 60) return 'Just now';
-    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
-    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
-
-    return date.toLocaleDateString();
-  };
-
   return (
-    <>
-      <div style={{ marginBottom: isMobile ? 20 : 24 }}>
-        <h1
-          style={{
-            fontSize: isMobile ? 28 : 32,
-            fontWeight: 800,
-            margin: 0,
-            marginBottom: 4,
-            letterSpacing: '-0.5px',
-            lineHeight: 1.08,
-          }}
-        >
-          Hello, {user?.name?.split(' ')[0] || 'there'}
-        </h1>
-        <p style={{ fontSize: isMobile ? 15 : 16, color: '#737685', margin: 0, maxWidth: 720, lineHeight: 1.55 }}>
-          Live Firebase reports, community confirmations, and media-backed field updates.
-        </p>
-      </div>
-
-      {imageUploadWarning && (
-        <div
-          style={{
-            background: '#fffbeb',
-            border: '1px solid #fde68a',
-            color: '#92400e',
-            padding: '12px 16px',
-            borderRadius: 12,
-            fontSize: 14,
-            fontWeight: 600,
-            display: 'flex',
-            alignItems: 'flex-start',
-            gap: 10,
-          }}
-        >
-          <span
-            className="material-symbols-outlined"
-            style={{ fontSize: 20, color: '#d97706', flexShrink: 0, marginTop: 1 }}
+    <div className="flex flex-col gap-10">
+      {/* Dynamic Header */}
+      <div className="relative overflow-hidden rounded-[40px] bg-blue-700 p-8 md:p-12 text-white shadow-2xl shadow-blue-700/20">
+        <div className="relative z-10 max-w-2xl">
+          <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-4 leading-tight">
+            Help is One <span className="text-blue-200">Report</span> Away.
+          </h1>
+          <p className="text-blue-100 font-medium md:text-lg mb-8 leading-relaxed">
+            ReliefSync connects your field observations with emergency responders and AI coordination in real-time.
+          </p>
+          <button 
+            onClick={() => setShowModal(true)}
+            className="px-8 py-4 rounded-2xl bg-white text-blue-700 font-black uppercase tracking-[0.1em] hover:bg-blue-50 transition-all shadow-xl active:scale-95 flex items-center gap-3"
           >
-            warning
-          </span>
-          <div>
-            <div>{imageUploadWarning}</div>
-            <div style={{ marginTop: 6, fontWeight: 500, fontSize: 13, lineHeight: 1.5 }}>
-              Fix in Firebase Console -&gt; Storage -&gt; Rules: add{' '}
-              <code style={{ background: '#fef3c7', padding: '1px 6px', borderRadius: 4 }}>
-                report_media/{'{userId}'}/**
-              </code>{' '}
-              with write permission for authenticated users.
-            </div>
-          </div>
-        </div>
-      )}
-
-      {confirmationMessage && (
-        <div
-          style={{
-            background: confirmationMessage.type === 'error' ? '#fef2f2' : '#f0fdf4',
-            border: `1px solid ${confirmationMessage.type === 'error' ? '#fecaca' : '#bbf7d0'}`,
-            color: confirmationMessage.type === 'error' ? '#b91c1c' : '#166534',
-            padding: '12px 16px',
-            borderRadius: 12,
-            fontSize: 14,
-            fontWeight: 600,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            marginTop: imageUploadWarning ? 14 : 0,
-            marginBottom: 16,
-          }}
-        >
-          <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
-            {confirmationMessage.type === 'error' ? 'error' : 'check_circle'}
-          </span>
-          {confirmationMessage.text}
-        </div>
-      )}
-
-      <div style={{ display: 'flex', gap: 12, marginBottom: 20, flexWrap: 'wrap', alignItems: 'stretch' }}>
-        <div style={{ position: 'relative', flex: '1 1 260px', minWidth: isMobile ? '100%' : 220 }}>
-          <span
-            className="material-symbols-outlined"
-            style={{
-              position: 'absolute',
-              left: 14,
-              top: '50%',
-              transform: 'translateY(-50%)',
-              color: '#737685',
-              fontSize: 20,
-              pointerEvents: 'none',
-            }}
-          >
-            search
-          </span>
-          <input
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            placeholder="Search incidents, locations..."
-            style={{
-              width: '100%',
-              padding: '12px 16px 12px 44px',
-              borderRadius: 12,
-              border: '1px solid #e1e2e4',
-              background: '#fff',
-              fontSize: 15,
-              outline: 'none',
-              boxSizing: 'border-box',
-              fontFamily: 'Inter, sans-serif',
-            }}
-          />
-        </div>
-        <select
-          value={filter}
-          onChange={(event) => setFilter(event.target.value)}
-          style={{
-            padding: '12px 16px',
-            borderRadius: 12,
-            border: '1px solid #e1e2e4',
-            background: '#fff',
-            fontSize: 14,
-            fontWeight: 600,
-            color: '#191c1e',
-            fontFamily: 'Inter, sans-serif',
-            cursor: 'pointer',
-            flex: isMobile ? '1 1 160px' : '0 0 auto',
-            minWidth: isMobile ? 'calc(50% - 6px)' : 0,
-          }}
-        >
-          <option value="All">All Categories</option>
-          {CATEGORIES.map((category) => (
-            <option key={category.label} value={category.label}>
-              {category.label}
-            </option>
-          ))}
-        </select>
-        <select
-          value={statusFilter}
-          onChange={(event) => setStatusFilter(event.target.value as (typeof STATUS_OPTIONS)[number])}
-          style={{
-            padding: '12px 16px',
-            borderRadius: 12,
-            border: '1px solid #e1e2e4',
-            background: '#fff',
-            fontSize: 14,
-            fontWeight: 600,
-            color: '#191c1e',
-            fontFamily: 'Inter, sans-serif',
-            cursor: 'pointer',
-            flex: isMobile ? '1 1 160px' : '0 0 auto',
-            minWidth: isMobile ? 'calc(50% - 6px)' : 0,
-          }}
-        >
-          <option value="all">All Status</option>
-          <option value="pending">Pending</option>
-          <option value="active">Active</option>
-          <option value="resolved">Resolved</option>
-        </select>
-      </div>
-
-      <div
-        className="hide-scrollbar"
-        style={{ display: 'flex', gap: 10, overflowX: 'auto', marginBottom: 28, paddingBottom: 4, scrollSnapType: 'x proximity' }}
-      >
-        {[{ label: 'All', icon: 'apps', color: '#0052cc' }, ...CATEGORIES].map((category) => (
-          <button
-            key={category.label}
-            onClick={() => setFilter(category.label)}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              padding: '8px 16px',
-              borderRadius: 9999,
-              border: `1px solid ${filter === category.label ? category.color : '#e1e2e4'}`,
-              background: filter === category.label ? `${category.color}15` : '#fff',
-              color: filter === category.label ? category.color : '#434654',
-              fontWeight: 600,
-              fontSize: 13,
-              cursor: 'pointer',
-              whiteSpace: 'nowrap',
-              flexShrink: 0,
-              fontFamily: 'Inter, sans-serif',
-              scrollSnapAlign: 'start',
-            }}
-          >
-            <span className="material-symbols-outlined" style={{ fontSize: 16 }}>
-              {category.icon}
-            </span>
-            {category.label}
+            <span className="material-symbols-outlined font-bold">add_circle</span>
+            File Incident Report
           </button>
-        ))}
-      </div>
-
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, minmax(0, 1fr))',
-          gap: 12,
-          marginBottom: 28,
-        }}
-      >
-        {[
-          { label: 'Total Reports', value: reports.length, icon: 'assignment', color: '#0052cc' },
-          {
-            label: 'Critical',
-            value: reports.filter((report) => report.severity === 'Critical').length,
-            icon: 'crisis_alert',
-            color: '#ba1a1a',
-          },
-          {
-            label: 'Confirmed',
-            value: reports.filter((report) => Array.isArray(report.verifiedBy) && report.verifiedBy.length > 0).length,
-            icon: 'fact_check',
-            color: '#15803d',
-          },
-        ].map((stat) => (
-          <div
-            key={stat.label}
-            style={{
-              background: '#fff',
-              borderRadius: 16,
-              padding: '20px 16px',
-              border: '1px solid #f1f5f9',
-              textAlign: 'center',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-            }}
-          >
-            <span
-              className="material-symbols-outlined"
-              style={{ color: stat.color, fontSize: 28, display: 'block', marginBottom: 6, fontVariationSettings: "'FILL' 1" }}
-            >
-              {stat.icon}
-            </span>
-            <div style={{ fontSize: 28, fontWeight: 800, color: '#191c1e', lineHeight: 1 }}>{stat.value}</div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: '#737685', letterSpacing: '0.05em', marginTop: 4 }}>
-              {stat.label}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-          <h2 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>Live Incidents ({filtered.length})</h2>
         </div>
-
-        {filtered.length === 0 && (
-          <div
-            style={{
-              textAlign: 'center',
-              padding: '60px 20px',
-              color: '#737685',
-              background: '#fff',
-              borderRadius: 16,
-              border: '1px dashed #e1e2e4',
-            }}
-          >
-            <span className="material-symbols-outlined" style={{ fontSize: 48, display: 'block', marginBottom: 12, opacity: 0.4 }}>
-              assignment
-            </span>
-            <p style={{ margin: 0, fontWeight: 600 }}>No incidents found.</p>
-            <p style={{ margin: '4px 0 0', fontSize: 14 }}>Be the first to report one.</p>
-          </div>
-        )}
-
-        {filtered.map((report) => {
-          const verificationCount = Array.isArray(report.verifiedBy) ? report.verifiedBy.length : 0;
-          const alreadyVerified = Boolean(user?.id && Array.isArray(report.verifiedBy) && report.verifiedBy.includes(user.id));
-          const canConfirm = Boolean(user?.id && report.userId !== user.id && !alreadyVerified);
-          const locationLabel = getLocationLabel(report.location);
-
-          return (
-            <div
-              key={report.id}
-              style={{
-                background: '#fff',
-                borderRadius: 16,
-                padding: isMobile ? '18px 16px 18px 20px' : '20px 20px 20px 24px',
-                border: '1px solid #f1f5f9',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-                position: 'relative',
-                overflow: 'hidden',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 14,
-              }}
-            >
-              <div
-                style={{
-                  position: 'absolute',
-                  left: 0,
-                  top: 0,
-                  bottom: 0,
-                  width: 4,
-                  background: severityColor[report.severity] || '#737685',
-                  borderRadius: '4px 0 0 4px',
-                }}
-              />
-
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap' }}>
-                <div style={{ flex: '1 1 280px', minWidth: 0 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
-                    <span
-                      style={{
-                        padding: '3px 10px',
-                        borderRadius: 9999,
-                        background: severityBg[report.severity] || '#f1f5f9',
-                        color: severityColor[report.severity] || '#737685',
-                        fontSize: 11,
-                        fontWeight: 700,
-                        letterSpacing: '0.05em',
-                      }}
-                    >
-                      {report.severity}
-                    </span>
-                    <span
-                      style={{
-                        padding: '3px 10px',
-                        borderRadius: 9999,
-                        background: '#f1f5f9',
-                        color: '#434654',
-                        fontSize: 11,
-                        fontWeight: 700,
-                      }}
-                    >
-                      {report.category}
-                    </span>
-                    <span style={{ fontSize: 13, color: '#737685', fontWeight: 500 }}>
-                      in {locationLabel}
-                    </span>
-                  </div>
-                  <h3 style={{ fontSize: 17, fontWeight: 800, color: '#191c1e', marginBottom: 6, lineHeight: 1.3 }}>{report.title}</h3>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                     {report.isAnonymous ? (
-                        <div style={{ width: 20, height: 20, borderRadius: '50%', background: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                           <span className="material-symbols-outlined" style={{ fontSize: 14, color: '#64748b' }}>visibility_off</span>
-                        </div>
-                     ) : (
-                        report.userPhotoURL ? <img src={report.userPhotoURL} style={{ width: 20, height: 20, borderRadius: '50%' }} /> : <div style={{ width: 20, height: 20, borderRadius: '50%', background: '#0052cc', color: '#fff', fontSize: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{getInitials(report.userName)}</div>
-                     )}
-                     <span style={{ fontSize: 12, fontWeight: 700, color: '#434654' }}>
-                        {report.isAnonymous ? `@${report.userName}` : report.userName}
-                     </span>
-                     <div style={{ width: 3, height: 3, borderRadius: '50%', background: '#cbd5e1' }} />
-                     <span style={{ fontSize: 12, fontWeight: 500, color: '#737685' }}>{formatTime(report.createdAt)}</span>
-                  </div>
-                  {report.description && (
-                    <p style={{ fontSize: 13, color: '#434654', margin: '10px 0 0', lineHeight: 1.6, wordBreak: 'break-word' }}>
-                      {report.description}
-                    </p>
-                  )}
-                  {locationLabel && (
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'flex-start',
-                        gap: 4,
-                        marginTop: 6,
-                        fontSize: 13,
-                        color: '#737685',
-                        minWidth: 0,
-                      }}
-                    >
-                      <span className="material-symbols-outlined" style={{ fontSize: 15, marginTop: 1, flexShrink: 0 }}>
-                        location_on
-                      </span>
-                      <span style={{ wordBreak: 'break-word' }}>{locationLabel}</span>
-                    </div>
-                  )}
-                </div>
-                <div
-                  style={{
-                    display: 'flex',
-                    flexDirection: isMobile ? 'row' : 'column',
-                    alignItems: isMobile ? 'center' : 'flex-end',
-                    justifyContent: 'space-between',
-                    gap: 8,
-                    flexShrink: 0,
-                    width: isMobile ? '100%' : 'auto',
-                  }}
-                >
-                  <span
-                    style={{
-                      padding: '4px 10px',
-                      borderRadius: 9999,
-                      fontSize: 12,
-                      fontWeight: 700,
-                      background:
-                        report.status === 'pending' ? '#f1f5f9' : report.status === 'active' ? '#dae2ff' : '#dcfce7',
-                      color: report.status === 'pending' ? '#737685' : report.status === 'active' ? '#0052cc' : '#15803d',
-                    }}
-                  >
-                    {report.status === 'pending' ? 'Pending' : report.status === 'active' ? 'Active' : 'Resolved'}
-                  </span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-                    {report.userPhotoURL ? (
-                      <img
-                        src={report.userPhotoURL}
-                        alt={report.userName || 'Reporter'}
-                        style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover' }}
-                      />
-                    ) : (
-                      <div
-                        style={{
-                          width: 28,
-                          height: 28,
-                          borderRadius: '50%',
-                          background: '#0052cc',
-                          color: '#fff',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          fontSize: 11,
-                          fontWeight: 700,
-                          flexShrink: 0,
-                        }}
-                      >
-                        {getInitials(report.userName)}
-                      </div>
-                    )}
-                    <span style={{ fontSize: 11, color: '#9ca3af', wordBreak: 'break-word' }}>
-                      {report.userName || 'Community user'}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {Array.isArray(report.imageUrls) && report.imageUrls.length > 0 && (
-                <div
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: report.imageUrls.length > 1 && !isMobile ? 'repeat(2, 1fr)' : '1fr',
-                    gap: 10,
-                  }}
-                >
-                  {report.imageUrls.slice(0, 4).map((imageUrl: string) => (
-                    <img
-                      key={imageUrl}
-                      src={imageUrl}
-                      alt="Report evidence"
-                      style={{
-                        width: '100%',
-                        height: isMobile ? 180 : 148,
-                        objectFit: 'cover',
-                        borderRadius: 14,
-                        border: '1px solid #e5e7eb',
-                      }}
-                    />
-                  ))}
-                </div>
-              )}
-
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#15803d', fontSize: 13, fontWeight: 600 }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: 18, fontVariationSettings: "'FILL' 1" }}>
-                    verified
-                  </span>
-                  {verificationCount} community confirmation{verificationCount === 1 ? '' : 's'}
-                </div>
-
-                <div style={{ display: 'flex', gap: 10 }}>
-                  <button
-                    onClick={() => handleConfirmReport(report.id)}
-                    disabled={confirmingReportId === report.id || !canConfirm}
-                    style={{
-                      flex: 1,
-                      height: 48,
-                      borderRadius: 12,
-                      background: alreadyVerified ? '#f0fdf4' : '#0052cc',
-                      color: alreadyVerified ? '#15803d' : '#fff',
-                      border: alreadyVerified ? '1px solid #bbf7d0' : 'none',
-                      fontSize: 13,
-                      fontWeight: 700,
-                      cursor: alreadyVerified || !user ? 'default' : 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: 8,
-                      opacity: canConfirm || alreadyVerified ? 1 : 0.5,
-                      fontFamily: 'Inter, sans-serif',
-                    }}
-                  >
-                    <span className="material-symbols-outlined" style={{ fontSize: 18, fontVariationSettings: alreadyVerified ? "'FILL' 1" : "" }}>
-                      {alreadyVerified ? 'verified_user' : 'check_circle'}
-                    </span>
-                    {confirmingReportId === report.id ? '...' : alreadyVerified ? 'Verified' : 'Confirm'}
-                  </button>
-
-                  <button
-                    onClick={async () => {
-                      if (!user?.id) return;
-                      const watchers = Array.isArray(report.watchers) ? report.watchers : [];
-                      const isWatching = watchers.includes(user.id);
-                      const updated = isWatching 
-                        ? watchers.filter((id: string) => id !== user.id)
-                        : [...watchers, user.id];
-                      
-                      await updateDoc(doc(db, 'reports', report.id), { watchers: updated });
-                    }}
-                    style={{
-                      width: 48,
-                      height: 48,
-                      borderRadius: 12,
-                      background: Array.isArray(report.watchers) && user && report.watchers.includes(user.id) ? '#fff7ed' : '#f8fafc',
-                      border: '1px solid #e2e8f0',
-                      color: Array.isArray(report.watchers) && user && report.watchers.includes(user.id) ? '#ea580c' : '#64748b',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      cursor: user ? 'pointer' : 'default',
-                    }}
-                  >
-                    <span className="material-symbols-outlined" style={{ fontSize: 20, fontVariationSettings: Array.isArray(report.watchers) && user && report.watchers.includes(user.id) ? "'FILL' 1" : "" }}>
-                      notifications_active
-                    </span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          )
-        })}
+        
+        {/* Abstract Shapes */}
+        <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-white/10 blur-[100px] rounded-full translate-x-1/2 -translate-y-1/2" />
+        <div className="absolute bottom-0 left-0 w-[200px] h-[200px] bg-blue-400/20 blur-[60px] rounded-full -translate-x-1/2 translate-y-1/2" />
       </div>
 
-      <button
-        onClick={() => setShowModal(true)}
-        style={{
-          position: 'fixed',
-          bottom: isMobile ? 'calc(5.75rem + env(safe-area-inset-bottom))' : 32,
-          right: isMobile ? 16 : 24,
-          width: isMobile ? 60 : 56,
-          height: isMobile ? 60 : 56,
-          borderRadius: 16,
-          background: '#b81a36',
-          border: 'none',
-          color: '#fff',
-          fontSize: 28,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          cursor: 'pointer',
-          boxShadow: '0 8px 24px rgba(184,26,54,0.35)',
-          zIndex: 40,
-        }}
-        title="Add Report"
-      >
-        <span className="material-symbols-outlined" style={{ fontSize: 28 }}>
-          add
-        </span>
-      </button>
-
-      {showModal && (
-        <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            background: 'rgba(25,28,30,0.6)',
-            backdropFilter: 'blur(6px)',
-            zIndex: 100,
-            display: 'flex',
-            alignItems: isMobile ? 'flex-end' : 'center',
-            justifyContent: 'center',
-            padding: isMobile ? 0 : 24,
-          }}
-        >
-          <div
-            style={{
-              background: '#fff',
-              borderRadius: isMobile ? '24px 24px 0 0' : 24,
-              width: '100%',
-              maxWidth: 600,
-              maxHeight: isMobile ? '92dvh' : 'min(90vh, 820px)',
-              overflowY: 'auto',
-              padding: '0 0 32px',
-            }}
-          >
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                gap: 12,
-                padding: isMobile ? '18px 16px 14px' : '20px 24px 16px',
-                borderBottom: '1px solid #f1f5f9',
-                position: 'sticky',
-                top: 0,
-                background: '#fff',
-                zIndex: 1,
-              }}
-            >
-              <div>
-                <h2 style={{ fontSize: 20, fontWeight: 800, margin: 0 }}>Report an Incident</h2>
-                <p style={{ fontSize: 13, color: '#737685', margin: '4px 0 0' }}>
-                  Submit a new emergency report with optional evidence photos.
-                </p>
-              </div>
-              <button
-                onClick={() => setShowModal(false)}
-                style={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: '50%',
-                  background: '#f1f5f9',
-                  border: 'none',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0,
-                }}
-              >
-                <span className="material-symbols-outlined" style={{ fontSize: 20 }}>
-                  close
-                </span>
-              </button>
+      {/* Quick Stats & My Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+         <div className="md:col-span-2 bg-white rounded-[32px] p-6 border border-slate-100 shadow-sm">
+            <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6">Incident Radius Analysis</h4>
+            <div className="flex gap-4 overflow-x-auto pb-2 hide-scrollbar">
+               {['All', ...CATEGORIES.map(c => c.label)].map(cat => (
+                 <button 
+                   key={cat}
+                   onClick={() => setActiveCategory(cat)}
+                   className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap ${
+                     activeCategory === cat ? 'bg-blue-700 text-white shadow-lg shadow-blue-700/20' : 'bg-slate-50 text-slate-500 hover:bg-slate-100'
+                   }`}
+                 >
+                   {cat}
+                 </button>
+               ))}
             </div>
+         </div>
+         <div className="bg-slate-900 rounded-[32px] p-6 text-white flex flex-col justify-between">
+            <div>
+               <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">My Reports</h4>
+               <div className="flex items-end gap-3 text-3xl font-black">
+                  {myReports.length}
+                  <span className="text-[10px] font-bold text-green-400 uppercase mb-2 tracking-tighter">● Live Tracking</span>
+               </div>
+            </div>
+            <div className="flex gap-1 h-1.5 mt-4">
+               {[1, 2, 3, 4, 5].map(i => (
+                 <div key={i} className={`flex-1 rounded-full ${i <= myReports.length ? 'bg-blue-500' : 'bg-white/10'}`} />
+               ))}
+            </div>
+         </div>
+      </div>
 
-            <form onSubmit={handleSubmit} style={{ padding: isMobile ? '18px 16px' : '20px 24px', display: 'flex', flexDirection: 'column', gap: 18 }}>
-              {submitError && (
-                <div
-                  style={{
-                    background: '#fef2f2',
-                    border: '1px solid #fecaca',
-                    color: '#b91c1c',
-                    padding: '12px 16px',
-                    borderRadius: 12,
-                    fontSize: 14,
-                    fontWeight: 600,
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: 8,
-                  }}
-                >
-                  <span className="material-symbols-outlined" style={{ fontSize: 18, marginTop: 2 }}>
-                    error
-                  </span>
-                  <div style={{ flex: 1 }}>{submitError}</div>
-                </div>
-              )}
+      {/* Main Content Grid */}
+      <div className="flex flex-col gap-8">
+         <div className="flex justify-between items-center">
+            <h2 className="text-2xl font-black text-slate-900 tracking-tight">Active Community Feed</h2>
+            <div className="relative w-64 hidden md:block">
+               <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
+               <input 
+                 value={search}
+                 onChange={(e) => setSearch(e.target.value)}
+                 type="text" 
+                 placeholder="Search activity..."
+                 className="w-full pl-12 pr-4 py-3 rounded-2xl bg-white border border-slate-200 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-700/5 transition-all"
+               />
+            </div>
+         </div>
 
-              <div>
-                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#434654', marginBottom: 6 }}>
-                  Incident Title *
-                </label>
-                <input
-                  required
-                  value={form.title}
-                  onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))}
-                  placeholder="e.g. Flash Flood on Route 9"
-                  style={{
-                    width: '100%',
-                    padding: '12px 14px',
-                    borderRadius: 12,
-                    border: '1.5px solid #e1e2e4',
-                    fontSize: 15,
-                    fontFamily: 'Inter, sans-serif',
-                    outline: 'none',
-                    boxSizing: 'border-box',
-                  }}
-                />
+         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {loading ? (
+              <div className="col-span-2 py-20 flex flex-col items-center justify-center gap-4">
+                 <span className="material-symbols-outlined animate-spin text-blue-700">progress_activity</span>
+                 <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Synchronizing satellite data</p>
               </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 14 }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#434654', marginBottom: 6 }}>
-                    Category *
-                  </label>
-                  <select
-                    value={form.category}
-                    onChange={(event) => setForm((current) => ({ ...current, category: event.target.value }))}
-                    style={{
-                      width: '100%',
-                      padding: '12px 14px',
-                      borderRadius: 12,
-                      border: '1.5px solid #e1e2e4',
-                      fontSize: 15,
-                      fontFamily: 'Inter, sans-serif',
-                      background: '#fff',
-                      cursor: 'pointer',
-                      boxSizing: 'border-box',
-                    }}
-                  >
-                    {CATEGORIES.map((category) => (
-                      <option key={category.label} value={category.label}>
-                        {category.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#434654', marginBottom: 6 }}>
-                    Severity *
-                  </label>
-                  <select
-                    value={form.severity}
-                    onChange={(event) => setForm((current) => ({ ...current, severity: event.target.value }))}
-                    style={{
-                      width: '100%',
-                      padding: '12px 14px',
-                      borderRadius: 12,
-                      border: '1.5px solid #e1e2e4',
-                      fontSize: 15,
-                      fontFamily: 'Inter, sans-serif',
-                      background: '#fff',
-                      cursor: 'pointer',
-                      boxSizing: 'border-box',
-                    }}
-                  >
-                    {SEVERITY.map((severity) => (
-                      <option key={severity} value={severity}>
-                        {severity}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+            ) : filteredReports.length === 0 ? (
+              <div className="col-span-2 py-20 border-2 border-dashed border-slate-100 rounded-[40px] flex flex-col items-center justify-center text-slate-300">
+                 <span className="material-symbols-outlined text-4xl mb-2">assignment_late</span>
+                 <p className="text-sm font-bold uppercase tracking-widest">No matching incidents</p>
               </div>
-
-              <SmartLocationField value={form.location} onChange={(loc) => setForm((current) => ({ ...current, location: loc }))} />
-
-              <div>
-                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#434654', marginBottom: 6 }}>
-                  Description
-                </label>
-                <textarea
-                  value={form.description}
-                  onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))}
-                  rows={3}
-                  placeholder="Describe the situation, number of people affected, resources needed..."
-                  style={{
-                    width: '100%',
-                    padding: '12px 14px',
-                    borderRadius: 12,
-                    border: '1.5px solid #e1e2e4',
-                    fontSize: 15,
-                    fontFamily: 'Inter, sans-serif',
-                    resize: 'vertical',
-                    outline: 'none',
-                    boxSizing: 'border-box',
-                  }}
-                />
-              </div>
-
-              <div>
-                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#434654', marginBottom: 8 }}>
-                  Evidence Photos
-                </label>
-                <label
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 8,
-                    border: '1.5px dashed #cbd5e1',
-                    borderRadius: 14,
-                    padding: '18px 16px',
-                    cursor: 'pointer',
-                    background: '#f8fafc',
-                    color: '#334155',
-                    fontWeight: 600,
-                    textAlign: 'center',
-                  }}
-                >
-                  <span className="material-symbols-outlined">add_a_photo</span>
-                  Add up to 4 photos
-                  <input type="file" accept="image/*" multiple onChange={handleImageSelection} style={{ display: 'none' }} />
-                </label>
-
-                {selectedImagePreviews.length > 0 && (
-                  <div
-                    style={{
-                      display: 'grid',
-                      gridTemplateColumns: isMobile ? 'repeat(2, minmax(0, 1fr))' : 'repeat(2, 1fr)',
-                      gap: 10,
-                      marginTop: 12,
-                    }}
-                  >
-                    {selectedImagePreviews.map((image) => (
-                      <div key={image.name} style={{ position: 'relative', minWidth: 0 }}>
-                        <img
-                          src={image.url}
-                          alt={image.name}
-                          style={{ width: '100%', height: isMobile ? 120 : 112, objectFit: 'cover', borderRadius: 12 }}
-                        />
-                        <button
-                          type="button"
-                          onClick={() => removeSelectedImage(image.name)}
-                          style={{
-                            position: 'absolute',
-                            top: 8,
-                            right: 8,
-                            width: 28,
-                            height: 28,
-                            borderRadius: '50%',
-                            border: 'none',
-                            background: 'rgba(15,23,42,0.75)',
-                            color: '#fff',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            cursor: 'pointer',
-                          }}
-                        >
-                          <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
-                            close
+            ) : filteredReports.map(report => (
+              <div key={report.id} className="bg-white rounded-[32px] p-8 border border-slate-100 shadow-sm hover:border-blue-200 hover:shadow-xl hover:shadow-blue-700/5 transition-all group flex flex-col gap-6">
+                 <div className="flex justify-between items-start">
+                    <div className="flex gap-4">
+                       <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-xl shrink-0" style={{ backgroundColor: CATEGORIES.find(c => c.label === report.category)?.bg || '#f1f5f9' }}>
+                          <span className="material-symbols-outlined" style={{ color: CATEGORIES.find(c => c.label === report.category)?.color || '#64748b' }}>
+                            {CATEGORIES.find(c => c.label === report.category)?.icon || 'emergency'}
                           </span>
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                       </div>
+                       <div>
+                          <h3 className="font-extrabold text-slate-900 leading-tight mb-1 group-hover:text-blue-700 transition-colors">{report.title}</h3>
+                          <div className="flex items-center gap-2">
+                             <span className="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest" style={{ backgroundColor: severityColors[report.severity]?.bg, color: severityColors[report.severity]?.main }}>
+                                {report.severity}
+                             </span>
+                             <span className="text-[10px] font-bold text-slate-400 uppercase border-l border-slate-200 pl-2">
+                                {report.category}
+                             </span>
+                          </div>
+                       </div>
+                    </div>
+                    <div className="text-right">
+                       <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest underline underline-offset-4 decoration-blue-700/30">
+                          {report.status}
+                       </p>
+                    </div>
+                 </div>
+
+                 {report.imageUrls && report.imageUrls[0] && (
+                   <div className="aspect-video rounded-[24px] overflow-hidden bg-slate-100 border border-slate-100">
+                      <img src={report.imageUrls[0]} className="w-full h-full object-cover" alt="Evidence" />
+                   </div>
+                 )}
+
+                 <p className="text-sm text-slate-600 font-medium leading-relaxed line-clamp-3">
+                   {report.description}
+                 </p>
+
+                 <div className="flex items-center justify-between pt-2 border-t border-slate-50">
+                    <div className="flex items-center gap-2">
+                       <div className="w-8 h-8 rounded-full bg-blue-700 text-white flex items-center justify-center text-[10px] font-bold border-2 border-white shadow-sm overflow-hidden">
+                          {report.userPhotoURL ? <img src={report.userPhotoURL} className="w-full h-full object-cover" /> : getInitials(report.userName)}
+                       </div>
+                       <span className="text-[11px] font-black text-slate-900 uppercase tracking-tight">{report.userName}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-[10px] font-black text-green-600 uppercase tracking-widest">
+                       <span className="material-symbols-outlined text-base">verified</span>
+                       {report.verifiedBy?.length || 0} Confirmed
+                    </div>
+                 </div>
+              </div>
+            ))}
+         </div>
+      </div>
+
+      {/* Report Modal */}
+      {showModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
+           <div className="bg-white rounded-[40px] w-full max-w-[600px] max-h-[90vh] overflow-hidden shadow-2xl flex flex-col animate-in zoom-in-95 duration-500">
+              <div className="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                 <div>
+                   <h2 className="text-xl font-black text-slate-900 leading-none">New Incident Report</h2>
+                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Satellite-linked field submission</p>
+                 </div>
+                 <button onClick={() => setShowModal(false)} className="w-10 h-10 rounded-xl hover:bg-slate-100 flex items-center justify-center transition-colors">
+                    <span className="material-symbols-outlined text-slate-400">close</span>
+                 </button>
               </div>
 
-              <div
-                onClick={() => setForm(f => ({ ...f, isAnonymous: !f.isAnonymous }))}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12,
-                  padding: '14px 16px',
-                  borderRadius: 16,
-                  background: form.isAnonymous ? '#f0f9ff' : '#f8fafc',
-                  border: `1px solid ${form.isAnonymous ? '#bae6fd' : '#e2e8f0'}`,
-                  cursor: 'pointer',
-                  transition: 'all 0.2s'
-                }}
-              >
-                <div style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 12,
-                  background: form.isAnonymous ? '#0052cc' : '#e2e8f0',
-                  color: form.isAnonymous ? '#fff' : '#64748b',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  transition: 'all 0.2s'
-                }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: 20 }}>
-                    {form.isAnonymous ? 'visibility_off' : 'visibility'}
-                  </span>
-                </div>
-                <div style={{ flex: 1 }}>
-                  <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#1e293b' }}>
-                    Post Anonymously
-                  </p>
-                  <p style={{ margin: 0, fontSize: 11, color: '#64748b' }}>
-                    {form.isAnonymous ? `Using alias: @${user?.anonymousHandle || 'Anonymous'}` : 'Your real name and photo will be visible.'}
-                  </p>
-                </div>
-                <div style={{
-                  width: 20,
-                  height: 20,
-                  borderRadius: '50%',
-                  border: `2px solid ${form.isAnonymous ? '#0052cc' : '#cbd5e1'}`,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  background: form.isAnonymous ? '#0052cc' : 'transparent'
-                }}>
-                  {form.isAnonymous && <span className="material-symbols-outlined" style={{ fontSize: 14, color: '#fff' }}>check</span>}
-                </div>
-              </div>
+              <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-8 flex flex-col gap-8 hide-scrollbar">
+                 <div className="flex flex-col gap-2">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Incident Category</label>
+                    <div className="grid grid-cols-3 gap-3">
+                       {CATEGORIES.map(cat => (
+                         <button 
+                           key={cat.label}
+                           type="button"
+                           onClick={() => setForm({ ...form, category: cat.label })}
+                           className={`p-4 rounded-3xl border transition-all flex flex-col items-center gap-2 ${
+                             form.category === cat.label ? 'bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-600/20 scale-105' : 'bg-white border-slate-100 text-slate-400 hover:border-slate-300'
+                           }`}
+                         >
+                            <span className="material-symbols-outlined text-xl">{cat.icon}</span>
+                            <span className="text-[10px] font-black uppercase tracking-tight">{cat.label}</span>
+                         </button>
+                       ))}
+                    </div>
+                 </div>
 
-              <button
-                type="submit"
-                disabled={submitting}
-                style={{
-                  width: '100%',
-                  padding: '16px',
-                  borderRadius: 16,
-                  border: 'none',
-                  background: '#0052cc',
-                  color: '#fff',
-                  fontSize: 16,
-                  fontWeight: 800,
-                  cursor: submitting ? 'not-allowed' : 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 10,
-                  boxShadow: '0 8px 24px rgba(0,82,204,0.25)',
-                  marginTop: 8,
-                  opacity: submitting ? 0.7 : 1,
-                  fontFamily: 'Inter, sans-serif',
-                }}
-              >
-                {submitting && (
-                  <span className="material-symbols-outlined" style={{ fontSize: 18, animation: 'spin 1s linear infinite' }}>
-                    progress_activity
-                  </span>
-                )}
-                <span className="material-symbols-outlined" style={{ fontSize: 18, fontVariationSettings: "'FILL' 1" }}>
-                  crisis_alert
-                </span>
-                Submit Report
-              </button>
-            </form>
-          </div>
+                 <div className="grid grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-2">
+                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Severity Level</label>
+                       <select 
+                         value={form.severity}
+                         onChange={(e) => setForm({ ...form, severity: e.target.value })}
+                         className="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-blue-700/5 transition-all h-14 appearance-none"
+                       >
+                          {SEVERITY.map(s => <option key={s} value={s}>{s}</option>)}
+                       </select>
+                    </div>
+                    <div className="flex flex-col gap-2">
+                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Title</label>
+                       <input 
+                         required
+                         value={form.title}
+                         onChange={(e) => setForm({ ...form, title: e.target.value })}
+                         placeholder="Brief title..."
+                         className="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-blue-700/5 transition-all h-14"
+                       />
+                    </div>
+                 </div>
+
+                 <div className="flex flex-col gap-2">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Precise Location</label>
+                    <SmartLocationField 
+                      value={form.location}
+                      onChange={(loc) => setForm({ ...form, location: loc })}
+                    />
+                 </div>
+
+                 <div className="flex flex-col gap-2">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Situation Description</label>
+                    <textarea 
+                      required
+                      value={form.description}
+                      onChange={(e) => setForm({ ...form, description: e.target.value })}
+                      placeholder="Explain the situation and immediate needs..."
+                      className="w-full p-6 rounded-[32px] bg-slate-50 border border-slate-100 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-700/5 transition-all min-h-[120px] resize-none"
+                    />
+                 </div>
+
+                 <div className="flex flex-col gap-2">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Evidence Photos (Max 4)</label>
+                    <div className="flex gap-4 flex-wrap">
+                       {selectedImages.map((file, i) => (
+                         <div key={i} className="w-20 h-20 rounded-2xl overflow-hidden border border-slate-100 relative group">
+                            <img src={URL.createObjectURL(file)} className="w-full h-full object-cover" />
+                            <button 
+                              type="button"
+                              onClick={() => setSelectedImages(prev => prev.filter((_, idx) => idx !== i))}
+                              className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all"
+                            >
+                               <span className="material-symbols-outlined text-white text-sm">close</span>
+                            </button>
+                         </div>
+                       ))}
+                       {selectedImages.length < 4 && (
+                         <label className="w-20 h-20 rounded-2xl border-2 border-dashed border-slate-200 flex items-center justify-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-all">
+                            <input type="file" hidden accept="image/*" multiple onChange={handleImageSelection} />
+                            <span className="material-symbols-outlined text-slate-300">add_a_photo</span>
+                         </label>
+                       )}
+                    </div>
+                 </div>
+
+                 <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                    <input 
+                      type="checkbox"
+                      checked={form.isAnonymous}
+                      onChange={(e) => setForm({ ...form, isAnonymous: e.target.checked })}
+                      className="w-5 h-5 rounded-md border-slate-300 text-blue-600 focus:ring-blue-600"
+                    />
+                    <div className="flex-1">
+                       <p className="text-xs font-black text-slate-900 uppercase tracking-tight">Post Anonymously</p>
+                       <p className="text-[10px] text-slate-500 font-medium">Your handler ID will be shown instead of your name.</p>
+                    </div>
+                 </div>
+
+                 <div className="flex gap-4 pt-4 border-t border-slate-100">
+                    <button 
+                      type="button"
+                      onClick={() => setShowModal(false)}
+                      className="flex-1 h-16 rounded-3xl bg-slate-100 text-slate-500 font-black uppercase tracking-widest hover:bg-slate-200 transition-all"
+                    >
+                       Cancel
+                    </button>
+                    <button 
+                      disabled={submitting || !form.location}
+                      className="flex-[2] h-16 rounded-3xl bg-blue-700 text-white font-black uppercase tracking-[0.1em] shadow-xl shadow-blue-700/30 hover:bg-blue-800 transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+                    >
+                       {submitting ? 'Submitting...' : 'Confirm Submission'}
+                       {!submitting && <span className="material-symbols-outlined">rocket_launch</span>}
+                    </button>
+                 </div>
+              </form>
+           </div>
         </div>
       )}
-      <style>{`@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}`}</style>
-    </>
+    </div>
   );
 };

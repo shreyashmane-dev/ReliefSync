@@ -5,7 +5,7 @@ import { db } from '../../core/firebase/config';
 import { useStore } from '../../core/store/useStore';
 import { GoogleMap, useJsApiLoader, MarkerF } from '@react-google-maps/api';
 
-const libraries: ("places" | "geometry")[] = ['places'];
+const libraries: ("places" | "geometry" | "visualization")[] = ['places', 'visualization'];
 
 import { BackupRequestModal } from './BackupRequestModal';
 
@@ -27,12 +27,27 @@ export const TaskDetail = () => {
 
   useEffect(() => {
     if (!taskId) return;
-    const unsubscribe = onSnapshot(doc(db, 'reports', taskId), (doc) => {
-      if (doc.exists()) {
-        setTask({ id: doc.id, ...doc.data() });
+    setLoading(true);
+    const unsubscribe = onSnapshot(
+      doc(db, 'reports', taskId), 
+      (snapshot) => {
+        try {
+          if (snapshot.exists()) {
+            setTask({ id: snapshot.id, ...snapshot.data() });
+          } else {
+            console.warn(`Task ${taskId} not found`);
+          }
+        } catch (err) {
+          console.error('Error processing TaskDetail snapshot:', err);
+        } finally {
+          setLoading(false);
+        }
+      },
+      (error) => {
+        console.error('TaskDetail Firestore query failed:', error);
+        setLoading(false);
       }
-      setLoading(false);
-    });
+    );
 
     // Real-time updates thread
     const q = query(
@@ -40,9 +55,19 @@ export const TaskDetail = () => {
       where('taskId', '==', taskId),
       orderBy('createdAt', 'desc')
     );
-    const unsubUpdates = onSnapshot(q, (snap) => {
-      setUpdates(snap.docs.map(d => ({ id: d.id, ...d.data() })));
-    });
+    const unsubUpdates = onSnapshot(
+      q, 
+      (snap) => {
+        try {
+          setUpdates(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+        } catch (err) {
+          console.error('Error processing taskUpdates snapshot:', err);
+        }
+      },
+      (error) => {
+        console.error('taskUpdates Firestore query failed:', error);
+      }
+    );
 
     return () => {
       unsubscribe();
@@ -77,7 +102,7 @@ export const TaskDetail = () => {
         missionStatus: newStatus,
         updatedAt: serverTimestamp(),
       });
-      
+
       // Log update
       await addDoc(collection(db, 'taskUpdates'), {
         taskId,

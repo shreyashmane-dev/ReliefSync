@@ -20,3 +20,36 @@ export const normalizePhoneNumber = (value: string) => {
 
   return cleaned;
 };
+
+type VolunteerAwareUser = {
+  role?: string | null;
+  responderActive?: boolean | null;
+  volunteerRegistered?: boolean | null;
+  isVolunteerApproved?: boolean | null;
+};
+
+export const isVolunteerConsoleEnabled = (user?: VolunteerAwareUser | null) => {
+  if (!user) return false;
+
+  return (
+    user.role === 'volunteer' ||
+    user.responderActive === true ||
+    user.volunteerRegistered === true
+  );
+};
+
+export const canClaimVolunteerJobs = (user?: VolunteerAwareUser | null) => {
+  return user?.volunteerRegistered === true && user?.isVolunteerApproved === true;
+};
+
+export const getVolunteerAccessMessage = (user?: VolunteerAwareUser | null) => {
+  if (user?.volunteerRegistered !== true) {
+    return 'You are not registered as volunteer';
+  }
+
+  if (user?.isVolunteerApproved !== true) {
+    return 'Waiting for approval';
+  }
+
+  return null;
+};

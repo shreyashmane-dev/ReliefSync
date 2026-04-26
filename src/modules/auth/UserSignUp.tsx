@@ -30,7 +30,21 @@ export const UserSignUp = () => {
     try {
       const cred = await createUserWithEmailAndPassword(auth, email, password);
       await updateProfile(cred.user, { displayName: name });
-      const userData = { id: cred.user.uid, name, email, phone: phone || null, role: 'user' as const, impactScore: 0, location: null, createdAt: new Date().toISOString() };
+      const userData = {
+        id: cred.user.uid,
+        name,
+        email,
+        phone: phone || null,
+        role: 'user' as const,
+        responderActive: false,
+        isVolunteerApproved: false,
+        volunteerRegistered: false,
+        isAnonymous: false,
+        anonymousHandle: '',
+        impactScore: 0,
+        location: null,
+        createdAt: new Date().toISOString(),
+      };
       await setDoc(doc(db, 'users', cred.user.uid), userData);
       setUser(userData);
       navigate('/');

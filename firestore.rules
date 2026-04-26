@@ -1,0 +1,96 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Universal Admin Clearance
+    function isAdmin() {
+      return request.auth != null && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    // Standard isAuthenticated check
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Role check helper
+    function hasRole(role) {
+      return isAuthenticated() && (isAdmin() || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == role);
+    }
+
+    // Requirement 3 & 4: Helper to check if user is an approved volunteer
+    function isApprovedVolunteer() {
+      return isAuthenticated() && 
+             exists(/databases/$(database)/documents/volunteers/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/volunteers/$(request.auth.uid)).data.approved == true;
+    }
+
+    // Allow task ownership to be initialized or repaired during the same claim transaction.
+    function canAssignTaskToSelf(taskId) {
+      return isAuthenticated() &&
+             isApprovedVolunteer() &&
+             request.resource.data.volunteerId == request.auth.uid &&
+             getAfter(/databases/$(database)/documents/reports/$(taskId)).data.assignedTo == request.auth.uid;
+    }
+
+    match /reports/{reportId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      
+      allow update: if isAuthenticated() && (
+        // Case 1: Admins can update anything
+        isAdmin() ||
+        
+        // Case 2: Claiming an open report (Volunteers)
+        (resource.data.status == "open" && isApprovedVolunteer()) ||
+        
+        // Case 3: Owner or assigned volunteer updating progress
+        (resource.data.userId == request.auth.uid || resource.data.assignedTo == request.auth.uid) ||
+        
+        // Case 4: Community verification (Allowed for any authenticated user)
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['verifiedBy', 'updatedAt']))
+      );
+    }
+    
+    match /volunteers/{userId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+      allow update: if isAuthenticated() && request.auth.uid == userId;
+    }
+
+    match /tasks/{taskId} {
+      allow read: if isAuthenticated() && (resource.data.volunteerId == request.auth.uid);
+      allow create: if canAssignTaskToSelf(taskId);
+      allow update: if isAuthenticated() && (
+        resource.data.volunteerId == request.auth.uid ||
+        canAssignTaskToSelf(taskId)
+      );
+      allow delete: if isAuthenticated() && resource.data.volunteerId == request.auth.uid;
+    }
+
+    match /taskUpdates/{updateId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && (request.resource.data.volunteerId == request.auth.uid || isApprovedVolunteer());
+    }
+
+    // Admin check against the new isolated collection
+    function isAdmin() {
+      return isAuthenticated() && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    match /admins/{userId} {
+      allow read: if isAuthenticated() && request.auth.uid == userId;
+      // Restrict writes to manual setup in Firebase Console for maximum security
+      allow write: if false; 
+    }
+
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      // Requirement 2: Allow users to update their own role/profile
+      allow write: if isAuthenticated() && request.auth.uid == userId;
+    }
+
+    match /{path=**} {
+      allow read, write: if isAdmin();
+    }
+  }
+}

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useJsApiLoader, Autocomplete, GoogleMap, MarkerF } from '@react-google-maps/api';
 
-const libraries: ("places" | "geometry")[] = ['places'];
+const libraries: ("places" | "geometry" | "visualization")[] = ['places', 'visualization'];
 
 export interface LocationData {
   address: string;

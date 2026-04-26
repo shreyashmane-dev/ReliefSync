@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { onAuthStateChanged } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, onSnapshot } from 'firebase/firestore';
 import { auth, db } from './core/firebase/config';
 import { useStore } from './core/store/useStore';
+import { isVolunteerConsoleEnabled } from './core/utils/user';
 import { Layout } from './shared/Layout';
 import { ReportsHome } from './modules/reports/ReportsHome';
 import { MyReports } from './modules/my-reports/MyReports';
@@ -29,38 +30,106 @@ import { UserSignUp } from './modules/auth/UserSignUp';
 import { PhoneAuth } from './modules/auth/PhoneAuth';
 import { AdminLogin } from './modules/auth/AdminLogin';
 
+// Admin Modules
+import { AdminLayout } from './modules/admin/AdminLayout';
+import { OperationsHub } from './modules/admin/OperationsHub';
+import { AnalyticsMap, PeopleManagement, TrustSafety, BackupCoordination, AICopilot } from './modules/admin/tabs';
+
 const App = () => {
   const { user, setUser } = useStore();
   const [authLoading, setAuthLoading] = useState(true);
+  const isVolunteerMode = isVolunteerConsoleEnabled(user);
 
   // Persist auth state across refreshes using Firebase onAuthStateChanged
   useEffect(() => {
+    let unsubscribeUserProfile: () => void = () => {};
+    let unsubscribeVolunteerProfile: () => void = () => {};
+    let unsubscribeAdminProfile: () => void = () => {};
+
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      unsubscribeUserProfile();
+      unsubscribeVolunteerProfile();
+      unsubscribeAdminProfile();
+
       if (firebaseUser) {
-        try {
-          const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
-          let userData = {
-            id: firebaseUser.uid,
-            name: firebaseUser.displayName || 'User',
-            email: firebaseUser.email || '',
-            role: 'user' as 'user' | 'admin' | 'volunteer',
-            impactScore: 0,
-            location: null
+        const baseUser = {
+          id: firebaseUser.uid,
+          name: firebaseUser.displayName || 'User',
+          email: firebaseUser.email || '',
+          role: 'user' as 'user' | 'admin' | 'volunteer',
+          impactScore: 0,
+          location: null,
+          responderActive: false,
+          isVolunteerApproved: false,
+          volunteerRegistered: false,
+        };
+
+        let userProfileData: Record<string, unknown> = {};
+        let volunteerProfileData: Record<string, unknown> | null = null;
+        let adminProfileData: Record<string, unknown> | null = null;
+
+        const syncUserState = () => {
+          const mergedUser = {
+            ...baseUser,
+            ...userProfileData,
+            role: adminProfileData ? 'admin' : (userProfileData.role || 'user'),
+            volunteerRegistered: volunteerProfileData !== null,
+            isVolunteerApproved: volunteerProfileData?.approved === true,
           };
-          if (userDoc.exists()) {
-            userData = { ...userData, ...userDoc.data() } as any;
-          }
-          setUser(userData);
-        } catch (err) {
-          console.error('Error restoring auth:', err);
-          setUser(null);
-        }
+
+          setUser(mergedUser);
+          setAuthLoading(false);
+        };
+
+        unsubscribeUserProfile = onSnapshot(
+          doc(db, 'users', firebaseUser.uid),
+          (userSnapshot) => {
+            userProfileData = userSnapshot.exists() ? userSnapshot.data() : {};
+            syncUserState();
+          },
+          (error) => {
+            console.error('Error restoring user profile:', error);
+            setUser(null);
+            setAuthLoading(false);
+          },
+        );
+
+        unsubscribeVolunteerProfile = onSnapshot(
+          doc(db, 'volunteers', firebaseUser.uid),
+          (volunteerSnapshot) => {
+            volunteerProfileData = volunteerSnapshot.exists() ? volunteerSnapshot.data() : null;
+            syncUserState();
+          },
+          (error) => {
+            console.error('Error restoring volunteer profile:', error);
+            volunteerProfileData = null;
+            syncUserState();
+          },
+        );
+        unsubscribeAdminProfile = onSnapshot(
+          doc(db, 'admins', firebaseUser.uid),
+          (adminSnapshot) => {
+            adminProfileData = adminSnapshot.exists() ? adminSnapshot.data() : null;
+            syncUserState();
+          },
+          (error) => {
+            console.error('Error restoring admin profile:', error);
+            adminProfileData = null;
+            syncUserState();
+          },
+        );
       } else {
         setUser(null);
+        setAuthLoading(false);
       }
-      setAuthLoading(false);
     });
-    return () => unsubscribe();
+
+    return () => {
+      unsubscribeUserProfile();
+      unsubscribeVolunteerProfile();
+      unsubscribeAdminProfile();
+      unsubscribe();
+    };
   }, [setUser]);
 
   // Show loading spinner while checking auth state
@@ -81,7 +150,9 @@ const App = () => {
     <BrowserRouter>
       {user && <VolunteerOnboarding />}
       <Routes>
-        {/* If user is NOT logged in, route to auth layout */}
+        {/* Public Routes */}
+        <Route path="/auth/admin" element={<AdminLogin />} />
+        
         {!user ? (
           <Route path="/" element={<AuthLayout />}>
             <Route index element={<LandingPage />} />
@@ -89,23 +160,32 @@ const App = () => {
             <Route path="auth/signin" element={<UserSignIn />} />
             <Route path="auth/signup" element={<UserSignUp />} />
             <Route path="auth/phone" element={<PhoneAuth />} />
-            <Route path="auth/admin" element={<AdminLogin />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         ) : (
-          /* If local/volunteer is logged in, route to main layout */
+          /* Main Application Layout */
           <Route path="/" element={<Layout />}>
-            <Route index element={user.role === 'volunteer' ? <VolunteerJobs /> : <ReportsHome />} />
+            <Route index element={isVolunteerMode ? <VolunteerJobs /> : <ReportsHome />} />
             <Route path="my-reports" element={<MyReports />} />
-            <Route path="my-tasks" element={<VolunteerTasks />} />
-            <Route path="my-tasks/:taskId" element={<TaskDetail />} />
-            <Route path="my-tasks/:taskId/complete" element={<CompletionForm />} />
-            <Route path="impact" element={user.role === 'volunteer' ? <VolunteerImpact /> : <Impact />} />
-            <Route path="assistant" element={user.role === 'volunteer' ? <VolunteerAssistant /> : <Assistant />} />
+            <Route path="my-tasks" element={isVolunteerMode ? <VolunteerTasks /> : <Navigate to="/" replace />} />
+            <Route path="my-tasks/:taskId" element={isVolunteerMode ? <TaskDetail /> : <Navigate to="/" replace />} />
+            <Route path="my-tasks/:taskId/complete" element={isVolunteerMode ? <CompletionForm /> : <Navigate to="/" replace />} />
+            <Route path="impact" element={isVolunteerMode ? <VolunteerImpact /> : <Impact />} />
+            <Route path="assistant" element={isVolunteerMode ? <VolunteerAssistant /> : <Assistant />} />
             <Route path="profile" element={<Profile />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         )}
+
+        {/* Admin Command Center - Protected */}
+        <Route path="/admin" element={user?.role === 'admin' ? <AdminLayout /> : <Navigate to="/auth/admin" replace />}>
+          <Route index element={<OperationsHub />} />
+          <Route path="analytics" element={<AnalyticsMap />} />
+          <Route path="people" element={<PeopleManagement />} />
+          <Route path="trust" element={<TrustSafety />} />
+          <Route path="backup" element={<BackupCoordination />} />
+          <Route path="copilot" element={<AICopilot />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );

@@ -1,12 +1,32 @@
+import { useState, useEffect } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
+import { collection, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
+import { db } from '../core/firebase/config';
 import { useStore } from '../core/store/useStore';
-import { getInitials } from '../core/utils/user';
+import { getInitials, isVolunteerConsoleEnabled } from '../core/utils/user';
 
 export const Layout = () => {
   const { pathname } = useLocation();
   const { user } = useStore();
+  const [broadcast, setBroadcast] = useState<any>(null);
 
-  const isVolunteer = user?.role === 'volunteer';
+  useEffect(() => {
+    const q = query(collection(db, 'broadcasts'), orderBy('createdAt', 'desc'), limit(1));
+    const unsub = onSnapshot(q, (snap) => {
+      if (!snap.empty) {
+        const data = snap.docs[0].data();
+        // Only show if less than 1 hour old
+        if (Date.now() - new Date(data.createdAt?.toDate?.() || Date.now()).getTime() < 3600000) {
+          setBroadcast(data);
+          // Auto-hide alert after 10 seconds
+          setTimeout(() => setBroadcast(null), 10000);
+        }
+      }
+    });
+    return () => unsub();
+  }, []);
+
+  const isVolunteer = isVolunteerConsoleEnabled(user);
 
   const navItems = isVolunteer ? [
     { path: '/', icon: 'dashboard', label: 'Jobs' },
@@ -35,6 +55,16 @@ export const Layout = () => {
               <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest leading-none">Field Ops Console</span>
               <span className="text-sm font-bold text-slate-700">Welcome, {user?.name.split(' ')[0]}</span>
             </div>
+          )}
+
+          {user?.role === 'admin' && (
+            <Link to="/admin" className="hidden lg:flex flex-col ml-4 group">
+              <span className="text-[10px] font-black text-red-600 uppercase tracking-widest leading-none group-hover:text-red-700 transition-colors">Strategic Control</span>
+              <span className="text-sm font-bold text-slate-700 group-hover:text-blue-700 transition-colors flex items-center gap-1">
+                Open Command Center
+                <span className="material-symbols-outlined text-sm">open_in_new</span>
+              </span>
+            </Link>
           )}
 
           {/* Desktop Nav */}
@@ -80,7 +110,26 @@ export const Layout = () => {
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-grow w-full max-w-[1200px] mx-auto px-4 md:px-lg py-4 md:py-lg pb-[calc(7rem+env(safe-area-inset-bottom))] md:pb-lg flex flex-col gap-6 md:gap-xxl relative safe-px overflow-x-clip">
+      <main className="flex-grow w-full max-w-[1200px] mx-auto px-4 md:px-lg py-4 md:py-lg pb-[calc(7rem+env(safe-area-inset-bottom))] md:pb-lg flex flex-col gap-4 md:gap-6 relative safe-px overflow-x-clip">
+        {/* Admin Broadcast Alert */}
+        {broadcast && (
+          <div className="bg-red-600 text-white rounded-2xl p-4 shadow-xl shadow-red-600/20 flex items-center gap-4 animate-in slide-in-from-top-10 duration-500">
+            <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+               <span className="material-symbols-outlined text-white">campaign</span>
+            </div>
+            <div className="flex-1">
+               <h4 className="text-[10px] font-black uppercase tracking-widest text-white/80 leading-none mb-1">HQ Broadcast</h4>
+               <p className="text-sm font-bold leading-tight">{broadcast.message}</p>
+            </div>
+            <button 
+              onClick={() => setBroadcast(null)}
+              className="w-8 h-8 rounded-lg hover:bg-black/10 flex items-center justify-center transition-colors"
+            >
+              <span className="material-symbols-outlined text-sm">close</span>
+            </button>
+          </div>
+        )}
+        
         <Outlet />
       </main>
 

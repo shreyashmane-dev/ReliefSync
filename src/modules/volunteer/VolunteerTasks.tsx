@@ -5,7 +5,6 @@ import {
   query,
   where,
   onSnapshot,
-  orderBy,
 } from 'firebase/firestore';
 import { db } from '../../core/firebase/config';
 import { useStore } from '../../core/store/useStore';
@@ -29,27 +28,46 @@ export const VolunteerTasks = () => {
 
     const q = query(
       collection(db, 'reports'),
-      where('assignedTo', '==', user.id),
-      orderBy('updatedAt', 'desc')
+      where('assignedTo', '==', user.id)
     );
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const docs = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      setTasks(docs);
-      setLoading(false);
-    });
+    const unsubscribe = onSnapshot(
+      q, 
+      (snapshot) => {
+        try {
+          const docs = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          }));
+          
+          // Sort client-side to avoid complex indexes
+          const sorted = docs.sort((a: any, b: any) => {
+            const timeA = a.updatedAt?.toDate?.()?.getTime?.() ?? a.assignedAt?.toDate?.()?.getTime?.() ?? 0;
+            const timeB = b.updatedAt?.toDate?.()?.getTime?.() ?? b.assignedAt?.toDate?.()?.getTime?.() ?? 0;
+            return timeB - timeA;
+          });
+          
+          setTasks(sorted);
+        } catch (err) {
+          console.error('Error processing VolunteerTasks snapshot:', err);
+        } finally {
+          setLoading(false);
+        }
+      },
+      (error) => {
+        console.error('VolunteerTasks Firestore query failed:', error);
+        setLoading(false);
+      }
+    );
 
     return () => unsubscribe();
   }, [user?.id]);
 
   const filteredTasks = useMemo(() => {
     if (activeTab === 'active') {
-      return tasks.filter(t => t.status !== 'resolved');
+      return tasks.filter(t => t.status !== 'completed' && t.status !== 'resolved');
     }
-    return tasks.filter(t => t.status === 'resolved');
+    return tasks.filter(t => t.status === 'completed' || t.status === 'resolved');
   }, [tasks, activeTab]);
 
   return (

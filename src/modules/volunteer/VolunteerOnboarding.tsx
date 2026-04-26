@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '../../core/firebase/config';
 import { useStore } from '../../core/store/useStore';
+import { canClaimVolunteerJobs, isVolunteerConsoleEnabled } from '../../core/utils/user';
 
 const TOUR_STEPS = [
   {
@@ -67,7 +68,7 @@ export const VolunteerOnboarding = () => {
 
   useEffect(() => {
     // Show only if volunteer but haven't seen tour
-    if (user?.role === 'volunteer' && !user?.volunteerTourSeen) {
+    if (isVolunteerConsoleEnabled(user) && canClaimVolunteerJobs(user) && !user?.volunteerTourSeen) {
       setIsVisible(true);
     }
   }, [user]);

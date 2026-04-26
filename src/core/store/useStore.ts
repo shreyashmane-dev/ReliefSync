@@ -7,6 +7,8 @@ export interface AppState {
   setIncidents: (incidents: any[]) => void;
   activeTab: string;
   setActiveTab: (tab: string) => void;
+  adminActiveTab: string;
+  setAdminActiveTab: (tab: string) => void;
 }
 
 export const useStore = create<AppState>((set) => ({
@@ -16,4 +18,6 @@ export const useStore = create<AppState>((set) => ({
   setIncidents: (incidents) => set({ incidents }),
   activeTab: 'reports',
   setActiveTab: (activeTab) => set({ activeTab }),
+  adminActiveTab: 'operations',
+  setAdminActiveTab: (adminActiveTab) => set({ adminActiveTab }),
 }));

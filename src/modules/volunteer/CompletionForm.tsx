@@ -45,7 +45,7 @@ export const CompletionForm = () => {
 
       // 3. Update task status to resolved
       await updateDoc(doc(db, 'reports', taskId), {
-        status: 'resolved',
+        status: 'completed',
         missionStatus: 'completed',
         completedAt: serverTimestamp(),
         completionId: completionRef.id,
