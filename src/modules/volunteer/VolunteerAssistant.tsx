@@ -13,24 +13,52 @@ export const VolunteerAssistant = () => {
   const [input, setInput] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     scrollRef.current?.scrollTo(0, scrollRef.current.scrollHeight);
   }, [messages]);
 
-  const handleSend = () => {
-    if (!input.trim()) return;
+  const handleSend = async () => {
+    if (!input.trim() || loading) return;
     const userMsg = { role: 'user', content: input, timestamp: new Date() };
     setMessages(prev => [...prev, userMsg]);
     setInput('');
+    setLoading(true);
     
-    // Simulate AI thinking and reply
-    setTimeout(() => {
+    try {
+      const response = await fetch('/api/chat/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: input }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'AI Service Busy');
+      }
+
+      const data = await response.json();
       setMessages(prev => [...prev, {
           role: 'assistant',
-          content: "I'm analyzing the active operational data and your field request. Based on current protocols, you should prioritize immediate stabilization and request additional water-purification kits. I'll continue to monitor the incident radius for safety escalations.",
+          content: data.reply || 'No response.',
           timestamp: new Date()
       }]);
-    }, 1500);
+    } catch (err) {
+      const message =
+        err instanceof Error && err.message === 'QUOTA_EXCEEDED'
+          ? 'Gemini is rate limited right now. Give it a few seconds, then retry.'
+          : err instanceof Error && err.message?.startsWith('API_ERROR:')
+            ? 'HQ rejected the AI request. Check the server log for the exact Gemini error.'
+            : "I'm having trouble connecting to HQ. Please try again or check your signal.";
+      setMessages(prev => [...prev, {
+          role: 'assistant',
+          content: message,
+          timestamp: new Date()
+      }]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useStore } from '../../core/store/useStore';
 import { auth, db } from '../../core/firebase/config';
-import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { signInWithEmailAndPassword, signInWithRedirect, getRedirectResult, GoogleAuthProvider } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { useIsMobile } from '../../core/hooks/useIsMobile';
 
@@ -14,6 +14,40 @@ export const UserSignIn = () => {
   const { setUser } = useStore();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+
+  useEffect(() => {
+    const handleRedirect = async () => {
+      try {
+        const cred = await getRedirectResult(auth);
+        if (cred) {
+          setLoading(true);
+          const ref = doc(db, 'users', cred.user.uid);
+          const snap = await getDoc(ref);
+          let data = {
+            id: cred.user.uid,
+            name: cred.user.displayName || 'User',
+            email: cred.user.email || '',
+            role: 'user' as const,
+            responderActive: false,
+            isVolunteerApproved: false,
+            volunteerRegistered: false,
+            impactScore: 0,
+            location: null,
+          };
+          if (snap.exists()) data = { ...data, ...snap.data() } as any;
+          else await setDoc(ref, data);
+          setUser(data);
+          navigate('/');
+        }
+      } catch (err: any) {
+        console.error('Redirect Auth Error:', err);
+        setError(err.message || 'Google sign in failed.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    handleRedirect();
+  }, [navigate, setUser]);
 
   const handleSignIn = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -47,27 +81,10 @@ export const UserSignIn = () => {
     setLoading(true);
     setError(null);
     try {
-      const cred = await signInWithPopup(auth, new GoogleAuthProvider());
-      const ref = doc(db, 'users', cred.user.uid);
-      const snap = await getDoc(ref);
-      let data = {
-        id: cred.user.uid,
-        name: cred.user.displayName || 'User',
-        email: cred.user.email || '',
-        role: 'user' as const,
-        responderActive: false,
-        isVolunteerApproved: false,
-        volunteerRegistered: false,
-        impactScore: 0,
-        location: null,
-      };
-      if (snap.exists()) data = { ...data, ...snap.data() } as any;
-      else await setDoc(ref, data);
-      setUser(data);
-      navigate('/');
+      // Switch from Popup to Redirect to solve COOP issues
+      await signInWithRedirect(auth, new GoogleAuthProvider());
     } catch (err: any) {
-      setError(err.message || 'Google sign in failed.');
-    } finally {
+      setError(err.message || 'Google sign in initialization failed.');
       setLoading(false);
     }
   };

@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useStore } from '../../core/store/useStore';
 import { auth, db } from '../../core/firebase/config';
-import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithRedirect, getRedirectResult } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 
 export const AdminLogin = () => {
@@ -12,6 +12,50 @@ export const AdminLogin = () => {
   const [error, setError] = useState<string | null>(null);
   const { setUser } = useStore();
   const navigate = useNavigate();
+  const hasHandledResult = useRef(false);
+
+  useEffect(() => {
+    if (hasHandledResult.current) return;
+    
+    // Standard approach to handle redirect result for COOP-restricted environments
+    const handleResult = async () => {
+      try {
+        const cred = await getRedirectResult(auth);
+        if (cred) {
+          hasHandledResult.current = true;
+          console.log('Redirect Auth successful. Checking registry for UID:', cred.user.uid);
+          setLoading(true);
+          const adminSnap = await getDoc(doc(db, 'admins', cred.user.uid));
+          
+          if (adminSnap.exists()) {
+            const adminData = adminSnap.data();
+            const userData = {
+               id: cred.user.uid,
+               name: cred.user.displayName || adminData.name || 'Admin',
+               email: cred.user.email || 'Admin',
+               role: 'admin' as const,
+               ...adminData
+            };
+            setUser(userData);
+            console.log('Admin verified. Navigating to Command Center...');
+            navigate('/admin');
+          } else {
+            console.warn('Access Denied: UID not found in admins collection:', cred.user.uid);
+            setError(`Access Denied: Your Google UID (${cred.user.uid}) is not in the "admins" collection. Please register this account as an admin.`);
+            // Sign out if they are not an admin to avoid being stuck in a "half-logged" state
+            await auth.signOut();
+            setUser(null);
+          }
+        }
+      } catch (err: any) {
+        console.error('Redirect Auth Error:', err);
+        setError(err.message || 'Authentication redirection failed.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    handleResult();
+  }, [navigate, setUser]);
 
   const handleAdminAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,38 +99,49 @@ export const AdminLogin = () => {
     setLoading(true); setError(null);
     try {
       const provider = new GoogleAuthProvider();
-      const cred = await signInWithPopup(auth, provider);
-      console.log('Google Auth successful. Checking admin registry for UID:', cred.user.uid);
       
-      const adminSnap = await getDoc(doc(db, 'admins', cred.user.uid));
-      
-      if (!adminSnap.exists()) {
-        setError(`Access Denied: Your Google UID (${cred.user.uid}) is not in the "admins" collection.`);
-        setLoading(false);
-        return;
-      }
-      
-      const adminData = adminSnap.data();
-      const userData = {
-        id: cred.user.uid,
-        name: cred.user.displayName || adminData.name || 'Admin',
-        email: cred.user.email || cred.user.email,
-        role: 'admin',
-        ...adminData
-      };
-      
-      setUser(userData);
-      navigate('/admin');
-    } catch (err: any) {
-      console.error('Admin Google Auth failed:', err);
-      if (err.code === 'permission-denied') {
-        setError('Firebase Permission Error: Ensure the "admins" collection exists and rules are published.');
+      // Smart Auth Strategy: 
+      // Use Popup for zero-configuration local development on localhost.
+      // Use Redirect for strict security compliance in production.
+      if (window.location.hostname === 'localhost') {
+        const { signInWithPopup } = await import('firebase/auth');
+        const cred = await signInWithPopup(auth, provider);
+        handleManualAuth(cred); // Reuse logic to check admin registry
       } else {
-        setError(err.message || 'Google Authentication failed.');
+        await signInWithRedirect(auth, provider);
       }
-    } finally {
+    } catch (err: any) {
+      console.error('Admin Google Auth initialization failed:', err);
+      setError(err.message || 'Google Authentication initialization failed.');
       setLoading(false);
     }
+  };
+
+  const handleManualAuth = async (cred: any) => {
+      try {
+          setLoading(true);
+          const adminSnap = await getDoc(doc(db, 'admins', cred.user.uid));
+          if (adminSnap.exists()) {
+            const adminData = adminSnap.data();
+            const userData = {
+               id: cred.user.uid,
+               name: cred.user.displayName || adminData.name || 'Admin',
+               email: cred.user.email || 'Admin',
+               role: 'admin' as const,
+               ...adminData
+            };
+            setUser(userData);
+            navigate('/admin');
+          } else {
+            setError(`Access Denied: Your Google UID (${cred.user.uid}) is not in the "admins" collection.`);
+            await auth.signOut();
+            setUser(null);
+          }
+      } catch (err: any) {
+          setError('Verification failed after login.');
+      } finally {
+          setLoading(false);
+      }
   };
 
   const inp = { width: '100%', background: '#f5f7fa', border: '2px solid transparent', borderRadius: 12, padding: '14px 16px 14px 48px', fontSize: 15, color: '#191c1e', outline: 'none', boxSizing: 'border-box' as const, fontFamily: 'Inter, sans-serif' };

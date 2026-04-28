@@ -47,5 +47,5 @@ export const getGeminiModel = () =>
       model: GEMINI_MODEL,
       generationConfig: GENERATION_CONFIG,
     },
-    { apiVersion: 'v1' }
+    { apiVersion: 'v1beta' }
   );

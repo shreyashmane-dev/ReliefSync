@@ -5,12 +5,14 @@ import { doc, onSnapshot } from 'firebase/firestore';
 import { auth, db } from './core/firebase/config';
 import { useStore } from './core/store/useStore';
 import { isVolunteerConsoleEnabled } from './core/utils/user';
+import { connectSocket, disconnectSocket } from './core/services/socketClient';
 import { Layout } from './shared/Layout';
 import { ReportsHome } from './modules/reports/ReportsHome';
 import { MyReports } from './modules/my-reports/MyReports';
 import { Impact } from './modules/impact/Impact';
 import { Assistant } from './modules/assistant/Assistant';
 import { Profile } from './modules/profile/Profile';
+import AIAssistant from './components/AIAssistant';
 
 // Volunteer Modules
 import { VolunteerJobs } from './modules/volunteer/VolunteerJobs';
@@ -51,6 +53,7 @@ const App = () => {
     let unsubscribeUserProfile: () => void = () => {};
     let unsubscribeVolunteerProfile: () => void = () => {};
     let unsubscribeAdminProfile: () => void = () => {};
+    let notificationsRequestedForUid: string | null = null;
 
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       unsubscribeUserProfile();
@@ -70,17 +73,23 @@ const App = () => {
           volunteerRegistered: false,
         };
 
-        let userProfileData: Record<string, unknown> = {};
+        let userProfileData: Record<string, unknown> | null = null;
         let volunteerProfileData: Record<string, unknown> | null = null;
         let adminProfileData: Record<string, unknown> | null = null;
+        let userLoaded = false;
+        let adminLoaded = false;
 
         const syncUserState = () => {
-          const profileRole = getUserRole(userProfileData['role']);
+          // Wait for both user and admin profiles to be checked before releasing authLoading
+          if (!userLoaded || !adminLoaded) return;
+
+          const profileRole = getUserRole(userProfileData?.['role']);
           const isVolunteerApproved = volunteerProfileData?.['approved'] === true;
 
           const mergedUser = {
             ...baseUser,
-            ...userProfileData,
+            ...(userProfileData || {}),
+            ...(volunteerProfileData || {}),
             role: adminProfileData ? 'admin' : profileRole,
             volunteerRegistered: volunteerProfileData !== null,
             isVolunteerApproved,
@@ -88,18 +97,27 @@ const App = () => {
 
           setUser(mergedUser);
           setAuthLoading(false);
+
+          // Request Push Notification Permissions
+          if (firebaseUser.uid && notificationsRequestedForUid !== firebaseUser.uid) {
+             notificationsRequestedForUid = firebaseUser.uid;
+             import('./core/services/fcmService').then(({ requestFirebaseNotificationPermission }) => {
+                requestFirebaseNotificationPermission(firebaseUser.uid);
+             });
+          }
         };
 
         unsubscribeUserProfile = onSnapshot(
           doc(db, 'users', firebaseUser.uid),
           (userSnapshot) => {
             userProfileData = userSnapshot.exists() ? userSnapshot.data() : {};
+            userLoaded = true;
             syncUserState();
           },
           (error) => {
             console.error('Error restoring user profile:', error);
-            setUser(null);
-            setAuthLoading(false);
+            userLoaded = true;
+            syncUserState();
           },
         );
 
@@ -119,15 +137,18 @@ const App = () => {
           doc(db, 'admins', firebaseUser.uid),
           (adminSnapshot) => {
             adminProfileData = adminSnapshot.exists() ? adminSnapshot.data() : null;
+            adminLoaded = true;
             syncUserState();
           },
           (error) => {
             console.error('Error restoring admin profile:', error);
             adminProfileData = null;
+            adminLoaded = true;
             syncUserState();
           },
         );
       } else {
+        notificationsRequestedForUid = null;
         setUser(null);
         setAuthLoading(false);
       }
@@ -140,6 +161,18 @@ const App = () => {
       unsubscribe();
     };
   }, [setUser]);
+
+  useEffect(() => {
+    if (!user?.id) {
+      disconnectSocket();
+      return;
+    }
+
+    connectSocket(user.id, user.role || 'user');
+    return () => {
+      disconnectSocket();
+    };
+  }, [user?.id, user?.role]);
 
   // Show loading spinner while checking auth state
   if (authLoading) {
@@ -196,6 +229,7 @@ const App = () => {
           <Route path="copilot" element={<AICopilot />} />
         </Route>
       </Routes>
+      {user && <AIAssistant currentUser={user} />}
     </BrowserRouter>
   );
 };

@@ -31,8 +31,14 @@ type VolunteerAwareUser = {
 export const isVolunteerConsoleEnabled = (user?: VolunteerAwareUser | null) => {
   if (!user) return false;
 
+  // Strict role-based access for volunteers
+  if (user.role === 'volunteer') return true;
+  
+  // If role is explicitly something else, they are NOT in volunteer mode
+  if (user.role === 'user' || user.role === 'admin') return false;
+  
+  // Fallback for edge cases where role might be missing but attributes exist
   return (
-    user.role === 'volunteer' ||
     user.responderActive === true ||
     user.volunteerRegistered === true
   );

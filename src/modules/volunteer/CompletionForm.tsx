@@ -4,6 +4,7 @@ import { doc, updateDoc, serverTimestamp, collection, addDoc } from 'firebase/fi
 import { db, storage } from '../../core/firebase/config';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useStore } from '../../core/store/useStore';
+import { getSocket } from '../../core/services/socketClient';
 
 export const CompletionForm = () => {
   const { taskId } = useParams();
@@ -49,6 +50,27 @@ export const CompletionForm = () => {
         missionStatus: 'completed',
         completedAt: serverTimestamp(),
         completionId: completionRef.id,
+        progressNote: `${user.name || 'Responder'} completed the mission and submitted the final field report.`,
+        etaText: 'Mission closed',
+        assignedResponderName: user.name || 'Responder',
+        updatedAt: serverTimestamp(),
+      });
+
+      await addDoc(collection(db, 'taskUpdates'), {
+        taskId,
+        volunteerId: user.id,
+        userName: user.name || 'Responder',
+        type: 'completion',
+        title: 'Responder completed the mission',
+        message: form.description,
+        createdAt: serverTimestamp(),
+      });
+
+      const socket = getSocket();
+      socket?.emit('task_status_update', {
+        taskId,
+        status: 'completed',
+        volunteerId: user.id,
       });
 
       // 4. Update impact points

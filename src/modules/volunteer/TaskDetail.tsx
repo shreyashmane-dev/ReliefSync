@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { doc, onSnapshot, updateDoc, serverTimestamp, collection, addDoc, query, where, orderBy } from 'firebase/firestore';
+import { doc, onSnapshot, updateDoc, serverTimestamp, collection, addDoc, query, where } from 'firebase/firestore';
 import { db } from '../../core/firebase/config';
+import { googleMapsLibraries, googleMapsScriptId } from '../../core/maps/googleMaps';
 import { useStore } from '../../core/store/useStore';
-import { GoogleMap, useJsApiLoader, MarkerF } from '@react-google-maps/api';
-
-const libraries: ("places" | "geometry" | "visualization")[] = ['places', 'visualization'];
+import { getSocket } from '../../core/services/socketClient';
+import { GoogleMap, useJsApiLoader } from '@react-google-maps/api';
+import { AdvancedMarker } from '../../components/AdvancedMarker';
+import { googleMapsMapId } from '../../config/googleMaps';
 
 import { BackupRequestModal } from './BackupRequestModal';
 
@@ -19,11 +21,23 @@ export const TaskDetail = () => {
   const [updates, setUpdates] = useState<any[]>([]);
   const [newUpdate, setNewUpdate] = useState('');
   const [showBackupModal, setShowBackupModal] = useState(false);
+  const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
 
   const { isLoaded } = useJsApiLoader({
+    id: googleMapsScriptId,
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '',
-    libraries,
+    libraries: googleMapsLibraries,
   });
+
+  const getTimestampValue = (value: any) => {
+    if (!value) return 0;
+    if (typeof value.toMillis === 'function') return value.toMillis();
+    if (typeof value.seconds === 'number') return value.seconds * 1000;
+    if (value instanceof Date) return value.getTime();
+
+    const parsed = new Date(value).getTime();
+    return Number.isNaN(parsed) ? 0 : parsed;
+  };
 
   useEffect(() => {
     if (!taskId) return;
@@ -52,14 +66,17 @@ export const TaskDetail = () => {
     // Real-time updates thread
     const q = query(
       collection(db, 'taskUpdates'),
-      where('taskId', '==', taskId),
-      orderBy('createdAt', 'desc')
+      where('taskId', '==', taskId)
     );
     const unsubUpdates = onSnapshot(
       q, 
       (snap) => {
         try {
-          setUpdates(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+          const sortedUpdates = snap.docs
+            .map(d => ({ id: d.id, ...d.data() }))
+            .sort((a: any, b: any) => getTimestampValue(b.createdAt) - getTimestampValue(a.createdAt));
+
+          setUpdates(sortedUpdates);
         } catch (err) {
           console.error('Error processing taskUpdates snapshot:', err);
         }
@@ -97,9 +114,37 @@ export const TaskDetail = () => {
   const updateStatus = async (newStatus: string) => {
     if (!taskId) return;
     setStatusUpdating(true);
+    const responderName = user?.name || 'Responder';
+    const statusContent: Record<string, { progressNote: string; etaText: string; title: string; message: string }> = {
+      assigned: {
+        progressNote: `${responderName} has accepted your report and is preparing for dispatch.`,
+        etaText: 'Dispatch in progress',
+        title: 'Responder assigned',
+        message: `${responderName} is reviewing the situation and preparing to move.`,
+      },
+      in_progress: {
+        progressNote: `${responderName} is actively responding and heading toward the reported location.`,
+        etaText: 'Responder en route',
+        title: 'Responder started field response',
+        message: `${responderName} started the mission and is now moving toward the incident location.`,
+      },
+      completed: {
+        progressNote: `${responderName} marked the mission complete.`,
+        etaText: 'Mission complete',
+        title: 'Mission completed',
+        message: `${responderName} finished the response work for this incident.`,
+      },
+    };
+
+    const statusUpdate = statusContent[newStatus];
     try {
       await updateDoc(doc(db, 'reports', taskId), {
         missionStatus: newStatus,
+        ...(statusUpdate ? {
+          progressNote: statusUpdate.progressNote,
+          etaText: statusUpdate.etaText,
+          assignedResponderName: responderName,
+        } : {}),
         updatedAt: serverTimestamp(),
       });
 
@@ -107,9 +152,19 @@ export const TaskDetail = () => {
       await addDoc(collection(db, 'taskUpdates'), {
         taskId,
         volunteerId: user?.id,
+        userName: responderName,
         type: 'status_update',
         status: newStatus,
+        title: statusUpdate?.title || 'Mission status updated',
+        message: statusUpdate?.message || `${responderName} updated the mission status to ${newStatus.replace('_', ' ')}.`,
         createdAt: serverTimestamp(),
+      });
+
+      const socket = getSocket();
+      socket?.emit('task_status_update', {
+        taskId,
+        status: newStatus,
+        volunteerId: user?.id,
       });
     } catch (err) {
       console.error(err);
@@ -129,6 +184,25 @@ export const TaskDetail = () => {
   if (!task) return <div className="p-8 text-center">Task not found.</div>;
 
   const missionStatus = task.missionStatus || 'assigned';
+  const destinationLat = Number(task.location?.lat);
+  const destinationLng = Number(task.location?.lng);
+  const hasDestinationCoordinates = Number.isFinite(destinationLat) && Number.isFinite(destinationLng);
+  const destinationAddress =
+    typeof task.location === 'string' ? task.location : task.location?.address?.trim();
+
+  const handleNavigate = () => {
+    const destination = hasDestinationCoordinates
+      ? `${destinationLat},${destinationLng}`
+      : destinationAddress;
+
+    if (!destination) {
+      alert('User location is unavailable for this task.');
+      return;
+    }
+
+    const navigationUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}&travelmode=driving`;
+    window.open(navigationUrl, '_blank', 'noopener,noreferrer');
+  };
 
   return (
     <div className="flex flex-col gap-6">
@@ -161,18 +235,39 @@ export const TaskDetail = () => {
 
         {/* Map Section */}
         <div className="h-48 bg-slate-100 relative">
-          {isLoaded && task.location?.lat && (
+          {isLoaded && hasDestinationCoordinates && (
             <GoogleMap
               mapContainerStyle={{ width: '100%', height: '100%' }}
-              center={{ lat: task.location.lat, lng: task.location.lng }}
+              center={{ lat: destinationLat, lng: destinationLng }}
               zoom={15}
-              options={{ disableDefaultUI: true, gestureHandling: 'none' }}
+              onLoad={(map) => {
+                setMapInstance(map);
+              }}
+              options={{ disableDefaultUI: true, gestureHandling: 'none', mapId: googleMapsMapId }}
             >
-              <MarkerF position={{ lat: task.location.lat, lng: task.location.lng }} />
+              <AdvancedMarker
+                map={mapInstance}
+                position={{ lat: destinationLat, lng: destinationLng }}
+                title={task.title || 'Incident location'}
+              >
+                <div
+                  style={{
+                    width: 18,
+                    height: 18,
+                    background: '#2563eb',
+                    border: '2px solid white',
+                    borderRadius: '50%',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+                  }}
+                />
+              </AdvancedMarker>
             </GoogleMap>
           )}
           <div className="absolute top-4 right-4 flex gap-2">
-             <button className="bg-white shadow-md p-2 rounded-lg flex items-center gap-2 text-xs font-bold text-blue-700 active:scale-95 transition-transform">
+             <button
+                onClick={handleNavigate}
+                className="bg-white shadow-md p-2 rounded-lg flex items-center gap-2 text-xs font-bold text-blue-700 active:scale-95 transition-transform"
+             >
                 <span className="material-symbols-outlined text-sm">navigation</span>
                 Navigate
              </button>
