@@ -83,6 +83,27 @@ service cloud.firestore {
       allow write: if isAuthenticated() && request.auth.uid == userId;
     }
 
+    match /notifications/{notificationId} {
+      allow read: if isAuthenticated() && (
+        resource.data.receiverId == request.auth.uid ||
+        resource.data.userId == request.auth.uid ||
+        resource.data.volunteerId == request.auth.uid ||
+        (resource.data.role == 'admin' && isAdmin())
+      );
+      allow update: if isAuthenticated() && (
+        resource.data.receiverId == request.auth.uid ||
+        resource.data.userId == request.auth.uid ||
+        resource.data.volunteerId == request.auth.uid ||
+        isAdmin()
+      );
+      allow create, delete: if isAdmin();
+    }
+
+    match /broadcasts/{broadcastId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
     match /{path=**} {
       allow read, write: if isAdmin();
     }

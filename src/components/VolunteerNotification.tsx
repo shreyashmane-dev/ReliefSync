@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { buildApiUrl } from '../core/config/api';
 import { connectSocket, getSocket } from '../core/services/socketClient';
 
 interface VolunteerNotificationProps {
@@ -97,7 +98,7 @@ export const VolunteerNotification: React.FC<VolunteerNotificationProps> = ({ cu
 
     const fetchNotifications = async () => {
       try {
-        const response = await fetch(`/api/notifications/${currentUser.id}?role=volunteer&limit=20`);
+        const response = await fetch(buildApiUrl(`/api/notifications/${currentUser.id}?role=volunteer&limit=20`));
         if (!response.ok) {
           throw new Error('Unable to load volunteer notifications.');
         }
@@ -201,7 +202,7 @@ export const VolunteerNotification: React.FC<VolunteerNotificationProps> = ({ cu
         response,
       });
     } else {
-      await fetch(`/api/notifications/${notification.notificationId}/respond`, {
+      await fetch(buildApiUrl(`/api/notifications/${notification.notificationId}/respond`), {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

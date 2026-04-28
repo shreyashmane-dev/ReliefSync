@@ -51,6 +51,9 @@ export const Notifications = () => {
               return timeB - timeA;
            });
        });
+    }, (error) => {
+       console.warn('Notification listener unavailable:', error);
+       setNotifications([]);
     }));
 
     if (adminQ) {
@@ -66,6 +69,8 @@ export const Notifications = () => {
                  return timeB - timeA;
               });
           });
+       }, (error) => {
+          console.warn('Admin notification listener unavailable:', error);
        }));
     }
 

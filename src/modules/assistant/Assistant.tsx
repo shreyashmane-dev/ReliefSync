@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
+import { buildApiUrl } from '../../core/config/api';
+import { useStore } from '../../core/store/useStore';
 
 interface Message {
   id: string;
@@ -15,6 +17,7 @@ const SUGGESTIONS = [
 ];
 
 export const Assistant = () => {
+  const { user } = useStore();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -43,10 +46,14 @@ export const Assistant = () => {
     setLoading(true);
 
     try {
-       const response = await fetch('/api/chat/sync', {
+       const response = await fetch(buildApiUrl('/api/chat/sync'), {
          method: 'POST',
          headers: { 'Content-Type': 'application/json' },
-         body: JSON.stringify({ message }),
+         body: JSON.stringify({
+           message,
+           role: user?.role || 'user',
+           userData: user || null,
+         }),
        });
        
        if (!response.ok) {

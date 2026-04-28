@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { geminiService } from '../services/geminiService.js';
+import { vertexIntelligenceService } from '../services/vertexIntelligenceService.js';
 
 const chatRouter = Router();
 
@@ -14,16 +14,18 @@ chatRouter.post('/', async (req, res) => {
     return res.status(400).json({ error: 'Message is required.' });
   }
 
-  if (!process.env.GEMINI_API_KEY) {
-    return res.status(500).json({ error: 'Server is missing GEMINI_API_KEY.' });
-  }
-
   try {
-    const result = await geminiService.chat(message);
-    return res.status(result.ok ? 200 : 503).json({
+    const result = await vertexIntelligenceService.generateRoleCopilotReply({
+      role: req.body?.role || 'user',
+      message,
+      userData: req.body?.userData || {},
+      context: req.body?.context || {},
+    });
+    return res.status(200).json({
       reply: result.reply,
-      error: result.error,
-      code: result.code
+      nextActions: result.nextActions,
+      riskFlags: result.riskFlags,
+      suggestedTools: result.suggestedTools,
     });
   } catch (error) {
     console.error('Gemini chat error:', error);
@@ -39,11 +41,17 @@ chatRouter.post('/', async (req, res) => {
 chatRouter.post('/sync', async (req, res) => {
   const { message } = req.body ?? {};
   try {
-    const result = await geminiService.chat(message);
-    return res.status(result.ok ? 200 : 503).json({
+    const result = await vertexIntelligenceService.generateRoleCopilotReply({
+      role: req.body?.role || 'user',
+      message,
+      userData: req.body?.userData || {},
+      context: req.body?.context || {},
+    });
+    return res.status(200).json({
       reply: result.reply,
-      error: result.error,
-      code: result.code
+      nextActions: result.nextActions,
+      riskFlags: result.riskFlags,
+      suggestedTools: result.suggestedTools,
     });
   } catch (error) {
     return res.status(500).json({ reply: "System busy." });

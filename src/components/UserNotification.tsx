@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { buildApiUrl } from '../core/config/api';
 import { connectSocket, getSocket } from '../core/services/socketClient';
 
 interface UserNotificationProps {
@@ -45,7 +46,7 @@ export const UserNotification: React.FC<UserNotificationProps> = ({ currentUser 
 
     const fetchNotifications = async () => {
       try {
-        const response = await fetch(`/api/notifications/${currentUser.id}?role=user&limit=100`);
+        const response = await fetch(buildApiUrl(`/api/notifications/${currentUser.id}?role=user&limit=100`));
         if (!response.ok) return;
         const data = await response.json();
         setNotifications(data.notifications || []);
@@ -114,7 +115,7 @@ export const UserNotification: React.FC<UserNotificationProps> = ({ currentUser 
           : notification
       )
     );
-    await fetch(`/api/notifications/${notificationId}/read`, { method: 'PUT' }).catch(() => undefined);
+    await fetch(buildApiUrl(`/api/notifications/${notificationId}/read`), { method: 'PUT' }).catch(() => undefined);
   };
 
   return (

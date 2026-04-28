@@ -1,5 +1,4 @@
-import { geminiService } from "../services/geminiService.js";
-import { getGeminiModel } from "../config/gemini.js";
+import { vertexIntelligenceService } from "../services/vertexIntelligenceService.js";
 
 /**
  * Controller for general disaster report analysis (Requirement #4)
@@ -13,7 +12,11 @@ export async function analyzeGenericReport(req, res) {
       return res.status(400).json({ error: "Report text is required" });
     }
 
-    const result = await geminiService.analyzeReport(text);
+    const result = await vertexIntelligenceService.triageIncident({
+      title: 'Mission report',
+      description: text,
+      message: text,
+    });
     res.json(result);
   } catch (error) {
     console.error("AI Generic Analysis Error:", error);
@@ -32,36 +35,20 @@ export async function analyzeReport(req, res) {
       return res.status(400).json({ error: "Message is required" });
     }
 
-    const model = getGeminiModel();
-    const prompt = `
-You are a disaster response AI. 
-Analyze the following report and return ONLY a valid JSON object with these keys: 
-"urgency" (low | medium | high), 
-"emergency_type" (string), 
-"volunteers_needed" (number), 
-"actions" (string), 
-"location_summary" (string).
+    const triage = await vertexIntelligenceService.triageIncident({
+      title: 'Community report',
+      description: message,
+      message,
+    });
 
-Report: ${message}
-`;
-
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    let text = response.text().trim();
-    
-    text = text.replace(/```json/g, '').replace(/```/g, '').trim();
-
-    try {
-      res.json(JSON.parse(text));
-    } catch (parseErr) {
-      res.json({
-         urgency: "medium",
-         emergency_type: "incident",
-         volunteers_needed: 2,
-         actions: "Evaluate situation and maintain safety protocols.",
-         location_summary: "Confirmed report location"
-      });
-    }
+    res.json({
+      urgency: triage.severity,
+      emergency_type: triage.category.toLowerCase(),
+      volunteers_needed: triage.resourceEstimate.volunteers,
+      actions: triage.recommendedActions.join(' '),
+      location_summary: 'Confirmed report location',
+      intelligence: triage,
+    });
   } catch (error) {
     console.error("AI Controller Error:", error);
     res.status(500).json({ error: "AI processing failed" });

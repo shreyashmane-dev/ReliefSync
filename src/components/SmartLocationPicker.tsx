@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Autocomplete, CircleF, GoogleMap, useJsApiLoader } from '@react-google-maps/api';
 import { AdvancedMarker } from './AdvancedMarker';
+import { buildApiUrl } from '../core/config/api';
 import {
   defaultMapCenter,
   googleMapsApiKey,
@@ -159,7 +160,7 @@ export const SmartLocationPicker: React.FC<SmartLocationPickerProps> = ({
     setSaving(true);
     setStatusMessage(null);
     try {
-      const response = await fetch('/api/notifications/volunteers/update-location', {
+      const response = await fetch(buildApiUrl('/api/notifications/volunteers/update-location'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

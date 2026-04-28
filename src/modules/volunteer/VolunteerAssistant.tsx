@@ -1,5 +1,22 @@
 import { useState, useRef, useEffect } from 'react';
 import { useStore } from '../../core/store/useStore';
+import { buildApiUrl } from '../../core/config/api';
+
+const normalizePrompt = (value: string) => value.trim().toLowerCase();
+
+const isVolunteerOpsPrompt = (value: string) => {
+  const text = normalizePrompt(value);
+  return [
+    'find tasks',
+    'my tasks',
+    'done task',
+    'availability',
+    'check availability',
+    'directions',
+    'ask for directions',
+    'my history',
+  ].includes(text);
+};
 
 export const VolunteerAssistant = () => {
   const { user } = useStore();
@@ -19,18 +36,46 @@ export const VolunteerAssistant = () => {
     scrollRef.current?.scrollTo(0, scrollRef.current.scrollHeight);
   }, [messages]);
 
-  const handleSend = async () => {
-    if (!input.trim() || loading) return;
-    const userMsg = { role: 'user', content: input, timestamp: new Date() };
+  const handleSend = async (override?: string) => {
+    const messageToSend = (override ?? input).trim();
+    if (!messageToSend || loading) return;
+    const userMsg = { role: 'user', content: messageToSend, timestamp: new Date() };
     setMessages(prev => [...prev, userMsg]);
     setInput('');
     setLoading(true);
     
     try {
-      const response = await fetch('/api/chat/sync', {
+      if (isVolunteerOpsPrompt(messageToSend) && user?.id) {
+        const response = await fetch(buildApiUrl('/api/ai/intelligence/volunteer-ops'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            volunteerId: user.id,
+            query: messageToSend,
+          }),
+        });
+        const data = await response.json();
+
+        const suggestionText = Array.isArray(data.suggestions) && data.suggestions.length > 0
+          ? `\n\nRelated suggestions:\n${data.suggestions.map((item: string, index: number) => `${index + 1}. ${item}`).join('\n')}`
+          : '';
+
+        setMessages(prev => [...prev, {
+          role: 'assistant',
+          content: `${data.reply || 'No result found.'}${suggestionText}`,
+          timestamp: new Date()
+        }]);
+        return;
+      }
+
+      const response = await fetch(buildApiUrl('/api/chat/sync'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: input }),
+        body: JSON.stringify({
+          message: messageToSend,
+          role: 'volunteer',
+          userData: user || null,
+        }),
       });
 
       if (!response.ok) {
@@ -85,9 +130,10 @@ export const VolunteerAssistant = () => {
 
         <div className="p-4 border-t border-slate-50 bg-slate-50/30 flex flex-col gap-3">
           <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
-            {['Risk Scan', 'Protocol Check', 'Resource Supply', 'Backup Policy'].map(chip => (
+            {['Find Tasks', 'My Tasks', 'Done Task', 'Availability', 'Directions', 'My History'].map(chip => (
                <button 
                 key={chip} 
+                onClick={() => handleSend(chip)}
                 className="px-3 py-1.5 rounded-full bg-white border border-slate-200 text-[10px] font-black text-blue-700 uppercase tracking-widest whitespace-nowrap active:bg-blue-50"
                >
                  {chip}
@@ -104,7 +150,7 @@ export const VolunteerAssistant = () => {
               className="flex-1 bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:border-blue-500 transition-colors shadow-sm"
             />
             <button 
-              onClick={handleSend}
+              onClick={() => handleSend()}
               className="w-12 h-12 rounded-xl bg-blue-700 text-white flex items-center justify-center shadow-lg shadow-blue-700/20 active:scale-95 transition-transform"
             >
               <span className="material-symbols-outlined text-[20px]">send</span>
