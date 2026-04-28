@@ -35,6 +35,12 @@ import { AdminLayout } from './modules/admin/AdminLayout';
 import { OperationsHub } from './modules/admin/OperationsHub';
 import { AnalyticsMap, PeopleManagement, TrustSafety, BackupCoordination, AICopilot } from './modules/admin/tabs';
 
+type UserRole = 'user' | 'admin' | 'volunteer';
+
+const getUserRole = (role: unknown): UserRole => {
+  return role === 'admin' || role === 'volunteer' ? role : 'user';
+};
+
 const App = () => {
   const { user, setUser } = useStore();
   const [authLoading, setAuthLoading] = useState(true);
@@ -69,12 +75,15 @@ const App = () => {
         let adminProfileData: Record<string, unknown> | null = null;
 
         const syncUserState = () => {
+          const profileRole = getUserRole(userProfileData['role']);
+          const isVolunteerApproved = volunteerProfileData?.['approved'] === true;
+
           const mergedUser = {
             ...baseUser,
             ...userProfileData,
-            role: adminProfileData ? 'admin' : (userProfileData.role || 'user'),
+            role: adminProfileData ? 'admin' : profileRole,
             volunteerRegistered: volunteerProfileData !== null,
-            isVolunteerApproved: volunteerProfileData?.approved === true,
+            isVolunteerApproved,
           };
 
           setUser(mergedUser);
