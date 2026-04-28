@@ -13,12 +13,9 @@ export const OperationsHub = () => {
   const [adminAlerts, setAdminAlerts] = useState<any[]>([]);
   
   // Requested state variables
-  const [selectedReport, setSelectedReport] = useState<any>(null);
   const [activeMarkerId, setActiveMarkerId] = useState<string | null>(null);
   const [showAssignPanel, setShowAssignPanel] = useState(false);
   const [assigningToReport, setAssigningToReport] = useState<any>(null);
-  const [nearbyVolunteers, setNearbyVolunteers] = useState<any[]>([]);
-  const [mapZoomed, setMapZoomed] = useState(false);
   const [mapFocus, setMapFocus] = useState<{ lat: number; lng: number } | null>(null);
   const reportRefs = useRef<any>({});
 
@@ -46,7 +43,6 @@ export const OperationsHub = () => {
   }, []);
 
   const handleReportClick = (report: any) => {
-    setSelectedReport(report);
     setActiveMarkerId(report.id);
     setAssigningToReport(report); // Show detail panel on map click too
     if (report.location?.lat && report.location?.lng) {
@@ -264,7 +260,7 @@ export const OperationsHub = () => {
               ) : filteredReports.map((report) => (
                 <div 
                   key={report.id} 
-                  ref={el => reportRefs.current[report.id] = el}
+                  ref={el => { reportRefs.current[report.id] = el; }}
                   onClick={() => {
                     handleReportClick(report);
                     setAssigningToReport(report);
