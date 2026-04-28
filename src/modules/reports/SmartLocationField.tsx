@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useJsApiLoader, Autocomplete, GoogleMap, MarkerF } from '@react-google-maps/api';
-
-const libraries: ("places" | "geometry" | "visualization")[] = ['places', 'visualization'];
+import { useJsApiLoader, Autocomplete, GoogleMap } from '@react-google-maps/api';
+import { AdvancedMarker } from '../../components/AdvancedMarker';
+import { googleMapsLibraries, googleMapsScriptId } from '../../core/maps/googleMaps';
+import { googleMapsMapId } from '../../config/googleMaps';
 
 export interface LocationData {
   address: string;
@@ -16,14 +17,15 @@ interface SmartLocationFieldProps {
 
 export const SmartLocationField: React.FC<SmartLocationFieldProps> = ({ value, onChange }) => {
   const { isLoaded, loadError } = useJsApiLoader({
+    id: googleMapsScriptId,
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '',
-    libraries,
+    libraries: googleMapsLibraries,
   });
 
   const [isOpen, setIsOpen] = useState(false);
   const [addressInput, setAddressInput] = useState(value?.address || '');
+  const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
-  const mapRef = useRef<google.maps.Map | null>(null);
 
   // Default to a wide view if no location is selected
   const defaultCenter = { lat: 20.5937, lng: 78.9629 };
@@ -38,13 +40,6 @@ export const SmartLocationField: React.FC<SmartLocationFieldProps> = ({ value, o
       setIsOpen(false);
     }
   }, [value?.address]);
-
-  // Debugging: Confirm Places API loaded
-  useEffect(() => {
-    if (isLoaded && window.google) {
-      console.log('Google Maps Places Library Loaded:', !!window.google.maps.places);
-    }
-  }, [isLoaded]);
 
   const handlePlaceChanged = () => {
     if (autocompleteRef.current !== null) {
@@ -181,17 +176,32 @@ export const SmartLocationField: React.FC<SmartLocationFieldProps> = ({ value, o
             center={center}
             zoom={value?.lat ? 16 : 4}
             onClick={handleMapClick}
-            onLoad={(map) => { mapRef.current = map; }}
+            onLoad={(map) => { setMapInstance(map); }}
             options={{
               streetViewControl: false,
               mapTypeControl: false,
               fullscreenControl: false,
               zoomControl: true,
               disableDefaultUI: false,
-              gestureHandling: 'greedy'
+              gestureHandling: 'greedy',
+              mapId: googleMapsMapId,
             }}
           >
-            {value?.lat && value?.lng && <MarkerF position={{ lat: value.lat, lng: value.lng }} />}
+            {value?.lat && value?.lng && (
+              <AdvancedMarker 
+                map={mapInstance} 
+                position={{ lat: value.lat, lng: value.lng }} 
+              >
+                <div style={{
+                  width: 16,
+                  height: 16,
+                  background: '#0052cc',
+                  border: '2px solid white',
+                  borderRadius: '50%',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.3)'
+                }} />
+              </AdvancedMarker>
+            )}
           </GoogleMap>
           <div style={{ padding: '10px 14px', background: '#f8f9fb', fontSize: 12, color: '#737685', textAlign: 'center', borderTop: '1px solid #e1e2e4', fontWeight: 500 }}>
             Adjust pin by clicking on the map

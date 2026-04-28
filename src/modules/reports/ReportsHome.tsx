@@ -39,6 +39,8 @@ export const ReportsHome = () => {
   const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [dispatchingVolunteers, setDispatchingVolunteers] = useState(false);
+  const [notificationSummary, setNotificationSummary] = useState<string | null>(null);
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   
   const [form, setForm] = useState<{
@@ -97,19 +99,87 @@ export const ReportsHome = () => {
     e.preventDefault();
     if (!user) return;
     setSubmitting(true);
+    setNotificationSummary(null);
     try {
       const imageUrls = await uploadImages();
-      await addDoc(collection(db, 'reports'), {
+      
+      // AI Analysis
+      let aiAnalysis = null;
+      try {
+        const aiRes = await fetch('/api/ai/ai-analyze', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: form.description }),
+        });
+        if (aiRes.ok) {
+          aiAnalysis = await aiRes.json();
+        }
+      } catch (aiErr) {
+        console.error('AI Analysis failed:', aiErr);
+      }
+
+      const reportData = {
         ...form,
         userId: user.id,
-        userName: form.isAnonymous ? 'Anonymous' : user.name,
-        userPhotoURL: form.isAnonymous ? null : user.photoURL,
+        userName: form.isAnonymous ? 'Anonymous' : (user.name || 'Unknown User'),
+        userPhotoURL: form.isAnonymous ? null : (user.photoURL || null),
         imageUrls,
+        aiAnalysis,
+        location: {
+          ...form.location,
+          area: (form.location as any).address?.split(',')[0] || 'Unknown Area', // Extract first part of address as area
+        },
         status: 'open',
         verifiedBy: [],
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
-      });
+      };
+
+      const reportRef = await addDoc(collection(db, 'reports'), reportData);
+
+      setDispatchingVolunteers(true);
+      try {
+        const notificationResponse = await fetch('/api/notifications/process-report', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            report: {
+              id: reportRef.id,
+              ...reportData,
+              peopleAffected: 0,
+            },
+          }),
+        });
+        const notificationData = await notificationResponse.json().catch(() => ({}));
+        if (notificationResponse.ok) {
+          setNotificationSummary(`Report submitted! ${notificationData.notificationCount || 0} volunteers in your area notified.`);
+        } else {
+          setNotificationSummary('Report submitted, but volunteer notification dispatch needs a retry.');
+        }
+      } catch (notificationError) {
+        console.warn('Volunteer notification processing failed:', notificationError);
+        setNotificationSummary('Report submitted, but volunteer notification dispatch needs a retry.');
+      } finally {
+        setDispatchingVolunteers(false);
+      }
+
+      // 1. Notify in-app (Firestore)
+      if (form.location?.lat && form.location?.lng) {
+        const { createEmergencyNotifications } = await import('../../core/services/notificationService');
+        await createEmergencyNotifications(reportRef.id, { lat: form.location.lat, lng: form.location.lng });
+
+        // 2. Dispatch Push Notifications via Backend
+        try {
+          await fetch('/api/notifications/dispatch', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reportId: reportRef.id, location: form.location }),
+          });
+        } catch (pushErr) {
+          console.warn('Push notification dispatch failed:', pushErr);
+        }
+      }
+
       setShowModal(false);
       setForm({ title: '', category: 'Medical', severity: 'Medium', location: null, description: '', isAnonymous: false });
       setSelectedImages([]);
@@ -132,13 +202,6 @@ export const ReportsHome = () => {
           <p className="text-blue-100 font-medium md:text-lg mb-8 leading-relaxed">
             ReliefSync connects your field observations with emergency responders and AI coordination in real-time.
           </p>
-          <button 
-            onClick={() => setShowModal(true)}
-            className="px-8 py-4 rounded-2xl bg-white text-blue-700 font-black uppercase tracking-[0.1em] hover:bg-blue-50 transition-all shadow-xl active:scale-95 flex items-center gap-3"
-          >
-            <span className="material-symbols-outlined font-bold">add_circle</span>
-            File Incident Report
-          </button>
         </div>
         
         {/* Abstract Shapes */}
@@ -146,7 +209,32 @@ export const ReportsHome = () => {
         <div className="absolute bottom-0 left-0 w-[200px] h-[200px] bg-blue-400/20 blur-[60px] rounded-full -translate-x-1/2 translate-y-1/2" />
       </div>
 
+      {/* Floating Action Button */}
+      <button 
+        onClick={() => setShowModal(true)}
+        className="fixed bottom-8 right-8 z-50 group flex items-center gap-3 px-6 py-4 rounded-full bg-blue-700 text-white shadow-2xl hover:bg-blue-800 hover:scale-105 active:scale-95 transition-all outline-none ring-4 ring-blue-700/20"
+      >
+        <span className="material-symbols-outlined font-black group-hover:rotate-90 transition-transform">add_circle</span>
+        <span className="text-xs font-black uppercase tracking-widest hidden md:block">Report Incident</span>
+        
+        {/* Pulsing Aura */}
+        <div className="absolute inset-0 rounded-full bg-blue-700 animate-ping opacity-20 pointer-events-none" />
+      </button>
+
       {/* Quick Stats & My Overview */}
+      {notificationSummary && (
+        <div className="rounded-[28px] border border-emerald-200 bg-emerald-50 px-6 py-5 text-emerald-900 shadow-sm">
+          <p className="text-[11px] font-black uppercase tracking-widest">Dispatch Update</p>
+          <p className="mt-2 text-sm font-bold">{notificationSummary}</p>
+          {dispatchingVolunteers && (
+            <div className="mt-3 flex items-center gap-2 text-xs font-black uppercase tracking-widest text-emerald-700">
+              <span className="material-symbols-outlined animate-spin text-base">progress_activity</span>
+              Finding nearby volunteers...
+            </div>
+          )}
+        </div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
          <div className="md:col-span-2 bg-white rounded-[32px] p-6 border border-slate-100 shadow-sm">
             <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6">Incident Radius Analysis</h4>
@@ -244,6 +332,30 @@ export const ReportsHome = () => {
                  <p className="text-sm text-slate-600 font-medium leading-relaxed line-clamp-3">
                    {report.description}
                  </p>
+
+                 {report.aiAnalysis && (
+                   <div className="p-4 rounded-2xl bg-blue-50/50 border border-blue-100 flex flex-col gap-3">
+                      <div className="flex justify-between items-center">
+                         <div className="flex items-center gap-2">
+                            <span className="material-symbols-outlined text-blue-600 text-sm">auto_awesome</span>
+                            <span className="text-[10px] font-black uppercase tracking-widest text-blue-700">AI Operational Insights</span>
+                         </div>
+                         <span className={`px-2 py-0.5 rounded-md text-[8px] font-bold uppercase ${report.aiAnalysis.urgency === 'high' ? 'bg-red-100 text-red-600' : 'bg-blue-100 text-blue-600'}`}>
+                            {report.aiAnalysis.urgency} Urgency
+                         </span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                         <div>
+                            <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Recommended Actions</p>
+                            <p className="text-[10px] font-bold text-slate-700 line-clamp-2">{report.aiAnalysis.actions}</p>
+                         </div>
+                         <div className="text-right">
+                            <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Responders Needed</p>
+                            <p className="text-xs font-black text-blue-700">{report.aiAnalysis.volunteers_needed}+</p>
+                         </div>
+                      </div>
+                   </div>
+                 )}
 
                  <div className="flex items-center justify-between pt-2 border-t border-slate-50">
                     <div className="flex items-center gap-2">

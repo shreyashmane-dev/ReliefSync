@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
   collection,
   query,
@@ -10,16 +11,17 @@ import {
   serverTimestamp,
 } from 'firebase/firestore';
 import { db } from '../../core/firebase/config';
+import { googleMapsLibraries, googleMapsScriptId } from '../../core/maps/googleMaps';
 import { useStore } from '../../core/store/useStore';
-import { GoogleMap, useJsApiLoader, HeatmapLayerF } from '@react-google-maps/api';
+import { CircleF, GoogleMap, useJsApiLoader } from '@react-google-maps/api';
+import { FullMapScreen } from '../../components/FullMapScreen';
+import { googleMapsMapId } from '../../config/googleMaps';
 
-const libraries: ("places" | "geometry" | "visualization")[] = ['places', 'visualization'];
-
-const SEVERITY_WEIGHTS: Record<string, number> = {
-  Critical: 3,
-  High: 2,
-  Medium: 1,
-  Low: 1,
+const SEVERITY_ZONE_STYLE: Record<string, { radius: number; fillOpacity: number }> = {
+  Critical: { radius: 900, fillOpacity: 0.28 },
+  High: { radius: 700, fillOpacity: 0.22 },
+  Medium: { radius: 500, fillOpacity: 0.18 },
+  Low: { radius: 360, fillOpacity: 0.14 },
 };
 
 const SEVERITY_COLORS: Record<string, string> = {
@@ -66,31 +68,65 @@ export const VolunteerJobs = () => {
   const [distanceFilter, setDistanceFilter] = useState(50); // km
   const [userLocation, setUserLocation] = useState<{ lat: number, lng: number } | null>(null);
   const [mapView, setMapView] = useState(false);
+  const [showFullMap, setShowFullMap] = useState(false);
+  const [allVolunteers, setAllVolunteers] = useState<any[]>([]);
+  const [locationSavedBanner, setLocationSavedBanner] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user?.id) return;
     
-    // Requirement 1: Fetch volunteer document using current user UID
-    const checkStatus = async () => {
-      try {
-        const status = await getVolunteerStatus(user.id);
-        setVolunteerStatus(status);
-      } catch (err) {
-        console.error('Failed to sync volunteer status:', err);
+    // Requirement 1: Fetch volunteer document and their registered location
+    const unsubscribe = onSnapshot(doc(db, 'volunteers', user.id), (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        setVolunteerStatus({
+          registered: true,
+          approved: data.approved === true
+        });
+        
+        // If they have a registered coverage location, use it as the operational center
+        if (data.location?.lat && data.location?.lng) {
+          console.log('[SYNC] Using registered volunteer location:', data.location);
+          setUserLocation({ lat: data.location.lat, lng: data.location.lng });
+        }
+      } else {
+        setVolunteerStatus({ registered: false, approved: false });
       }
-    };
-    checkStatus();
+    }, (err) => {
+      console.error('Failed to sync volunteer status:', err);
+    });
+
+    return () => unsubscribe();
   }, [user?.id]);
 
   useEffect(() => {
+    // Fallback/Update browser location if not already set by registered profile
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
-          setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+          setUserLocation(prev => {
+            if (prev) return prev; // Keep registered location if exists
+            return { lat: pos.coords.latitude, lng: pos.coords.longitude };
+          });
         },
         (err) => console.warn('Geolocation error:', err)
       );
     }
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, 'volunteers'), (snapshot) => {
+      setAllVolunteers(
+        snapshot.docs.map((entry) => ({
+          id: entry.id,
+          ...entry.data()
+        }))
+      );
+    }, (err) => {
+      console.error('Failed to sync all volunteers:', err);
+    });
+
+    return () => unsubscribe();
   }, []);
 
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
@@ -106,19 +142,21 @@ export const VolunteerJobs = () => {
   };
 
   const { isLoaded } = useJsApiLoader({
+    id: googleMapsScriptId,
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '',
-    libraries,
+    libraries: googleMapsLibraries,
   });
 
-  const heatmapData = useMemo(() => {
-    if (!isLoaded) return [];
+  const mapSignals = useMemo(() => {
     return jobs
       .filter(j => j.location?.lat && j.location?.lng)
       .map(j => ({
-        location: new google.maps.LatLng(j.location.lat, j.location.lng),
-        weight: SEVERITY_WEIGHTS[j.severity] || 1,
+        id: j.id,
+        center: { lat: j.location.lat, lng: j.location.lng },
+        color: SEVERITY_COLORS[j.severity] || SEVERITY_COLORS.Low,
+        zone: SEVERITY_ZONE_STYLE[j.severity] || SEVERITY_ZONE_STYLE.Low,
       }));
-  }, [jobs, isLoaded]);
+  }, [jobs]);
 
   const getTimestampValue = (value: any) => {
     if (!value) return 0;
@@ -140,7 +178,7 @@ export const VolunteerJobs = () => {
 
     const q = query(
       collection(db, 'reports'),
-      where('status', '==', 'open')
+      where('status', 'in', ['open', 'pending', 'notifying'])
     );
 
     const unsubscribe = onSnapshot(
@@ -230,6 +268,9 @@ export const VolunteerJobs = () => {
         transaction.update(jobRef, {
           assignedTo: user.id,
           assignedAt: serverTimestamp(),
+          assignedResponderName: user.name,
+          progressNote: `${user.name || 'A responder'} accepted your report and is preparing the safest route to your location.`,
+          etaText: 'Route check in progress',
           status: 'assigned',
           updatedAt: serverTimestamp(),
           missionStatus: 'assigned',
@@ -240,7 +281,10 @@ export const VolunteerJobs = () => {
         transaction.set(updateRef, {
           taskId: jobId,
           volunteerId: user.id,
+          userName: user.name,
           type: 'claim',
+          title: 'Responder accepted the mission',
+          message: `${user.name || 'A responder'} has taken ownership of this incident and is getting ready to move.`,
           note: `System Audit: Mission claimed by verified responder ${user.name} (UID: ${user.id.slice(0, 8)})`,
           createdAt: serverTimestamp(),
         });
@@ -310,7 +354,31 @@ export const VolunteerJobs = () => {
           </div>
           <div className="flex-1">
             <h4 className="text-sm font-bold text-rose-900">Volunteer Registration Missing</h4>
-            <p className="text-xs text-rose-700">Your account is in volunteer mode, but no matching volunteer document was found. Open Firebase and create `volunteers/&lt;uid&gt;` or re-run the volunteer activation flow.</p>
+            <p className="text-xs text-rose-700">Your account is in volunteer mode, but no matching volunteer document was found in our mission systems.</p>
+            <button 
+              onClick={async () => {
+                if (!user?.id) return;
+                try {
+                  const { setDoc } = await import('firebase/firestore');
+                  await setDoc(doc(db, 'volunteers', user.id), {
+                    id: user.id,
+                    name: user.name,
+                    email: user.email,
+                    photoURL: user.photoURL || null,
+                    approved: user.role === 'volunteer', // If they already have the role, assume they were approved
+                    appliedAt: new Date().toISOString(),
+                    repairedAt: new Date().toISOString()
+                  });
+                  window.location.reload();
+                } catch (err) {
+                  console.error(err);
+                  alert('Repair failed. Please contact admin.');
+                }
+              }}
+              className="mt-2 px-4 py-1.5 bg-rose-600 text-white text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-rose-700 transition-all"
+            >
+              Repair Status
+            </button>
           </div>
         </div>
       )}
@@ -327,27 +395,50 @@ export const VolunteerJobs = () => {
         </div>
       )}
 
+      {locationSavedBanner && (
+        <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-center justify-between gap-4">
+          <div>
+            <h4 className="text-sm font-bold text-emerald-900">Volunteer coverage updated</h4>
+            <p className="text-xs text-emerald-700">{locationSavedBanner}</p>
+          </div>
+          <button
+            onClick={() => setLocationSavedBanner(null)}
+            className="w-8 h-8 rounded-lg hover:bg-emerald-100 flex items-center justify-center transition-colors"
+          >
+            <span className="material-symbols-outlined text-sm text-emerald-700">close</span>
+          </button>
+        </div>
+      )}
 
       <div className="flex justify-between items-center gap-4 flex-wrap">
         <div>
           <h1 className="text-2xl font-extrabold tracking-tight text-on-surface">Operations Console</h1>
           <p className="text-on-surface-variant text-sm mt-1">Discover available high-impact missions in your area.</p>
         </div>
-        <div className="flex bg-slate-100 rounded-xl p-1">
-          <button 
-            onClick={() => setMapView(false)}
-            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ${!mapView ? 'bg-white shadow-[0_4px_12px_rgba(0,0,0,0.05)] text-blue-700' : 'text-slate-400 hover:text-slate-600'}`}
+        <div className="flex items-center gap-3 flex-wrap">
+          <button
+            onClick={() => setShowFullMap(true)}
+            className="px-4 py-2 rounded-xl bg-blue-700 text-white text-xs font-black uppercase tracking-widest shadow-lg shadow-blue-700/20 flex items-center gap-2"
           >
-            <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: !mapView ? "'FILL' 1" : "" }}>reorder</span>
-            Grid View
+            <span className="material-symbols-outlined text-[18px]">map</span>
+            View Map
           </button>
-          <button 
-            onClick={() => setMapView(true)}
-            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ${mapView ? 'bg-white shadow-[0_4px_12px_rgba(0,0,0,0.05)] text-blue-700' : 'text-slate-400 hover:text-slate-600'}`}
-          >
-            <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: mapView ? "'FILL' 1" : "" }}>radar</span>
-            Heatmap
-          </button>
+          <div className="flex bg-slate-100 rounded-xl p-1">
+            <button 
+              onClick={() => setMapView(false)}
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ${!mapView ? 'bg-white shadow-[0_4px_12px_rgba(0,0,0,0.05)] text-blue-700' : 'text-slate-400 hover:text-slate-600'}`}
+            >
+              <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: !mapView ? "'FILL' 1" : "" }}>reorder</span>
+              Grid View
+            </button>
+            <button 
+              onClick={() => setMapView(true)}
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ${mapView ? 'bg-white shadow-[0_4px_12px_rgba(0,0,0,0.05)] text-blue-700' : 'text-slate-400 hover:text-slate-600'}`}
+            >
+              <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: mapView ? "'FILL' 1" : "" }}>radar</span>
+              Heatmap
+            </button>
+          </div>
         </div>
       </div>
 
@@ -385,27 +476,26 @@ export const VolunteerJobs = () => {
                   stylers: [{ saturation: -100 }, { lightness: 10 }]
                 }
               ],
+              mapId: googleMapsMapId,
               disableDefaultUI: true,
               zoomControl: true,
               scrollwheel: true,
             }}
           >
-            <HeatmapLayerF 
-              data={heatmapData}
-              options={{ 
-                radius: 40,
-                opacity: 0.9,
-                gradient: [
-                  'rgba(0, 0, 0, 0)',
-                  'rgba(128, 0, 128, 0.1)',
-                  'rgba(255, 0, 0, 0.4)',
-                  'rgba(255, 69, 0, 0.7)',
-                  'rgba(255, 140, 0, 0.85)',
-                  'rgba(255, 215, 0, 1)',
-                  'rgba(255, 255, 200, 1)'
-                ]
-              }}
-            />
+            {mapSignals.map((signal) => (
+              <CircleF
+                key={signal.id}
+                center={signal.center}
+                radius={signal.zone.radius}
+                options={{
+                  fillColor: signal.color,
+                  fillOpacity: signal.zone.fillOpacity,
+                  strokeColor: signal.color,
+                  strokeOpacity: 0.5,
+                  strokeWeight: 1.5,
+                }}
+              />
+            ))}
           </GoogleMap>
           
           {/* Intelligence Overlays */}
@@ -507,6 +597,8 @@ export const VolunteerJobs = () => {
         />
       </div>
 
+      {/* Location picker moved to profile */}
+
       {loading ? (
         <div className="py-20 flex flex-col items-center justify-center gap-4 text-on-surface-variant">
           <span className="material-symbols-outlined animate-spin text-4xl">progress_activity</span>
@@ -521,12 +613,25 @@ export const VolunteerJobs = () => {
           <p className="text-on-surface-variant text-sm max-w-sm mt-2">{errorMessage}</p>
         </div>
       ) : filteredJobs.length === 0 ? (
-        <div className="py-20 flex flex-col items-center justify-center text-center px-6">
-          <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mb-4">
-            <span className="material-symbols-outlined text-slate-400 text-3xl">radar</span>
+        <div className="py-12 px-8 rounded-[32px] bg-white border border-slate-100 shadow-sm flex items-center gap-8 animate-in fade-in slide-in-from-bottom-4">
+          <div className="w-20 h-20 rounded-3xl bg-slate-50 flex items-center justify-center shrink-0 relative overflow-hidden group">
+            <div className="absolute inset-0 bg-blue-600/5 scale-0 group-hover:scale-100 transition-transform duration-500 rounded-full" />
+            <span className="material-symbols-outlined text-slate-400 text-4xl animate-pulse relative z-10">radar</span>
           </div>
-          <h2 className="text-lg font-bold text-on-surface">No active missions available</h2>
-          <p className="text-on-surface-variant text-sm max-w-xs mt-2">No active missions matching your criteria at this moment.</p>
+          <div className="flex-1">
+            <h2 className="text-xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+              Operational Standby
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            </h2>
+            <p className="text-slate-500 text-sm font-bold mt-1 leading-relaxed">
+              Scanning local frequencies... No active missions match your current filters in this sector. 
+              Try expanding your search radius or adjusting severity levels to find nearby needs.
+            </p>
+          </div>
+          <div className="hidden md:flex flex-col items-end gap-1 shrink-0">
+             <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">Active Scan</span>
+             <span className="text-xs font-bold text-slate-400">Radius: {distanceFilter}km</span>
+          </div>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -615,6 +720,62 @@ export const VolunteerJobs = () => {
       )}
       </>
     )}
+
+    <AnimatePresence>
+      {showFullMap && (
+        <motion.div 
+          initial={{ opacity: 0, y: 100 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 100 }}
+          className="fixed inset-0 z-[200] bg-slate-50 flex flex-col"
+        >
+          {/* Dashboard Header */}
+          <div className="bg-white px-8 py-6 flex items-center justify-between border-b border-slate-100 shadow-sm shrink-0">
+             <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-blue-700 flex items-center justify-center text-white shadow-lg shadow-blue-700/20">
+                   <span className="material-symbols-outlined">map</span>
+                </div>
+                <div>
+                   <h2 className="text-xl font-black text-slate-900 tracking-tight">Geospatial Awareness</h2>
+                   <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Scanning Active Sector</span>
+                   </div>
+                </div>
+             </div>
+             
+             <div className="flex items-center gap-3">
+                <div className="hidden md:flex flex-col items-end mr-4">
+                   <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">Radius: {distanceFilter}km</span>
+                   <span className="text-[10px] font-bold text-slate-400 uppercase">{filteredJobs.length} Missions Identified</span>
+                </div>
+                <button 
+                  onClick={() => setShowFullMap(false)}
+                  className="px-6 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-900 text-xs font-black uppercase tracking-[0.1em] flex items-center gap-2 transition-all group"
+                >
+                  <span className="material-symbols-outlined text-[18px] group-hover:rotate-90 transition-transform">close</span>
+                  Close Console
+                </button>
+             </div>
+          </div>
+
+          {/* Map Surface */}
+          <div className="flex-1 relative">
+             <FullMapScreen
+               currentUser={user}
+               reports={filteredJobs}
+               volunteers={allVolunteers}
+               isFullScreen={true}
+               focusLocation={userLocation}
+               onAssignVolunteer={(report) => {
+                 handleTakeJob(report.id);
+                 setShowFullMap(false);
+               }}
+             />
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   </div>
 );
 };

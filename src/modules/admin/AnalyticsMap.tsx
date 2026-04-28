@@ -1,23 +1,17 @@
 import { useMemo, useState, useEffect } from 'react';
-import { GoogleMap, useJsApiLoader, HeatmapLayerF } from '@react-google-maps/api';
+import { GoogleMap, useJsApiLoader, HeatmapLayer } from '@react-google-maps/api';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../../core/firebase/config';
-
-const libraries: ("places" | "geometry" | "visualization")[] = ['places', 'visualization'];
-
-const SEVERITY_WEIGHTS: Record<string, number> = {
-  Critical: 5,
-  High: 3,
-  Medium: 2,
-  Low: 1,
-};
+import { googleMapsLibraries, googleMapsScriptId } from '../../core/maps/googleMaps';
+import { googleMapsMapId } from '../../config/googleMaps';
 
 export const AnalyticsMap = () => {
   const [timeRange, setTimeRange] = useState('24h');
   const [reports, setReports] = useState<any[]>([]);
   const { isLoaded } = useJsApiLoader({
+    id: googleMapsScriptId,
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '',
-    libraries,
+    libraries: googleMapsLibraries,
   });
 
   useEffect(() => {
@@ -26,29 +20,59 @@ export const AnalyticsMap = () => {
     });
   }, []);
 
-  const heatmapPoints = useMemo(() => {
-    if (!isLoaded) return [];
-    return reports
-      .filter(r => r.location && r.location.lat && r.location.lng)
-      .map(r => ({
-        location: new google.maps.LatLng(r.location.lat, r.location.lng),
-        weight: SEVERITY_WEIGHTS[r.severity] || 1
-      }));
-  }, [isLoaded, reports]);
+  const heatmapData = useMemo(() => {
+    if (!isLoaded || !reports.length) return [];
+    try {
+      return reports
+        .filter(r => r.location && r.location.lat && r.location.lng)
+        .map(r => ({
+          location: new google.maps.LatLng(Number(r.location.lat), Number(r.location.lng)),
+          weight: r.severity === 'Critical' ? 5 : r.severity === 'High' ? 3 : 1
+        }));
+    } catch (e) {
+      console.error('Heatmap Data Error:', e);
+      return [];
+    }
+  }, [reports, isLoaded]);
 
   const mapContainerStyle = {
     width: '100%',
     height: '100%'
   };
 
-  const center = { lat: 18.5204, lng: 73.8567 };
+  // Center based on first available report or default to Pune
+  const initialCenter = useMemo(() => {
+    const firstRep = reports.find(r => r.location?.lat && r.location?.lng);
+    if (firstRep) return { lat: Number(firstRep.location.lat), lng: Number(firstRep.location.lng) };
+    return { lat: 18.5204, lng: 73.8567 };
+  }, [reports]);
+
+  const mapStyles = [
+    {
+      "elementType": "geometry",
+      "stylers": [{ "color": "#0f172a" }] // Deep slate
+    },
+    {
+      "elementType": "labels.icon",
+      "stylers": [{ "visibility": "off" }]
+    },
+    {
+      "elementType": "labels.text.fill",
+      "stylers": [{ "color": "#64748b" }]
+    },
+    {
+       "featureType": "water",
+       "elementType": "geometry",
+       "stylers": [{ "color": "#0ea5e9" }]
+    }
+  ];
 
   return (
     <div className="flex flex-col gap-8 h-[calc(100vh-160px)]">
       <div className="flex justify-between items-start shrink-0">
         <div>
-          <h2 className="text-3xl font-black text-slate-900 tracking-tight">Analytics & Heatmaps</h2>
-          <p className="text-slate-500 font-medium">Predictive risk zones and demand hotspot clustering.</p>
+          <h2 className="text-3xl font-black text-slate-900 tracking-tight">Active Incident Heatmap</h2>
+          <p className="text-slate-500 font-medium">Real-time intensity cluster based on verified registration points.</p>
         </div>
         <div className="flex gap-2 p-1 bg-slate-100 rounded-xl">
           {['24h', '7d', '30d', 'Forecast'].map(range => (
@@ -73,15 +97,25 @@ export const AnalyticsMap = () => {
           {isLoaded ? (
             <GoogleMap
               mapContainerStyle={mapContainerStyle}
-              center={center}
+              center={initialCenter}
               zoom={13}
               options={{
                 styles: mapStyles,
+                mapId: googleMapsMapId,
                 disableDefaultUI: true,
                 zoomControl: true,
               }}
             >
-              <HeatmapLayerF data={heatmapPoints} options={{ radius: 40, opacity: 0.6 }} />
+              {heatmapData.length > 0 && (
+                <HeatmapLayer
+                  data={heatmapData}
+                  options={{
+                    radius: 60,
+                    opacity: 1,
+                    dissipating: true
+                  }}
+                />
+              )}
             </GoogleMap>
           ) : (
             <div className="w-full h-full bg-slate-50 flex items-center justify-center">
@@ -92,12 +126,12 @@ export const AnalyticsMap = () => {
           {/* Map Overlay Controls */}
           <div className="absolute top-6 left-6 flex flex-col gap-2">
              <div className="bg-white/90 backdrop-blur rounded-2xl p-4 shadow-xl border border-slate-100 min-w-[200px]">
-                <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">Layer Intensity</h4>
+                <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">Live Intensity Legend</h4>
                 <div className="flex flex-col gap-3">
                    {[
-                     { label: 'Critical Hotspots', color: '#ba1a1a', count: 12 },
-                     { label: 'Medium Risk Zones', color: '#eab308', count: 42 },
-                     { label: 'Safe Corridors', color: '#22c55e', count: 18 },
+                     { label: 'Critical Reports', color: '#ef4444', count: reports.filter(r => r.severity === 'Critical').length },
+                     { label: 'High Priority', color: '#f97316', count: reports.filter(r => r.severity === 'High').length },
+                     { label: 'Active Incidents', color: '#3b82f6', count: reports.length },
                    ].map(layer => (
                      <div key={layer.label} className="flex items-center gap-3">
                         <div className="w-2 h-2 rounded-full" style={{ backgroundColor: layer.color }}></div>
@@ -137,61 +171,8 @@ export const AnalyticsMap = () => {
                  Run Flood Simulation
               </button>
            </div>
-
-           <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
-              <h4 className="text-sm font-black text-slate-900 uppercase tracking-widest mb-4">Performance Metrics</h4>
-              <div className="grid grid-cols-2 gap-4">
-                 <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 text-center">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Avg Response</p>
-                    <h5 className="text-lg font-black text-slate-900">4.2m</h5>
-                 </div>
-                 <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 text-center">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Uptime</p>
-                    <h5 className="text-lg font-black text-slate-900">99.9%</h5>
-                 </div>
-              </div>
-           </div>
         </div>
       </div>
     </div>
   );
 };
-
-const mapStyles = [
-  {
-    "elementType": "geometry",
-    "stylers": [{ "color": "#f5f5f5" }]
-  },
-  {
-    "elementType": "labels.icon",
-    "stylers": [{ "visibility": "off" }]
-  },
-  {
-    "elementType": "labels.text.fill",
-    "stylers": [{ "color": "#616161" }]
-  },
-  {
-    "elementType": "labels.text.stroke",
-    "stylers": [{ "color": "#f5f5f5" }]
-  },
-  {
-    "featureType": "administrative.land_parcel",
-    "elementType": "labels.text.fill",
-    "stylers": [{ "color": "#bdbdbd" }]
-  },
-  {
-    "featureType": "poi",
-    "elementType": "geometry",
-    "stylers": [{ "color": "#eeeeee" }]
-  },
-  {
-    "featureType": "water",
-    "elementType": "geometry",
-    "stylers": [{ "color": "#e9e9e9" }]
-  },
-  {
-    "featureType": "water",
-    "elementType": "labels.text.fill",
-    "stylers": [{ "color": "#9e9e9e" }]
-  }
-];

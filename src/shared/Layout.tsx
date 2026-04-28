@@ -4,6 +4,9 @@ import { collection, query, orderBy, limit, onSnapshot } from 'firebase/firestor
 import { db } from '../core/firebase/config';
 import { useStore } from '../core/store/useStore';
 import { getInitials, isVolunteerConsoleEnabled } from '../core/utils/user';
+import { Notifications } from './Notifications';
+import { VolunteerNotification } from '../components/VolunteerNotification';
+import { UserNotification } from '../components/UserNotification';
 
 export const Layout = () => {
   const { pathname } = useLocation();
@@ -15,10 +18,8 @@ export const Layout = () => {
     const unsub = onSnapshot(q, (snap) => {
       if (!snap.empty) {
         const data = snap.docs[0].data();
-        // Only show if less than 1 hour old
         if (Date.now() - new Date(data.createdAt?.toDate?.() || Date.now()).getTime() < 3600000) {
           setBroadcast(data);
-          // Auto-hide alert after 10 seconds
           setTimeout(() => setBroadcast(null), 10000);
         }
       }
@@ -27,22 +28,25 @@ export const Layout = () => {
   }, []);
 
   const isVolunteer = isVolunteerConsoleEnabled(user);
+  const notificationBell =
+    user?.role === 'admin'
+      ? <Notifications />
+      : isVolunteer
+        ? <VolunteerNotification currentUser={user} />
+        : <UserNotification currentUser={user} />;
 
   const navItems = isVolunteer ? [
     { path: '/', icon: 'dashboard', label: 'Jobs' },
     { path: '/my-tasks', icon: 'task', label: 'My Tasks' },
     { path: '/impact', icon: 'analytics', label: 'Impact' },
-    { path: '/assistant', icon: 'smart_toy', label: 'AI Assistant' },
   ] : [
     { path: '/', icon: 'assignment', label: 'Reports' },
     { path: '/my-reports', icon: 'folder_shared', label: 'My Reports' },
     { path: '/impact', icon: 'analytics', label: 'Impact' },
-    { path: '/assistant', icon: 'smart_toy', label: 'AI Assistant' },
   ];
 
   return (
     <div className="bg-background text-on-background font-body-md min-h-[100dvh] flex flex-col antialiased overflow-x-clip">
-      {/* TopAppBar */}
       <header className="bg-white/95 dark:bg-slate-900/95 backdrop-blur w-full sticky top-0 z-50 border-b border-slate-100 dark:border-slate-800 shadow-sm dark:shadow-none font-sans text-base font-semibold">
         <div className="flex justify-between items-center px-4 md:px-6 py-3 w-full max-w-[1200px] mx-auto gap-3 safe-px">
           <div className="flex items-center gap-md">
@@ -53,7 +57,7 @@ export const Layout = () => {
           {isVolunteer && (
             <div className="hidden lg:flex flex-col ml-4">
               <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest leading-none">Field Ops Console</span>
-              <span className="text-sm font-bold text-slate-700">Welcome, {user?.name.split(' ')[0]}</span>
+              <span className="text-sm font-bold text-slate-700">Welcome, {user?.name?.split(' ')[0] || 'User'}</span>
             </div>
           )}
 
@@ -67,7 +71,6 @@ export const Layout = () => {
             </Link>
           )}
 
-          {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-lg">
             {navItems.map((item) => {
               const isActive = pathname === item.path || (item.path !== '/' && pathname.startsWith(item.path));
@@ -89,9 +92,7 @@ export const Layout = () => {
           </nav>
 
           <div className="flex items-center gap-sm shrink-0">
-            <button className="hidden sm:flex w-10 h-10 rounded-full bg-surface-container-high items-center justify-center hover:bg-surface-container-highest transition-colors">
-              <span className="material-symbols-outlined text-on-surface-variant">notifications</span>
-            </button>
+            {notificationBell}
             <Link to="/profile">
               {user?.photoURL ? (
                 <img
@@ -109,9 +110,7 @@ export const Layout = () => {
         </div>
       </header>
 
-      {/* Main Content Area */}
       <main className="flex-grow w-full max-w-[1200px] mx-auto px-4 md:px-lg py-4 md:py-lg pb-[calc(7rem+env(safe-area-inset-bottom))] md:pb-lg flex flex-col gap-4 md:gap-6 relative safe-px overflow-x-clip">
-        {/* Admin Broadcast Alert */}
         {broadcast && (
           <div className="bg-red-600 text-white rounded-2xl p-4 shadow-xl shadow-red-600/20 flex items-center gap-4 animate-in slide-in-from-top-10 duration-500">
             <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
@@ -133,7 +132,6 @@ export const Layout = () => {
         <Outlet />
       </main>
 
-      {/* BottomNavBar (Mobile Only) */}
       <nav className="md:hidden bg-white/95 dark:bg-slate-900/95 backdrop-blur border-t border-slate-100 dark:border-slate-800 shadow-[0_-2px_16px_rgba(15,23,42,0.08)] fixed bottom-0 left-0 w-full flex justify-around items-stretch px-2 pt-2 pb-[calc(1rem+env(safe-area-inset-bottom))] z-50 font-sans text-[10px] font-bold uppercase tracking-[0.08em] safe-px">
         {navItems.map((item) => {
           const isActive = pathname === item.path || (item.path !== '/' && pathname.startsWith(item.path));
@@ -141,7 +139,7 @@ export const Layout = () => {
             <Link
               key={item.path}
               to={item.path}
-              className={`flex flex-col items-center justify-center transition-all active:scale-90 duration-200 w-1/4 min-w-0 min-h-[60px] ${
+              className={`flex flex-col items-center justify-center transition-all active:scale-90 duration-200 flex-1 min-w-0 min-h-[60px] ${
                 isActive
                   ? 'text-blue-700 dark:text-blue-400 bg-blue-50/70 dark:bg-blue-900/20 rounded-xl px-2 py-2'
                   : 'text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-300'

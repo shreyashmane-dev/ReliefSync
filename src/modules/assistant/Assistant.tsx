@@ -43,15 +43,30 @@ export const Assistant = () => {
     setLoading(true);
 
     try {
-       const response = await fetch('/api/chat', {
+       const response = await fetch('/api/chat/sync', {
          method: 'POST',
          headers: { 'Content-Type': 'application/json' },
          body: JSON.stringify({ message }),
        });
+       
+       if (!response.ok) {
+         const errorData = await response.json().catch(() => ({}));
+         throw new Error(errorData.error || 'Server error');
+       }
+
        const data = await response.json();
        setMessages(prev => prev.map(m => m.id === botId ? { ...m, text: data.reply || 'No response.', streaming: false } : m));
-    } catch (err) {
-       setMessages(prev => prev.map(m => m.id === botId ? { ...m, text: 'Service busy. Please try again.', streaming: false } : m));
+    } catch (err: any) {
+       console.error('Chat error:', err);
+       const errorText =
+         err.message === 'Server is missing GEMINI_API_KEY.'
+           ? 'AI system is offline (Check API Key).'
+           : err.message === 'QUOTA_EXCEEDED'
+             ? 'Gemini is rate limited right now. Wait a few seconds and try again.'
+             : err.message?.startsWith('API_ERROR:')
+               ? 'Gemini rejected the request. Check the server log for the exact API response.'
+               : 'Service busy. Please try again.';
+       setMessages(prev => prev.map(m => m.id === botId ? { ...m, text: errorText, streaming: false } : m));
     } finally {
        setLoading(false);
     }
