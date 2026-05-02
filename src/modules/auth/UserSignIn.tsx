@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useStore } from '../../core/store/useStore';
 import { auth, db } from '../../core/firebase/config';
-import { signInWithEmailAndPassword, signInWithRedirect, getRedirectResult, GoogleAuthProvider } from 'firebase/auth';
+import { signInWithEmailAndPassword, signInWithRedirect, getRedirectResult, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { useIsMobile } from '../../core/hooks/useIsMobile';
 
@@ -69,7 +69,6 @@ export const UserSignIn = () => {
       // Use Popup for zero-configuration local development on localhost.
       // Use Redirect for strict security compliance in production.
       if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        const { signInWithPopup } = await import('firebase/auth');
         const cred = await signInWithPopup(auth, provider);
         if (cred) {
           await handleUserRegistration(cred);
