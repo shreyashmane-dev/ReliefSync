@@ -2,8 +2,9 @@ import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { signOut, updateProfile, RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
 import type { ConfirmationResult } from 'firebase/auth';
-import { collection, onSnapshot, query, where, doc, updateDoc } from 'firebase/firestore';
-import { auth, db } from '../../core/firebase/config';
+import { collection, onSnapshot, query, where, doc, updateDoc, setDoc } from 'firebase/firestore';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { auth, db, storage } from '../../core/firebase/config';
 import { useStore } from '../../core/store/useStore';
 import { 
   computeImpactPoints, 
@@ -34,6 +35,7 @@ export const Profile = () => {
   const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const recaptchaContainerRef = useRef<HTMLDivElement>(null);
   const recaptchaVerifierRef = useRef<RecaptchaVerifier | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Settings States
   const [darkMode, setDarkMode] = useState(document.documentElement.classList.contains('dark'));
@@ -108,6 +110,59 @@ export const Profile = () => {
     } catch (error) {
       console.error('Error updating profile:', error);
     } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handlePhotoClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !auth.currentUser || !user?.id) return;
+
+    // Basic validation
+    if (!file.type.startsWith('image/')) {
+      alert('Please upload an image file.');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) { // 5MB limit
+      alert('File size too large. Please upload an image under 5MB.');
+      return;
+    }
+
+    setIsUpdating(true);
+    try {
+      const storageRef = ref(storage, `profiles/${user.id}/${Date.now()}_${file.name}`);
+      const uploadTask = uploadBytesResumable(storageRef, file);
+
+      uploadTask.on(
+        'state_changed',
+        null,
+        (error) => {
+          console.error('Upload error:', error);
+          alert('Failed to upload image.');
+          setIsUpdating(false);
+        },
+        async () => {
+          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+          
+          // Update Firebase Auth profile
+          await updateProfile(auth.currentUser!, { photoURL: downloadURL });
+          
+          // Update Firestore user document
+          const userRef = doc(db, 'users', user.id);
+          await updateDoc(userRef, { photoURL: downloadURL });
+          
+          // Update local store
+          setUser({ ...user, photoURL: downloadURL });
+          setIsUpdating(false);
+        }
+      );
+    } catch (error) {
+      console.error('Error in handlePhotoChange:', error);
       setIsUpdating(false);
     }
   };
@@ -278,7 +333,7 @@ export const Profile = () => {
           
           <div className="flex flex-col md:flex-row items-center gap-12 text-center md:text-left">
             <div className="relative group">
-              <div className="w-40 h-40 rounded-full border-[12px] border-slate-50 dark:border-slate-800 shadow-2xl overflow-hidden bg-slate-100 transition-transform duration-700 group-hover:scale-105">
+              <div className="w-40 h-40 rounded-full border-[12px] border-slate-50 dark:border-slate-800 shadow-2xl overflow-hidden bg-slate-100 transition-transform duration-700 group-hover:scale-105 relative">
                 {user?.photoURL ? (
                   <img src={user.photoURL} className="w-full h-full object-cover" alt="Profile" />
                 ) : (
@@ -286,20 +341,40 @@ export const Profile = () => {
                     {getInitials(user?.name)}
                   </div>
                 )}
+                {isUpdating && (
+                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center backdrop-blur-sm">
+                    <span className="material-symbols-outlined text-white animate-spin">sync</span>
+                  </div>
+                )}
               </div>
               <button 
-                onClick={() => setIsEditing(!isEditing)}
-                className="absolute bottom-2 right-2 w-12 h-12 rounded-full bg-white dark:bg-slate-800 shadow-2xl flex items-center justify-center text-blue-600 border border-slate-100 dark:border-slate-700 hover:bg-blue-600 hover:text-white transition-all transform hover:rotate-12"
+                onClick={handlePhotoClick}
+                className="absolute bottom-2 right-2 w-12 h-12 rounded-full bg-blue-600 text-white shadow-2xl flex items-center justify-center border-4 border-white dark:border-slate-900 hover:scale-110 transition-all transform"
               >
-                <span className="material-symbols-outlined text-2xl">{isEditing ? 'close' : 'edit'}</span>
+                <span className="material-symbols-outlined text-xl">add_a_photo</span>
               </button>
+              <input 
+                type="file"
+                ref={fileInputRef}
+                onChange={handlePhotoChange}
+                accept="image/*"
+                style={{ display: 'none' }}
+              />
             </div>
 
             <div className="flex-1 space-y-6">
               <AnimatePresence mode="wait">
                 {!isEditing ? (
                   <motion.div key="view" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}>
-                    <h2 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight leading-none mb-4">{user?.name || 'Identity Unknown'}</h2>
+                    <div className="flex items-center gap-4 mb-4">
+                      <h2 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight leading-none">{user?.name || 'Identity Unknown'}</h2>
+                      <button 
+                        onClick={() => setIsEditing(true)}
+                        className="w-10 h-10 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-blue-600 transition-colors"
+                      >
+                        <span className="material-symbols-outlined text-xl">edit</span>
+                      </button>
+                    </div>
                     <div className="flex items-center gap-4 justify-center md:justify-start">
                        <div className="flex items-center gap-1.5 text-slate-400 font-black uppercase tracking-[0.2em] text-[10px]">
                          <span className="material-symbols-outlined text-blue-600 text-lg">location_on</span>

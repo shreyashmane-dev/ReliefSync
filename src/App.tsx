@@ -65,6 +65,7 @@ const App = () => {
           id: firebaseUser.uid,
           name: firebaseUser.displayName || 'User',
           email: firebaseUser.email || '',
+          photoURL: firebaseUser.photoURL || null,
           role: 'user' as 'user' | 'admin' | 'volunteer',
           impactScore: 0,
           location: null,
