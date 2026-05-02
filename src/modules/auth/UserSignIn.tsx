@@ -20,24 +20,7 @@ export const UserSignIn = () => {
       try {
         const cred = await getRedirectResult(auth);
         if (cred) {
-          setLoading(true);
-          const ref = doc(db, 'users', cred.user.uid);
-          const snap = await getDoc(ref);
-          let data = {
-            id: cred.user.uid,
-            name: cred.user.displayName || 'User',
-            email: cred.user.email || '',
-            role: 'user' as const,
-            responderActive: false,
-            isVolunteerApproved: false,
-            volunteerRegistered: false,
-            impactScore: 0,
-            location: null,
-          };
-          if (snap.exists()) data = { ...data, ...snap.data() } as any;
-          else await setDoc(ref, data);
-          setUser(data);
-          navigate('/');
+          await handleUserRegistration(cred);
         }
       } catch (err: any) {
         console.error('Redirect Auth Error:', err);
@@ -81,10 +64,50 @@ export const UserSignIn = () => {
     setLoading(true);
     setError(null);
     try {
-      // Switch from Popup to Redirect to solve COOP issues
-      await signInWithRedirect(auth, new GoogleAuthProvider());
+      const provider = new GoogleAuthProvider();
+      // Smart Auth Strategy: 
+      // Use Popup for zero-configuration local development on localhost.
+      // Use Redirect for strict security compliance in production.
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        const { signInWithPopup } = await import('firebase/auth');
+        const cred = await signInWithPopup(auth, provider);
+        if (cred) {
+          await handleUserRegistration(cred);
+        }
+      } else {
+        await signInWithRedirect(auth, provider);
+      }
     } catch (err: any) {
-      setError(err.message || 'Google sign in initialization failed.');
+      console.error('Google Auth Error:', err);
+      setError(err.message || 'Google sign in failed.');
+      setLoading(false);
+    }
+  };
+
+  const handleUserRegistration = async (cred: any) => {
+    try {
+      setLoading(true);
+      const ref = doc(db, 'users', cred.user.uid);
+      const snap = await getDoc(ref);
+      let data = {
+        id: cred.user.uid,
+        name: cred.user.displayName || 'User',
+        email: cred.user.email || '',
+        role: 'user' as const,
+        responderActive: false,
+        isVolunteerApproved: false,
+        volunteerRegistered: false,
+        impactScore: 0,
+        location: null,
+      };
+      if (snap.exists()) data = { ...data, ...snap.data() } as any;
+      else await setDoc(ref, data);
+      setUser(data);
+      navigate('/');
+    } catch (err: any) {
+      console.error('Registration Error:', err);
+      setError('Failed to sync user data after login.');
+    } finally {
       setLoading(false);
     }
   };
