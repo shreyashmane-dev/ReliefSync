@@ -6,3 +6,4 @@
 - Refined repository metadata. (2026-08-04 16:06:47.976135)
 - Added maintenance update. (2026-08-07 06:59:21.105613)
 - Minor documentation improvements. (2026-08-07 14:44:18.416181)
+- Minor documentation improvements. (2026-08-24 14:31:52.540848)
